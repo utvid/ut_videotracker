@@ -1,0 +1,4 @@
+Folder structuur
+
+Proefpersoon -->  Video		---> instructie videos 
+		  Calibration	---> kalibratie videos
