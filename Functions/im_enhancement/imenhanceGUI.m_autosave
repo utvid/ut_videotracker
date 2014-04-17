@@ -28,6 +28,8 @@ enhanceFigure = figure(	'Color',[1 1 1],...
 
 handles.hax1 = axes('Parent',enhanceFigure,'position',[0 0.4 0.5 0.5]);
 handles.hax2 = axes('Parent',enhanceFigure,'position',[0.5 0.4 0.5 0.5]);
+if strcmp(utvid.version,'R2012')
+image = 
 handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.center(1,1)).name]),1));
 handles.J = [];
 axes(handles.hax1);imshow(handles.I);title('Original Image');

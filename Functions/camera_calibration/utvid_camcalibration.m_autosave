@@ -48,16 +48,14 @@ function [K, R, T, P,Ximage,avgEr,stdEr] = ut_camera_calibration_cube2(Ximage, v
 
 testing = false;
 
-figure(100); imshow(Ximage); title('Cube image');
+h = figure(100); imshow(Ximage,[]); title('Cube image');
 set(gca,'YDir','normal');
 if ~testing
     %Lets user select point after point
     Ximage = [];
     for i=1:27
-%        imEx = imread(['U:\My Documents\Tracking\Functions\Calibration\cube_images\cube_' num2str(i) '.jpg']);        
-       % figure(2); imshow(imEx);
         title('Select a point and press ENTER');
-        [Xim, Yim] = getpts(100);   
+        [Xim, Yim] = getpts(h)  
         Ximage = [Ximage, [Xim(1); Yim(1)]];
     end    
 else

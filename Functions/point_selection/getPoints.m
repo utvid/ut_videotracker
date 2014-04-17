@@ -6,7 +6,7 @@ k = 1;
 while k <= nrMarkers+1
     try
         [x(k),y(k)]=ginput(1);
-        h(k) = plot(x(k),y(k),'or','MarkerSize',5);
+        h(k) = plot(x(k),y(k),'+r','MarkerSize',5);
         k = k+1;
         if k==nrMarkers+1;
             try
