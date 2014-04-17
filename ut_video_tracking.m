@@ -1,4 +1,4 @@
-function utvid_video_tracking
+function ut_video_tracking
 
 %% set up the main figure window
 monpos = get(0,'monitorposition');
