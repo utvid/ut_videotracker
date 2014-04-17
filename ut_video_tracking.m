@@ -1,4 +1,4 @@
-function utvid_video_tracking
+function ut_video_tracking
 
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
