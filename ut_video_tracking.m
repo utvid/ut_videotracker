@@ -1,8 +1,9 @@
 function ut_video_tracking
 
-p = mfilename('fullpath');
-[path,~,~] = fileparts(p);
-addpath(genpath(path));
+% p = mfilename('fullpath');
+p = pwd;
+% [path,name,ext] = fileparts(p)
+addpath(genpath([p '\Functions']));
 
 %% set up the main figure window
 utvid =[];
@@ -81,7 +82,7 @@ utvid.handle.h4 = uicontrol(...
     'string','IMAGE ENHANCEMENT',...
     'horizontalalignment','center',...
     'enable','on',...
-    'callback',@utvid_imenhanceGUI);
+    'callback',@imenhance);
 
 nbutton = 5;
 posx = mod(nbutton-1,Nx);
@@ -164,7 +165,7 @@ function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
 % Ask for using compression or not
-prompt = 'Use compression (y/n)? '
+prompt = 'Use compression (y/n)? ';
 result = input(prompt, 's');
 if isempty(result)
     result = 'y';
@@ -212,7 +213,8 @@ function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 cam ={'left','right','center'};
 for i = 1:utvid.settings.nrcams;
-    I = demosaic((read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i}).name]),1)),'rggb');
+    image = read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i}).name]),2);
+    I = demosaic(image(:,:,1),'rggb');
     % calibration using script of Hageman and van der Heijden
     [K, R, T, P,avgEr,stdEr] = utvid_camcalibration(I,50);
     utvid.calbMat.(cam{i}){1,1} = K;
@@ -221,7 +223,7 @@ for i = 1:utvid.settings.nrcams;
     utvid.calbMat.(cam{i}){1,4} = P;
     utvid.calbMat.(cam{i}){1,5} = avgEr;
     utvid.calbMat.(cam{i}){1,6} = stdEr;
-    calb{i}.P = utvid.calbMat.(cam{i}){1,4};
+    utvid.calb{i}.P = utvid.calbMat.(cam{i}){1,4};
 end
 utvid.settings.state = 3; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
@@ -233,8 +235,8 @@ end
 function imenhance(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
-%% imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+% imenhanceGUI moet nog verbeterd worden met meer opties
+utvid = imenhanceGUI(hMainFigure,utvid);
 
 utvid.settings.state = 4; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
@@ -245,13 +247,20 @@ end
 %% Select markers
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
-[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(calb, utvid); % create Pstruct and Pstruct_or
+[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
 nOrMar = 6;
 nMar = 10;
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
-        Im = read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
+        if strcmp(utvid.version,'R2012')
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
+        elseif strcmp(utvid.version,'R2013')
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
+        else
+            disp('Version not yet implemented')
+        end
+
         [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
         [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
     end
