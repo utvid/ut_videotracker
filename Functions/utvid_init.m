@@ -4,7 +4,30 @@ function [ utvid ] = utvid_init(hMainFigure,utvid)
 
 % Version added in utvid struct;
 utvid.settings.cdir = pwd;          % save current directory path
-utvid.settings.dir_data = uigetdir('..\..','select data folder'); % select data directory with a GUI
+if ischar(utvid.settings.dir_data) ~= 1 % check if path is already selected in drow down menu
+    utvid.settings.dir_data = uigetdir('..\..','select data folder'); % select data directory with a GUI
+    curfold = utvid.settings.historyfolder 
+    i = 1;
+    while i <= 10 || i == length(curfold)+1 %create list 10 last used folders
+        if i == 1
+            historyfolder{i} = utvid.settings.dir_data;
+            I = find(ismember(curfold,utvid.settings.dir_data)) % find if currently 
+            if isempty(I) ~= 1      % selected folder is already in existing list
+                curfold(I) = []  %if existed, clear it from the list
+            else
+                
+            end
+        elseif i <= length(curfold)+1
+            historyfolder{i} = curfold{i-1};
+        else 
+            historyfolder{i} = ' ';
+        end
+        i = i+1;
+    end
+    utvid.settings.historyfolder = historyfolder;
+    
+    save('historyfolder.mat','historyfolder')
+end
 v = version;
 utvid.version = v(end-6:end-2);
 

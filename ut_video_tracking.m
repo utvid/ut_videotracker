@@ -5,8 +5,14 @@ p = pwd;
 % [path,name,ext] = fileparts(p)
 addpath(genpath([p '\Functions']));
 
+load historyfolder.mat
+utvid.settings.historyfolder = historyfolder;
+utvid.settings.dir_data = 0;
+if isempty(historyfolder)
+    historyfolder = 'no folder selected yet';
+end
 %% set up the main figure window
-utvid =[];
+% utvid =[];
 monpos = get(0,'monitorposition');
 if size(monpos,1) == 1                                  % there is only a primary monitor
     scrbase = monpos(1,1:2)+8;
@@ -19,7 +25,7 @@ end
 if scrsize(1)/scrsize(2)>1.5, scrsize(1)=1.5*scrsize(2); end
 
 scrsize = monpos(1,3:4);
-winsize = [600 100];
+winsize = [600 150]; 
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
 hMainFigure = figure(	'Color',[1 1 1],...
@@ -32,12 +38,36 @@ hMainFigure = figure(	'Color',[1 1 1],...
     'Resize','off');
 
 Nx = 4;     % number of buttons in hor direction
-Ny = 2;     % number of buttons in ver direction
+Ny = 3;     % number of buttons in ver direction
 bsize = [winsize(1)/Nx winsize(2)/Ny];
+
+nbutton = 9;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+utvid.handle.h1 = uicontrol(...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2)+bsize(2)/2-5 bsize(1)*2 bsize(2)/2],...
+    'Style','text',...
+    'fontsize',10,...
+    'string','Initialize previously used folders: ',...
+    'horizontalalignment','left',...
+    'enable','on',...
+    'callback',@utvid_history);
+
+nbutton = 9;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+utvid.handle.h1 = uicontrol(...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize(1)*2 bsize(2)/2],...
+    'Style','popupmenu',...
+    'fontsize',10,...
+    'string',utvid.settings.historyfolder,...
+    'horizontalalignment','center',...
+    'enable','on',...
+    'callback',@utvid_history);
 
 nbutton = 1;
 posx = mod(nbutton-1,Nx);
-posy = floor(nbutton-1/Nx)+1;
+posy = floor((nbutton-1)/Nx)+1;
 utvid.handle.h1 = uicontrol(...
     'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize],...
     'Style','pushbutton',...
@@ -120,7 +150,7 @@ utvid.handle.h7 = uicontrol(...
     'enable','on',...
     'callback',@utvid_na);
 
-nbutton = Nx*Ny;
+nbutton = 8;
 posx = mod(nbutton-1,Nx);
 posy = floor((nbutton-1)/Nx)+1;
 utvid.handle.h8 = uicontrol(...
@@ -134,6 +164,24 @@ utvid.handle.h8 = uicontrol(...
 
 guidata(hMainFigure,utvid);
 
+end
+
+%%
+function utvid_history(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
+if iscell(utvid.settings.historyfolder)
+    num = get(hMainFigure,'value');
+    utvid.settings.dir_data = utvid.settings.historyfolder{num};
+end
+
+%proceed with initialization
+utvid = utvid_init(hMainFigure,utvid);
+% make buttons of completed steps green
+for i = 1:utvid.settings.state
+    set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
+end
+
+guidata(hMainFigure,utvid)
 end
 
 %% initialise marker tracking process
