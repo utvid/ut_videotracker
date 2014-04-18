@@ -295,7 +295,9 @@ end
 %% Select markers
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
-
+[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
+nOrMar = 6;
+nMar = 10;
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
@@ -306,25 +308,14 @@ for j = 1:size(utvid.movs.instrstart,2)
         else
             disp('Version not yet implemented')
         end
-        
-        nOrMar = 0;
-        nMar = 13;
-        if nOrMar == 0
-        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
-        elseif nOrMar < 3
-            disp('to view Orientation Markers for orientation correction')
-        else
-        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
+
         [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
-        end
+        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
     end
 end
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-
-[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
-
 guidata(hMainFigure);
 set(utvid.handle.h5,'backgroundcolor','g');
 

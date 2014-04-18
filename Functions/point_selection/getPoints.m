@@ -1,6 +1,5 @@
-function [x,y] = getPoints(Im,nrMarkers,str)
-hfig = figure; imshow(Im); title(str);
-set(hfig,'Units', 'Normalized', 'OuterPosition', [0 0 1 1]); 
+function [x,y] = getPoints(Im,nrMarkers,str);
+figure; imshow(Im); title(str);
 hold on;
 x=[];y=[];
 k = 1;
