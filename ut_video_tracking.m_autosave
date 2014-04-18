@@ -45,7 +45,19 @@ nbutton = 9;
 posx = mod(nbutton-1,Nx);
 posy = floor((nbutton-1)/Nx)+1;
 utvid.handle.h1 = uicontrol(...
-    'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize],...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2)+bsize(2)/2-5 bsize(1)*2 bsize(2)/2],...
+    'Style','text',...
+    'fontsize',10,...
+    'string','Initialize previously used folders: ',...
+    'horizontalalignment','left',...
+    'enable','on',...
+    'callback',@utvid_history);
+
+nbutton = 9;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+utvid.handle.h1 = uicontrol(...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize(1)*2 bsize(2)/2],...
     'Style','popupmenu',...
     'fontsize',10,...
     'string',utvid.settings.historyfolder,...
@@ -157,13 +169,21 @@ end
 %%
 function utvid_history(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-if iscell(historyfolder)
+if iscell(utvid.settings.historyfolder)
     num = get(hMainFigure,'value');
-    utvid.settings.dir_data = historyfolder{num};
+    utvid.settings.dir_data = utvid.settings.historyfolder{num};
+end
+
+%proceed with initialization
+utvid = utvid_init(hMainFigure,utvid);
+% make buttons of completed steps green
+for i = 1:utvid.settings.state
+    set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
 end
 
 guidata(hMainFigure,utvid)
 end
+
 %% initialise marker tracking process
 function utvid_initialise(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
@@ -275,9 +295,7 @@ end
 %% Select markers
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
-[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
-nOrMar = 6;
-nMar = 10;
+
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
@@ -288,14 +306,25 @@ for j = 1:size(utvid.movs.instrstart,2)
         else
             disp('Version not yet implemented')
         end
-
-        [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
+        
+        nOrMar = 0;
+        nMar = 13;
+        if nOrMar == 0
         [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
+        elseif nOrMar < 3
+            disp('to view Orientation Markers for orientation correction')
+        else
+        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
+        [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
+        end
     end
 end
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+
+[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
+
 guidata(hMainFigure);
 set(utvid.handle.h5,'backgroundcolor','g');
 
