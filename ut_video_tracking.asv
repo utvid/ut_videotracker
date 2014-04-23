@@ -235,7 +235,6 @@ utvid = guidata(hMainFigure);
 
 %% imenhanceGUI moet nog verbeterd worden met meer opties
 utvid = utvid_imenhanceGUI(hMainFigure,utvid);
-utvid
 utvid.settings.state = 4; % update state
 % save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
