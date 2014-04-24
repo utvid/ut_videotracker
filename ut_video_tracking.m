@@ -1,5 +1,4 @@
 function ut_video_tracking
-
 % p = mfilename('fullpath');
 p = pwd;
 % [path,name,ext] = fileparts(p)
@@ -25,10 +24,10 @@ end
 if scrsize(1)/scrsize(2)>1.5, scrsize(1)=1.5*scrsize(2); end
 
 scrsize = monpos(1,3:4);
-winsize = [600 150]; 
+winsize = [600 150];
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
-hMainFigure = figure(	'Color',[1 1 1],...
+hMainFigure = figure('Color',[1 1 1],...
     'MenuBar','none',...
     'Name','UT VIDEO TRACKER',...
     'PaperPositionMode','auto',...
@@ -50,8 +49,7 @@ utvid.handle.h1 = uicontrol(...
     'fontsize',10,...
     'string','Initialize previously used folders: ',...
     'horizontalalignment','left',...
-    'enable','on',...
-    'callback',@utvid_history);
+    'enable','on');
 
 nbutton = 9;
 posx = mod(nbutton-1,Nx);
@@ -109,10 +107,10 @@ utvid.handle.h4 = uicontrol(...
     'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize],...
     'Style','pushbutton',...
     'fontsize',10,...
-    'string','IMAGE ENHANCEMENT',...
+    'string','SELECT MARKERS',...
     'horizontalalignment','center',...
     'enable','on',...
-    'callback',@imenhance);
+    'callback',@utvid_markerselector);
 
 nbutton = 5;
 posx = mod(nbutton-1,Nx);
@@ -121,10 +119,10 @@ utvid.handle.h5 = uicontrol(...
     'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize],...
     'Style','pushbutton',...
     'fontsize',10,...
-    'string','SELECT MARKERS',...
+    'string','IMAGE ENHANCEMENT',...
     'horizontalalignment','center',...
     'enable','on',...
-    'callback',@utvid_markerselector);
+    'callback',@imenhance);
 
 nbutton = 6;
 posx = mod(nbutton-1,Nx);
@@ -169,9 +167,11 @@ end
 %%
 function utvid_history(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
+
 if iscell(utvid.settings.historyfolder)
     num = get(hMainFigure,'value');
     utvid.settings.dir_data = utvid.settings.historyfolder{num};
+    utvid.settings.dir_data
 end
 
 %proceed with initialization
@@ -279,25 +279,24 @@ guidata(hMainFigure,utvid);
 set(utvid.handle.h3,'backgroundcolor','g');
 end
 
-%% Image enhancement
-function imenhance(hMainFigure,utvid);
-utvid = guidata(hMainFigure);
-
-% imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = imenhanceGUI(hMainFigure,utvid);
-
-utvid.settings.state = 4; % update state
-save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-guidata(hMainFigure,utvid);
-set(utvid.handle.h4,'backgroundcolor','g');
-end
-
 %% Select markers
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
-[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
-nOrMar = 6;
-nMar = 10;
+
+prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
+result = input(prompt, 's');
+if strcmp(result,'n')
+    utvid.coords.nOrMar = 0;
+    prompt = 'How many markers to follow?';
+    utvid.coords.nMar = str2num(input(prompt, 's'));
+else
+    prompt = 'How many orientation markers to follow?';
+    utvid.coords.nOrMar = str2num(input(prompt, 's'));
+    
+    prompt = 'How many markers to follow?';
+    utvid.coords.nMar = str2num(input(prompt, 's'));
+end
+
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
@@ -308,77 +307,97 @@ for j = 1:size(utvid.movs.instrstart,2)
         else
             disp('Version not yet implemented')
         end
-
-        [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
-        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
+        
+        if utvid.coords.nOrMar == 0
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,utvid.coords.nMar,'Select Lip markers');
+        elseif utvid.coords.nOrMar < 3
+            disp('Not enough orientation markers')
+        else
+            [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nOrMar,'Select Orientation markers'));
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nMar,'Select Lip markers'));
+        end
     end
 end
+
+[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
+
+utvid.settings.state = 4; % update state
+save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+guidata(hMainFigure);
+set(utvid.handle.h4,'backgroundcolor','g');
+
+end
+
+%% Image enhancement
+function imenhance(hMainFigure,utvid);
+utvid = guidata(hMainFigure);
+
+% imenhanceGUI moet nog verbeterd worden met meer opties
+utvid = imenhanceGUI(hMainFigure,utvid);
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-guidata(hMainFigure);
+guidata(hMainFigure,utvid);
 set(utvid.handle.h5,'backgroundcolor','g');
-
 end
+
 %% PCA model
-    function utvid_selectpca(hMainFigure,utvid)
-        utvid = guidata(hMainFigure);
-        
-        prompt = 'Do you want to use a predefined PCA model (y/n)? '
+function utvid_selectpca(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
+
+prompt = 'Do you want to use a predefined PCA model (y/n)?';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
+        break
+        utvid_settings.pca = 'expansion';
+    else
+        prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
         result = input(prompt, 's');
-        if isempty(result)
-            result = 'y';
-        end
-        
-        while isempty(regexpi(result,'y'))
-            if regexpi(result,'n')==1
-                break
-                utvid_settings.pca = 'expansion';
-            else
-                prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
-                result = input(prompt, 's');
-            end
-        end
-        if result == regexpi(result,'y');
-            %% hier moet de PCA selectie GUI aangeroepen worden
-            %  met mogelijkheid tot het laden van een opgeslagen pcamodel
-            utvid_settings.pca = 'predefined';
-        end
-        utvid.settings.state = 6; % update state
-        save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-        guidata(hMainFigure,utvid);
-        set(utvid.handle.h6,'backgroundcolor','g');
     end
+end
+if result == regexpi(result,'y');
+    %% hier moet de PCA selectie GUI aangeroepen worden
+    %  met mogelijkheid tot het laden van een opgeslagen pcamodel
+    utvid_settings.pca = 'predefined';
+end
+utvid.settings.state = 6; % update state
+save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+guidata(hMainFigure,utvid);
+set(utvid.handle.h6,'backgroundcolor','g');
+end
 
 %% Marker tracking
-    function markertracker(hMainFigure,utvid);
-        utvid = guidata(hMainFigure);
-        
-        % verschillende opties toevoegen:
-        %  templatematching
-        %  circle search
-        %  minimum search
-        %  findblue
-        %  active appearance
-        %  et cetera
-        switch(result)
-            case templatematching
-                disp('Not yet implemented');
-            case minsearch
-                disp('Not yet implemented');
-            case bluesearch
-                disp('Not yet implemented');
-            case circlesearch
-                disp('Not yet implemented');
-            case aam
-                disp('Not yet implemented');
-        end
-        
-        
-        
-        
-        utvid.settings.state = 7; % update state
-        save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-        guidata(hMainFigure);
-        set(utvid.handle.h7,'backgroundcolor','g');
-    end
+function markertracker(hMainFigure,utvid);
+utvid = guidata(hMainFigure);
+
+utvid = markerTracking(hMainFigure,utvid);
+% verschillende opties toevoegen:
+%  templatematching
+%  circle search
+%  minimum search
+%  findblue
+%  active appearance
+%  et cetera
+switch(result)
+    case templatematching
+        disp('Not yet implemented');
+    case minsearch
+        disp('Not yet implemented');
+    case bluesearch
+        disp('Not yet implemented');
+    case circlesearch
+        disp('Not yet implemented');
+    case aam
+        disp('Not yet implemented');
+end
+
+utvid.settings.state = 7; % update state
+save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+guidata(hMainFigure);
+set(utvid.handle.h7,'backgroundcolor','g');
+end
