@@ -23,7 +23,7 @@ if ischar(utvid.settings.dir_data) ~= 1 % check if path is already selected in d
     end
     utvid.settings.historyfolder = historyfolder;
     
-    save([utvid.settings.cdir '\Functions\utility\historyfolder.mat'] ,'historyfolder')
+    save([utvid.settings.cdir '\functions\utility\historyfolder.mat'] ,'historyfolder')
 else
     curfold = utvid.settings.historyfolder;
     i = 1;
@@ -47,9 +47,6 @@ else
 end
 v = version;
 utvid.version = v(end-6:end-2);
-
-utvid.settings.cdir = pwd;                      % save current directory path
-utvid.settings.dir_data = uigetdir('..\..','select data folder'); % select data directory with a GUI
 cd(utvid.settings.dir_data);        % change directory to data directory
 if  exist('init.mat','file') ~=0    % check for existence of init.mat file
     handles = utvid.handle;
@@ -118,7 +115,6 @@ else                                % if init.mat doesnot exist execute the foll
         disp('Something went wrong, probably no video files were found')
     end
 end
-
 cd(utvid.settings.cdir);                        % change directory back to current directory path
 
 %% Geeft een error???

@@ -4,22 +4,10 @@ try
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
 catch
-    p = pwd;
+    path = pwd;
 end
-addpath(genpath(path));
+addpath(genpath([path '\functions']));
 
-try
-load historyfolder.mat
-catch
-    historyfolder = {[]}
-    save('historyfolder.mat','historyfolder');
-end
-
-utvid.settings.historyfolder = historyfolder;
-utvid.settings.dir_data = 0;
-if isempty(historyfolder)
-    historyfolder = 'no folder selected yet';
-end
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');
@@ -34,7 +22,7 @@ end
 if scrsize(1)/scrsize(2)>1.5, scrsize(1)=1.5*scrsize(2); end
 
 scrsize = monpos(1,3:4);
-winsize = [600 100];
+winsize = [600 150];
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
 hMainFigure = figure(	'Color',[1 1 1],...
@@ -47,7 +35,7 @@ hMainFigure = figure(	'Color',[1 1 1],...
     'Resize','off');
 
 Nx = 4;     % number of buttons in hor direction
-Ny = 2;     % number of buttons in ver direction
+Ny = 3;     % number of buttons in ver direction
 bsize = [winsize(1)/Nx winsize(2)/Ny];
 
 nbutton = 1;
@@ -135,7 +123,7 @@ utvid.handle.h7 = uicontrol(...
     'enable','on',...
     'callback',@utvid_na);
 
-nbutton = Nx*Ny;
+nbutton = 8;
 posx = mod(nbutton-1,Nx);
 posy = floor((nbutton-1)/Nx)+1;
 utvid.handle.h8 = uicontrol(...
@@ -151,7 +139,7 @@ utvid.handle.h8 = uicontrol(...
 nbutton = 9;
 posx = mod(nbutton-1,Nx);
 posy = floor((nbutton-1)/Nx)+1;
-utvid.handle.h1 = uicontrol(...
+utvid.handle.h10 = uicontrol(...
     'position',[posx*bsize(1) winsize(2)-posy*bsize(2)+bsize(2)/2-5 bsize(1)*2 bsize(2)/2],...
     'Style','text',...
     'fontsize',10,...
@@ -159,10 +147,23 @@ utvid.handle.h1 = uicontrol(...
     'horizontalalignment','left',...
     'enable','on');
 
+try
+load historyfolder.mat
+catch
+    historyfolder = {''};
+    save('historyfolder.mat','historyfolder');
+end
+
+utvid.settings.historyfolder = historyfolder;
+utvid.settings.dir_data = 0;
+if isempty(historyfolder)
+    historyfolder = 'no folder selected yet';
+end
+
 nbutton = 9;
 posx = mod(nbutton-1,Nx);
 posy = floor((nbutton-1)/Nx)+1;
-utvid.handle.h1 = uicontrol(...
+utvid.handle.h9 = uicontrol(...
     'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize(1)*2 bsize(2)/2],...
     'Style','popupmenu',...
     'fontsize',10,...
@@ -190,7 +191,7 @@ end
 %% close Marker Tracker GUI
 function utvid_close(hMainFigure,utvid)
 % utvid = guidata(hMainFigure);
-close(hMainFigure);
+delete(gcf);
 end
 
 %% Warning function for not yet implemented functions
@@ -203,13 +204,13 @@ function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
 % Ask for using compression or not
-prompt = 'Use compression (y/n)? '
+prompt = 'Use compression (y/n)? ';
 result = input(prompt, 's');
 if isempty(result)
     result = 'y';
 end
 
-while isempty(regexpi(result,'y'))
+while isempty(regexpi(result,'y'));
     if regexpi(result,'n')==1
         break
     else
@@ -349,7 +350,7 @@ end
                 result = input(prompt, 's');
             end
         end
-        if result == regexpi(result,'y');
+        if regexpi(result,'y');
             %% hier moet de PCA selectie GUI aangeroepen worden
             %  met mogelijkheid tot het laden van een opgeslagen pcamodel
             utvid = getPCApoints(utvid);
