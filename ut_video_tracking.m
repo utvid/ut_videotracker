@@ -132,7 +132,6 @@ utvid.handle.h8 = uicontrol(...
     'callback',@utvid_close);
 
 guidata(hMainFigure,utvid);
-
 end
 
 %% initialise marker tracking process
@@ -228,24 +227,14 @@ save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
 set(utvid.handle.h3,'backgroundcolor','g');
 end
-
-%% Image enhancement
-function utvid_imenhance(hMainFigure,utvid);
-utvid = guidata(hMainFigure);
-
-%% imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = utvid_imenhanceGUI(hMainFigure,utvid);
-utvid
-utvid.settings.state = 4; % update state
-% save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-guidata(hMainFigure,utvid);
-set(utvid.handle.h5,'backgroundcolor','g');
-end
-
 %% Select markers
+% ideas to add:
+% manually select number of orientation and facial/lip markers
+% search for ideal marker pixel after clicking
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 [utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
+
 nOrMar = 6;
 nMar = 10;
 cam ={'left','right','center'};
@@ -257,12 +246,24 @@ for j = 1:size(utvid.movs.instrstart,2)
     end
 end
 
-utvid.settings.state = 5; % update state
+utvid.settings.state = 4; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure);
 set(utvid.handle.h4,'backgroundcolor','g');
 
 end
+%% Image enhancement
+function utvid_imenhance(hMainFigure,utvid);
+utvid = guidata(hMainFigure);
+
+%imenhanceGUI moet nog verbeterd worden met meer opties
+utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+utvid.settings.state = 5; % update state
+save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+guidata(hMainFigure,utvid);
+set(utvid.handle.h5,'backgroundcolor','g');
+end
+
 %% PCA model
     function utvid_selectpca(hMainFigure,utvid)
         utvid = guidata(hMainFigure);
@@ -285,6 +286,7 @@ end
         if result == regexpi(result,'y');
             %% hier moet de PCA selectie GUI aangeroepen worden
             %  met mogelijkheid tot het laden van een opgeslagen pcamodel
+            utvid = getPCApoints(utvid);
             utvid_settings.pca = 'predefined';
         end
         utvid.settings.state = 6; % update state

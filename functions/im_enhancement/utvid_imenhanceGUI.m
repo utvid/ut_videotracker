@@ -87,7 +87,8 @@ handles.h{4} = uicontrol(...
     'fontsize',10,...
     'string','Histeq',...
     'horizontalalignment','center',...
-    'enable','on',...
+    'enable','off',...
+    'visible','off',...
     'callback',@utvid_na);
 nbutton = 5;
 posx = mod(nbutton-1,Nx);
@@ -319,11 +320,9 @@ handles.mono = 'false';
 set(gcf,'CloseRequestFcn',@utvid_close);
 guidata(enhanceFigure,handles);
 uiwait(enhanceFigure);
-
 %% utvid close
 function utvid_close(enhanceFigure,handles)
         handles = guidata(enhanceFigure);
-    
     if strcmpi(utvid.enhancement.filters,'true')==1
         utvid.enhancement.sigma_up = handles.sigma_up;
         utvid.enhancement.sigma_down = handles.sigma_down;
@@ -338,11 +337,10 @@ function utvid_close(enhanceFigure,handles)
     end
     delete(gcf)
 end
-%%
+%% Not yet implemented function
 function utvid_na(enhanceFigure,handles)
 warndlg('not yet implemented',' ','modal')
 end
-
 %% histogram equalizer
 function utvid_histeq(enhanceFigure,handles);
 handles = guidata(enhanceFigure);
@@ -369,7 +367,6 @@ axes(handles.hax2);imshow(handles.J);title('Enhanced Image');
 utvid.enhancement.imadjust = 'true';
 guidata(enhanceFigure,handles);
 end
-
 %% Filtering
 function contrastfilter(enhanceFigure,handles);
 handles = guidata(enhanceFigure);
@@ -382,7 +379,6 @@ axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';
 guidata(enhanceFigure,handles);
 end
-
 %% sigmaup
 function utvid_slidersigmaup(enhanceFigure,handles);
 handles = guidata(enhanceFigure);
@@ -500,7 +496,6 @@ axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
 end
-
 %% reset settings
 function reset(enhanceFigure,handles);
 handles = guidata(enhanceFigure);
