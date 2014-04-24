@@ -1,9 +1,25 @@
 function utvid_video_tracking
 
+try 
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
+catch
+    p = pwd;
+end
 addpath(genpath(path));
 
+try
+load historyfolder.mat
+catch
+    historyfolder = {[]}
+    save('historyfolder.mat','historyfolder');
+end
+
+utvid.settings.historyfolder = historyfolder;
+utvid.settings.dir_data = 0;
+if isempty(historyfolder)
+    historyfolder = 'no folder selected yet';
+end
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');

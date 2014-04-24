@@ -1,9 +1,25 @@
 function utvid_video_tracking
 
+try 
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
+catch
+    p = pwd;
+end
 addpath(genpath(path));
 
+try
+load historyfolder.mat
+catch
+    historyfolder = {[]}
+    save('historyfolder.mat','historyfolder');
+end
+
+utvid.settings.historyfolder = historyfolder;
+utvid.settings.dir_data = 0;
+if isempty(historyfolder)
+    historyfolder = 'no folder selected yet';
+end
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');
@@ -131,6 +147,30 @@ utvid.handle.h8 = uicontrol(...
     'enable','on',...
     'callback',@utvid_close);
 
+
+nbutton = 9;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+utvid.handle.h1 = uicontrol(...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2)+bsize(2)/2-5 bsize(1)*2 bsize(2)/2],...
+    'Style','text',...
+    'fontsize',10,...
+    'string','Initialize previously used folders: ',...
+    'horizontalalignment','left',...
+    'enable','on');
+
+nbutton = 9;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+utvid.handle.h1 = uicontrol(...
+    'position',[posx*bsize(1) winsize(2)-posy*bsize(2) bsize(1)*2 bsize(2)/2],...
+    'Style','popupmenu',...
+    'fontsize',10,...
+    'string',utvid.settings.historyfolder,...
+    'horizontalalignment','center',...
+    'enable','on',...
+    'callback',@utvid_history);
+
 guidata(hMainFigure,utvid);
 end
 
@@ -233,18 +273,44 @@ end
 % search for ideal marker pixel after clicking
 function utvid_markerselector(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
-[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
 
-nOrMar = 6;
-nMar = 10;
+prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
+result = input(prompt, 's');
+if strcmp(result,'n')
+    utvid.coords.nOrMar = 0;
+    prompt = 'How many markers to follow?';
+    utvid.coords.nMar = str2num(input(prompt, 's'));
+else
+    prompt = 'How many orientation markers to follow?';
+    utvid.coords.nOrMar = str2num(input(prompt, 's'));
+    
+    prompt = 'How many markers to follow?';
+    utvid.coords.nMar = str2num(input(prompt, 's'));
+end
+
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
-        Im = read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
-        [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = getPoints(Im,nOrMar,'Select Orientation markers');
-        [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,nMar,'Select Lip markers');
+        if strcmp(utvid.version,'R2012')
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
+        elseif strcmp(utvid.version,'R2013')
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
+        else
+            disp('Version not yet implemented')
+        end
+        
+        if utvid.coords.nOrMar == 0
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,utvid.coords.nMar,'Select Lip markers');
+        elseif utvid.coords.nOrMar < 3
+            disp('Not enough orientation markers')
+        else
+            [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nOrMar,'Select Orientation markers'));
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nMar,'Select Lip markers'));
+        end
     end
 end
+
+[utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
 
 utvid.settings.state = 4; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
@@ -327,3 +393,23 @@ end
         guidata(hMainFigure);
         set(utvid.handle.h7,'backgroundcolor','g');
     end
+    
+%%    
+function utvid_history(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
+
+if iscell(utvid.settings.historyfolder)
+    num = get(hMainFigure,'value');
+    utvid.settings.dir_data = utvid.settings.historyfolder{num};
+    utvid.settings.dir_data
+end
+
+%proceed with initialization
+utvid = utvid_init(hMainFigure,utvid);
+% make buttons of completed steps green
+for i = 1:utvid.settings.state
+    set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
+end
+
+guidata(hMainFigure,utvid)
+end
