@@ -1,11 +1,8 @@
 function utvid_video_tracking
 
-try 
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
-catch
-    path = pwd;
-end
+cd(path);
 addpath(genpath([path '\functions']));
 
 %% set up the main figure window

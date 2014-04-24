@@ -202,8 +202,8 @@ uiwait(pcaselectFig);
         handles = guidata(pcaselectFig);
         handles.curNoF = handles.curNoF + 1;
         cam ={'left','right','center'};
-        nrOrMar =1 ;
-        nrMarkers = 1;
+        nrOrMar = utvid.settings.nrOrMar;
+        nrMarkers = utvid.settings.nrMarkers;
         % go through all cameras
         for j = 1:utvid.settings.nrcams
             utvid.pca(handles.curNoF,j).video = utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name;
