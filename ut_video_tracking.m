@@ -1,5 +1,4 @@
-function utvid_video_tracking
-
+function ut_video_tracking
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
 cd(path);
@@ -269,19 +268,31 @@ end
 % ideas to add:
 % manually select number of orientation and facial/lip markers
 % search for ideal marker pixel after clicking
-function utvid_markerselector(hMainFigure,utvid);
+function utvid_markerselector(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
 prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
 result = input(prompt, 's');
+
 if strcmp(result,'n')
     utvid.coords.nOrMar = 0;
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2num(input(prompt, 's'));
+    utvid.coords.nMar = str2double(input(prompt, 's'));
 else
     prompt = 'How many orientation markers to follow?';
-    utvid.coords.nOrMar = str2num(input(prompt, 's'));
-    
+    utvid.coords.nOrMar = str2double(input(prompt, 's'));
+    if utvid.coords.nOrMar < 3
+        prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)?';
+        utvid.coords.nOrMar = str2double(input(prompt, 's'));
+        result = input(prompt, 's');
+        if strcmp(result,'n')
+            utvid.coords.nOrMar = 0;
+        else
+            prompt = 'How many orientation markers to follow? Minimal of 3.';
+            utvid.coords.nOrMar = str2num(input(prompt, 's'));
+        end
+    end           
+        
     prompt = 'How many markers to follow?';
     utvid.coords.nMar = str2num(input(prompt, 's'));
 end
@@ -298,12 +309,10 @@ for j = 1:size(utvid.movs.instrstart,2)
         end
         
         if utvid.coords.nOrMar == 0
-            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,utvid.coords.nMar,'Select Lip markers');
-        elseif utvid.coords.nOrMar < 3
-            disp('Not enough orientation markers')
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = getPoints(Im,utvid.coords.nMar,'Select shape markers');
         else
             [utvid.coords.or.(cam{i}).x(j,:),utvid.coords.or.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nOrMar,'Select Orientation markers'));
-            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nMar,'Select Lip markers'));
+            [utvid.coords.lip.(cam{i}).x(j,:),utvid.coords.lip.(cam{i}).y(j,:)] = round(getPoints(Im,utvid.coords.nMar,'Select shape markers'));
         end
     end
 end
@@ -317,11 +326,12 @@ set(utvid.handle.h4,'backgroundcolor','g');
 
 end
 %% Image enhancement
-function utvid_imenhance(hMainFigure,utvid);
+function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
 %imenhanceGUI moet nog verbeterd worden met meer opties
 utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
@@ -332,7 +342,7 @@ end
     function utvid_selectpca(hMainFigure,utvid)
         utvid = guidata(hMainFigure);
         
-        prompt = 'Do you want to use a predefined PCA model (y/n)? '
+        prompt = 'Do you want to use a predefined PCA model (y/n)? ';
         result = input(prompt, 's');
         if isempty(result)
             result = 'y';
@@ -363,6 +373,7 @@ end
     function markertracker(hMainFigure,utvid);
         utvid = guidata(hMainFigure);
         
+        utvid = markerTracking(utvid);
         % verschillende opties toevoegen:
         %  templatematching
         %  circle search
@@ -382,10 +393,7 @@ end
             case aam
                 disp('Not yet implemented');
         end
-        
-        
-        
-        
+
         utvid.settings.state = 7; % update state
         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
         guidata(hMainFigure);
