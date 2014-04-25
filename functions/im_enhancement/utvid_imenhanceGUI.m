@@ -28,9 +28,23 @@ enhanceFigure = figure(	'Color',[1 1 1],...
 handles.hax1 = axes('Parent',enhanceFigure,'position',[0 0.4 0.5 0.5]);
 handles.hax2 = axes('Parent',enhanceFigure,'position',[0.5 0.4 0.5 0.5]);
 % dit is een hard solution, moet nog een meer verfijnde oplossing komen
+
 try
-    handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.center(1,1)).name]),1));
+     if strcmp(utvid.version,'R2012')
+        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.center(1,1)).name]),2));
+    elseif strcmp(utvid.version,'R2013')
+        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.center(1,1)).name]),1));
+    else
+        disp('Version not yet implemented')
+    end
 catch
+    if strcmp(utvid.version,'R2012')
+        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.center(1,1)).name]),2));
+    elseif strcmp(utvid.version,'R2013')
+        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.center(1,1)).name]),1));
+    else
+        disp('Version not yet implemented')
+    end
     handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.center(1,1)).name]),1));
 end
 handles.J = [];
