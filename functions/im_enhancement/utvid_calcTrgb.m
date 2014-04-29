@@ -1,8 +1,8 @@
 function Trgb2gray = utvid_calcTrgb(im,coords,ver,hor)
 
 for i = 1:size(im,3)
-    data1(:,i) = diag(im(round(coords.y),round(coords.x),i));
-    data2(:,i) = diag(im(round(coords.y)+ver,round(coords.x)+hor,i));
+    data1(:,i) = diag(im(round(coords.y'),round(coords.x'),i));
+    data2(:,i) = diag(im(round(coords.y')+ver,round(coords.x')+hor,i));
 end
 
 mu1 = mean(data1);

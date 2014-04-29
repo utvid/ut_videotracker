@@ -425,7 +425,7 @@ utvid = guidata(hMainFigure);
 if iscell(utvid.settings.historyfolder)
     num = get(hMainFigure,'value');
     utvid.settings.dir_data = utvid.settings.historyfolder{num};
-    disp(['Measurement folder: ' utvid.settings.dir_data])
+    disp(utvid.settings.dir_data
 end
 
 %proceed with initialization

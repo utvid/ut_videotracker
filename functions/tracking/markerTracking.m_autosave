@@ -110,7 +110,7 @@ axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR,utvid.Tracking.n+1),[]);
 axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM,utvid.Tracking.n+1),[]);
 
 %number of principal components
-utvid.pca.PCs = 6;
+utvid.Tracking.PCs = 6;
 
 
 
@@ -125,6 +125,7 @@ function utvid_back(trackingFigure,handles)
         utvid.Tracking.n = utvid.Tracking.n-1;
         utvid = Tracking(utvid);
     end
+    
     
     guidata(trackingFigure,handles);
 end

@@ -324,7 +324,7 @@ handles.averpsf = fspecial('average',2*handles.window+1);
 handles.a = get(handles.sliders.a,'value');
 handles.b = get(handles.sliders.b,'value');
 try
-    handles.coords = utvid.coords.lip.center;
+    handles.coords = utvid.coords.shape.center;
 catch
     handles.coords =[];
     disp('Warning no coordinates available. Select markers first!!')
