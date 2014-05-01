@@ -8,11 +8,11 @@ function utvid_bayerfilter(utvid,compression)
         utvid.movs.obj{i} =  VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(i).name]);
         if compression == 1
             profile = 'Motion JPEG AVI';
-            wobj = VideoWriter([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(i).name],profile);
+            wobj = VideoWriter([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(i).name],profile);
             wobj.Quality = utvid.settings.vidquality;
         else
             profile = 'Uncompressed AVI';
-            wobj = VideoWriter([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(i).name],profile);
+            wobj = VideoWriter([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(i).name],profile);
         end
         wobj.FrameRate = utvid.movs.obj{i}.FrameRate;
         open(wobj);

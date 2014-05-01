@@ -46,7 +46,7 @@ else
     save([utvid.settings.cdir '\Functions\utility\historyfolder.mat'] ,'historyfolder')
 end
 v = version;
-utvid.version = v(end-6:end-2);
+utvid.settings.version = v(end-6:end-2);
 cd(utvid.settings.dir_data);        % change directory to data directory
 if  exist('init.mat','file') ~=0    % check for existence of init.mat file
     handles = utvid.handle;

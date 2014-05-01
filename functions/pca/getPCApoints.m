@@ -104,12 +104,12 @@ handles.text.curNoF =     uicontrol(...
 %% defaults
 handles.vid_selected = 1; % selected video (start at video 1)
 handles.frame_selected = 1;% selected frame (start at frame 1)
-if isfield(utvid,'pca');
-    handles.curNoF = length(utvid.pca);
-    ids = find(strcmp({utvid.pca.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
+if isfield(utvid.coords,'pca');
+    handles.curNoF = length(utvid.coords.data);
+    ids = find(strcmp({utvid.coords.data.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
     if isempty(ids)==0
         for j = 1:length(ids)
-            if utvid.pca(ids(j)).frame == handles.frame_selected;
+            if utvid.coords.data(ids(j)).frame == handles.frame_selected;
                 set(handles.text.framenumber,'ForegroundColor','red');
                 break
             else
@@ -145,7 +145,7 @@ uiwait(pcaselectFig);
         handles = guidata(pcaselectFig);
         handles.vid_selected = get(handles.video,'value');
         handles.frame_selected = 1;
-        obj = VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name]);
+        obj = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name]);
         handles.I = im2double(read(obj,handles.frame_selected));
         axes(handles.hax1);
         imshow(handles.I);
@@ -153,11 +153,11 @@ uiwait(pcaselectFig);
         set(handles.sliderframe,'Value',1);
         set(handles.sliderframe,'Max',obj.NumberOfFrames);
         set(handles.sliderframe,'SliderStep',[1 10]/(obj.NumberOfFrames-1));
-        if isfield(utvid,'pca');
-            ids = find(strcmp({utvid.pca.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
+        if isfield(utvid.coords,'pca');
+            ids = find(strcmp({utvid.coords.data.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
             if isempty(ids)==0
                 for k = 1:length(ids)
-                    if utvid.pca(ids(k)).frame == handles.frame_selected;
+                    if utvid.coords.data(ids(k)).frame == handles.frame_selected;
                         set(handles.text.framenumber,'ForegroundColor','red');
                         break
                     else
@@ -177,14 +177,14 @@ uiwait(pcaselectFig);
     function utvid_sliderframe(pcaselectFig,handles)
         handles = guidata(pcaselectFig);
         handles.frame_selected = round(get(handles.sliderframe,'value'));
-        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name]),handles.frame_selected));
+        handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name]),handles.frame_selected));
         axes(handles.hax1);imshow(handles.I);title(utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name)
         set(handles.text.framenumber,'string',handles.frame_selected);
-        if isfield(utvid,'pca')
-            ids = find(strcmp({utvid.pca.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
+        if isfield(utvid.coords,'pca')
+            ids = find(strcmp({utvid.coords.data.video},utvid.movs.list(utvid.movs.center(1,handles.vid_selected)).name));
             if isempty(ids)==0
                 for k = 1:length(ids);
-                    if utvid.pca(ids(k)).frame == handles.frame_selected;
+                    if utvid.coords.data(ids(k)).frame == handles.frame_selected;
                         set(handles.text.framenumber,'ForegroundColor','red');
                         break
                     else
@@ -208,12 +208,12 @@ uiwait(pcaselectFig);
         nrMarkers = utvid.settings.nrMarkers;
         % go through all cameras
         for j = 1:utvid.settings.nrcams
-            utvid.pca(handles.curNoF,j).video = utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name;
-            utvid.pca(handles.curNoF,j).frame = handles.frame_selected;
-            [utvid.pca(handles.curNoF,j).x_or,utvid.pca(handles.curNoF,j).y_or] = ...
-                getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrOrMar,'Select orientation markers');
-            [utvid.pca(handles.curNoF,j).x,utvid.pca(handles.curNoF,j).y] = ...
-                getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\NEW' utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrMarkers, 'Select lip markers');
+            utvid.coords.data(handles.curNoF,j).video = utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name;
+            utvid.coords.data(handles.curNoF,j).frame = handles.frame_selected;
+            [utvid.coords.data(handles.curNoF,j).x_or,utvid.coords.data.data(handles.curNoF,j).y_or] = ...
+                getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings. stname utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrOrMar,'Select orientation markers');
+            [utvid.coords.data(handles.curNoF,j).x,utvid.coords.data.data(handles.curNoF,j).y] = ...
+                getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrMarkers, 'Select lip markers');
         end
         assignin('base','temputvid',utvid);
         set(handles.text.curNoF,'string',handles.curNoF);

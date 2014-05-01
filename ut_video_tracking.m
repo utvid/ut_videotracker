@@ -199,6 +199,14 @@ end
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
+prompt = 'Give standard name (e.g. NEW): ' 
+result = input(prompt,'s');
+if isempty(result)
+    utvid.setttings.stname = 'NEW'
+else
+    utvid.settings.stname = result;
+end
+
 % Ask for using compression or not
 prompt = 'Use compression (y/n)? ';
 result = input(prompt, 's');
@@ -285,44 +293,44 @@ prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
 result = input(prompt, 's');
 
 if strcmp(result,'n')
-    utvid.coords.nOrMar = 0;
+    utvid.settings.nrOrMar = 0;
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2double(input(prompt, 's'));
+    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 else
     prompt = 'How many orientation markers to follow?';
-    utvid.coords.nOrMar = str2double(input(prompt, 's'));
-    if utvid.coords.nOrMar < 3
+    utvid.settings.nrOrMar = str2double(input(prompt, 's'));
+    if utvid.settings.nrOrMar < 3
         prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)?';
-        utvid.coords.nOrMar = str2double(input(prompt, 's'));
+        utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         result = input(prompt, 's');
         if strcmp(result,'n')
-            utvid.coords.nOrMar = 0;
+            utvid.settings.nrOrMar = 0;
         else
             prompt = 'How many orientation markers to follow? Minimal of 3.';
-            utvid.coords.nOrMar = str2double(input(prompt, 's'));
+            utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         end
     end           
         
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2double(input(prompt, 's'));
+    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 end
 
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.version,'R2012')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
         elseif strcmp(utvid.version,'R2013')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
         else
             disp('Version not yet implemented')
         end
         
-        if utvid.coords.nOrMar == 0
-            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nMar,'Select shape markers');
+        if utvid.settings.nrOrMar == 0
+            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
         else
-            [utvid.coords.or.(cam{i}).x(:,j),utvid.coords.or.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nOrMar,'Select Orientation markers');
-            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nMar,'Select shape markers');
+            [utvid.coords.or.(cam{i}).x(:,j),utvid.coords.or.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrOrMar,'Select Orientation markers');
+            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
         end
     end
 end
@@ -392,25 +400,6 @@ end
         utvid = guidata(hMainFigure);
         
         utvid = markerTracking(utvid);
-        % verschillende opties toevoegen:
-        %  templatematching
-        %  circle search
-        %  minimum search
-        %  findblue
-        %  active appearance
-        %  et cetera
-%         switch(result)
-%             case templatematching
-%                 disp('Not yet implemented');
-%             case minsearch
-%                 disp('Not yet implemented');
-%             case bluesearch
-%                 disp('Not yet implemented');
-%             case circlesearch
-%                 disp('Not yet implemented');
-%             case aam
-%                 disp('Not yet implemented');
-%         end
 
 %         utvid.settings.state = 7; % update state
 %         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
