@@ -5,10 +5,10 @@ function [utvid] = measurement(utvid)
 %            n = framenumber
 str = {'or','shape'};
 
-if utvid.coords.nOrMar ~= 0
-    jmax = 1;
-else
+if utvid.settings.nrOrMar ~= 0
     jmax = 2;
+else
+    jmax = 1;
 end
 
 for j = 1:jmax
@@ -18,17 +18,33 @@ for j = 1:jmax
         utvid.settings.Measmethod = 'minsearch';
     end
     
+    Xstacked = []; Ystacked = [];
+    
     for i = 1:utvid.settings.nrcams
         im  = frames{i};
-        if i == 1
-            x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
-            y   = utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n) ;
-        elseif i == 2
-            x   = utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n) ;
-            y   = utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n) ;
-        elseif i == 3
-            x   = utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n) ;
-            y   = utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n) ;
+        if j == 1
+            if i == 1
+                utvid.Tracking.Xpred.x1
+                x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n) ;
+            elseif i == 2
+                x   = utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n) ;
+            elseif i == 3
+                x   = utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n) ;
+            end
+        elseif j == 2
+            if i == 1
+                x   = utvid.Tracking.Xpredor.x1(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpredor.x1(:,2,utvid.Tracking.n) ;
+            elseif i == 2
+                x   = utvid.Tracking.Xpredor.x2(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpredor.x2(:,2,utvid.Tracking.n) ;
+            elseif i == 3
+                x   = utvid.Tracking.Xpredor.x3(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpredor.x3(:,2,utvid.Tracking.n) ;
+            end
         end
         
         switch utvid.settings.Measmethod
@@ -43,9 +59,16 @@ for j = 1:jmax
             otherwise
                 disp('No valid measurement setting selected');
         end
-        utvid.Tracking.(str).meas2D.(cam{i}).x(:,utvid.Tracking.n) = x;
-        utvid.Tracking.(str).meas2D.(cam{i}).y(:,utvid.Tracking.n) = y;
+        Xstacked = [Xstacked; x];
+        Ystacked = [Ystacked; y];
     end
+    
+    if j == 1
+        utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+    elseif j == 2
+        utvid.Tracking.Kal.measor(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+    end
+
 end
 
 end

@@ -38,8 +38,8 @@ function utvid = createKalmanFilter3D(utvid)
 
 Pext        = utvid.Pstruct.Pext;
 % nrMarkers   = handles.nMar;
-N           = 2*3*utvid.coords.nMar;
-M           = 6*utvid.coords.nMar;
+N           = 2*3*utvid.settings.nrMarkers;
+M           = 6*utvid.settings.nrMarkers;
 % nrOfFrames  = ObjM.NumberOfFrames;
 
 % utvid.Tracking.sigMeas = 3;    %measurement error expressed in pixels
@@ -69,8 +69,8 @@ utvid.Tracking.Kal.meas(:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.rig
 utvid.Tracking.Kal.H = zeros(N, M, utvid.Tracking.NoF);
 
 %define measurement noise
-Ppart1          = sum(Pext(N+1:end, 3*utvid.coords.nMar+1:end), 2);
-Ppart2          = Pext(N+1:end, 1:3*utvid.coords.nMar);
+Ppart1          = sum(Pext(N+1:end, 3*utvid.settings.nrMarkers+1:end), 2);
+Ppart2          = Pext(N+1:end, 1:3*utvid.settings.nrMarkers);
 utvid.Tracking.Kal.CnBase      = utvid.Tracking.sigMeas.^2*diag([Ppart1; Ppart1]).^2;
 utvid.Tracking.Kal.Cn(:,:,1)   = utvid.Tracking.Kal.CnBase;
 utvid.Tracking.Kal.CnPart      = utvid.Tracking.sigMeas*[Ppart2; Ppart2];    
@@ -78,13 +78,13 @@ utvid.Tracking.Kal.CnPart      = utvid.Tracking.sigMeas*[Ppart2; Ppart2];
 %define process matrix
 T = 1/utvid.Tracking.FrameRate;
 utvid.Tracking.Kal.F = eye(M); 
-utvid.Tracking.Kal.F(1:3*utvid.coords.nMar,3*utvid.coords.nMar+1:end) = T*eye(3*utvid.coords.nMar);
+utvid.Tracking.Kal.F(1:3*utvid.settings.nrMarkers,3*utvid.settings.nrMarkers+1:end) = T*eye(3*utvid.settings.nrMarkers);
 
 %define process noise
 utvid.Tracking.Kal.Cw = zeros(M);
 
-utvid.Tracking.Kal.Cw(3*utvid.coords.nMar+1:end, 3*utvid.coords.nMar+1:end) = ...      %Only process noise is added to the velocity-part of the state vector
-    diag([utvid.Tracking.sigVx^2*ones(utvid.coords.nMar,1); utvid.Tracking.sigVy^2*ones(utvid.coords.nMar,1); utvid.Tracking.sigVz^2*ones(utvid.coords.nMar,1)]);
+utvid.Tracking.Kal.Cw(3*utvid.settings.nrMarkers+1:end, 3*utvid.settings.nrMarkers+1:end) = ...      %Only process noise is added to the velocity-part of the state vector
+    diag([utvid.Tracking.sigVx^2*ones(utvid.settings.nrMarkers,1); utvid.Tracking.sigVy^2*ones(utvid.settings.nrMarkers,1); utvid.Tracking.sigVz^2*ones(utvid.settings.nrMarkers,1)]);
 
 %perform initial prediction based on selected markers
 utvid.Tracking.Kal.Cest(:,:,1) = 1E10*eye(M);
