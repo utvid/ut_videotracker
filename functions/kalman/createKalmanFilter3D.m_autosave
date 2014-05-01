@@ -35,7 +35,7 @@ function utvid = createKalmanFilter3D(utvid)
 %                                   F = nrOfFrames
 %                                   L = 3*nrMarkers
 % 
-
+if exist
 Pext        = utvid.Pstruct.Pext;
 % nrMarkers   = handles.nMar;
 N           = 2*3*utvid.coords.nMar;
@@ -45,15 +45,15 @@ M           = 6*utvid.coords.nMar;
 % utvid.Tracking.sigMeas = 3;    %measurement error expressed in pixels
 
 %create state variables
-utvid.Tracking.Kal.meas     = zeros(N, utvid.Tracking.NoF);
-utvid.Tracking.Kal.z        = zeros(N, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Xest     = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Xpred    = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Xest_b   = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Cest     = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Cpred    = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Cest_b   = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal.Cn       = zeros(N, N, utvid.Tracking.NoF);
+utvid.Tracking.meas     = zeros(N, utvid.Tracking.NoF);
+utvid.Tracking.z        = zeros(N, utvid.Tracking.NoF);
+utvid.Tracking.Xest     = zeros(M, utvid.Tracking.NoF);
+utvid.Tracking.Xpred    = zeros(M, utvid.Tracking.NoF);
+utvid.Tracking.Xest_b   = zeros(M, utvid.Tracking.NoF);
+utvid.Tracking.Cest     = zeros(M, M, utvid.Tracking.NoF);
+utvid.Tracking.Cpred    = zeros(M, M, utvid.Tracking.NoF);
+utvid.Tracking.Cest_b   = zeros(M, M, utvid.Tracking.NoF);
+utvid.Tracking.Cn       = zeros(N, N, utvid.Tracking.NoF);
 
 %initializes first measurement vector
 measVecX = []; measVecY = [];
@@ -61,42 +61,40 @@ measVecX = []; measVecY = [];
 %     measVecX = [measVecX; handles.xm((i-1)*7+1:(i-1)*7+7)'];
 %     measVecY = [measVecY; handles.ym((i-1)*7+1:(i-1)*7+7)'];
 % end
-utvid.Tracking.Kal.meas(:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.right.x;...
+utvid.Tracking.meas(:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.right.x;...
     utvid.coords.shape.center.x;utvid.coords.shape.left.y;utvid.coords.shape.right.y;...
     utvid.coords.shape.center.y];
 
 %define measurement matrix, which is determined every new iteration
-utvid.Tracking.Kal.H = zeros(N, M, utvid.Tracking.NoF);
+utvid.Tracking.H = zeros(N, M, utvid.Tracking.NoF);
 
 %define measurement noise
 Ppart1          = sum(Pext(N+1:end, 3*utvid.coords.nMar+1:end), 2);
 Ppart2          = Pext(N+1:end, 1:3*utvid.coords.nMar);
-utvid.Tracking.Kal.CnBase      = utvid.Tracking.sigMeas.^2*diag([Ppart1; Ppart1]).^2;
-utvid.Tracking.Kal.Cn(:,:,1)   = utvid.Tracking.Kal.CnBase;
-utvid.Tracking.Kal.CnPart      = utvid.Tracking.sigMeas*[Ppart2; Ppart2];    
+utvid.Tracking.CnBase      = utvid.Tracking.sigMeas.^2*diag([Ppart1; Ppart1]).^2;
+utvid.Tracking.Cn(:,:,1)   = utvid.Tracking.CnBase;
+utvid.Tracking.CnPart      = utvid.Tracking.sigMeas*[Ppart2; Ppart2];    
 
 %define process matrix
 T = 1/utvid.Tracking.FrameRate;
-utvid.Tracking.Kal.F = eye(M); 
-utvid.Tracking.Kal.F(1:3*utvid.coords.nMar,3*utvid.coords.nMar+1:end) = T*eye(3*utvid.coords.nMar);
+utvid.Tracking.F = eye(M); 
+utvid.Tracking.F(1:3*utvid.coords.nMar,3*utvid.coords.nMar+1:end) = T*eye(3*utvid.coords.nMar);
 
 %define process noise
-utvid.Tracking.Kal.Cw = zeros(M);
+utvid.Tracking.Cw = zeros(M);
 
-utvid.Tracking.Kal.Cw(3*utvid.coords.nMar+1:end, 3*utvid.coords.nMar+1:end) = ...      %Only process noise is added to the velocity-part of the state vector
+utvid.Tracking.Cw(3*utvid.coords.nMar+1:end, 3*utvid.coords.nMar+1:end) = ...      %Only process noise is added to the velocity-part of the state vector
     diag([utvid.Tracking.sigVx^2*ones(utvid.coords.nMar,1); utvid.Tracking.sigVy^2*ones(utvid.coords.nMar,1); utvid.Tracking.sigVz^2*ones(utvid.coords.nMar,1)]);
 
 %perform initial prediction based on selected markers
-utvid.Tracking.Kal.Cest(:,:,1) = 1E10*eye(M);
-utvid.Tracking.Kal.Cpred(:,:,1) = 1E10*eye(M);
-utvid.Tracking.Kal.Cpred(:,:,2) = 1E10*eye(M);
+utvid.Tracking.Cest(:,:,1) = 1E10*eye(M);
+utvid.Tracking.Cpred(:,:,1) = 1E10*eye(M);
+utvid.Tracking.Cpred(:,:,2) = 1E10*eye(M);
 
 if utvid.settings.nrcams == 3
-    [utvid.Tracking.Kal.Xest(1:end/2,1), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,1)] = twoDto3D_3cam(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
-    [utvid.Tracking.Kal.Xpred(1:end/2,2), ~] = twoDto3D_3cam(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext); 
+    [utvid.Tracking.Xest(1:end/2,1), utvid.Tracking.Cest(1:end/2,1:end/2,1)] = twoDto3D_3cam(utvid.Tracking.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
+    [utvid.Tracking.Xpred(1:end/2,2), ~] = twoDto3D_3cam(utvid.Tracking.meas(:,1), utvid.Tracking.sigMeas^2, Pext); 
 else
-    [utvid.Tracking.Kal.Xest(1:end/2,1), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,1)] = twoDto3D(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
-    [utvid.Tracking.Kal.Xpred(1:end/2,2), ~] = twoDto3D(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext);        
-end
-
+    [utvid.Tracking.Xest(1:end/2,1), utvid.Tracking.Cest(1:end/2,1:end/2,1)] = twoDto3D(utvid.Tracking.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
+    [utvid.Tracking.Xpred(1:end/2,2), ~] = twoDto3D(utvid.Tracking.meas(:,1), utvid.Tracking.sigMeas^2, Pext);        
 end

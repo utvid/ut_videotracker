@@ -14,7 +14,7 @@ scrsize = monpos(1,3:4);
 winsize = .95 * scrsize;%[800 600];
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
-trackingFigure = figure(	'Color',[1 1 1],...
+trackingFigure = figure('Color',[0.94 0.94 0.94],...
     'MenuBar','none',...
     'Name','UT MARKER TRACKING',...
     'PaperPositionMode','auto',...
@@ -100,19 +100,9 @@ handles.h{nbutton} = uicontrol(...
 handles.h{5} = uicontrol(...
     'Parent',trackingFigure,...
     'position',[posx*bsize(1)+.05*winsize(1)+150 winsize(2)-posy*bsize(2)-winsize(2)*.85 bsize],...
-    'style','checkbox','string','show images','value',1,'BackgroundColor','w');
+    'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94]);
 
-utvid.Tracking.ObjL = VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.left(1,1)).name]);
-utvid.Tracking.ObjR = VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.right(1,1)).name]);
-utvid.Tracking.ObjM = VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.center(1,1)).name]);
-axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL,utvid.Tracking.n+1),[]);
-axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR,utvid.Tracking.n+1),[]);
-axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM,utvid.Tracking.n+1),[]);
-
-%number of principal components
-utvid.pca.PCs = 6;
-
-
+utvid = initializeTracking(utvid,handles);
 
 set(gcf,'CloseRequestFcn',@utvid_close);
 guidata(trackingFigure,handles);
@@ -123,7 +113,7 @@ function utvid_back(trackingFigure,handles)
     handles = guidata(trackingFigure);
     if utvid.Tracking.n > 1
         utvid.Tracking.n = utvid.Tracking.n-1;
-        utvid = Tracking(utvid);
+        utvid = Tracking(utvid,handles);
     end
     
     guidata(trackingFigure,handles);
@@ -150,7 +140,7 @@ end
 function utvid_step(trackingFigure,handles)
     handles = guidata(trackingFigure);
     utvid.Tracking.n = utvid.Tracking.n+1;
-    utvid = Tracking(utvid);
+    utvid = Tracking(utvid,handles);
     
     guidata(trackingFigure,handles);
 end
@@ -164,7 +154,7 @@ function utvid_run(trackingFigure,handles)
     utvid.Tracking.FrameNum =  VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(1).name]).NumberOfFrames;
     while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n <= utvid.Tracking.FrameNum;
         utvid.Tracking.n = utvid.Tracking.n+1; 
-        utvid = Tracking(utvid);
+        utvid = Tracking(utvid,handles);
         pause(0.5)
     end
         

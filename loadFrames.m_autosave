@@ -1,0 +1,12 @@
+function utvid = 
+if strcmp(utvid.version,'R2012') %version control
+    FrameL = im2double(read(utvid.Tracking.ObjL,utvid.Tracking.n+1));
+    FrameR = im2double(read(utvid.Tracking.ObjR,utvid.Tracking.n+1));
+    FrameM = im2double(read(utvid.Tracking.ObjM,utvid.Tracking.n+1));
+elseif strcmp(utvid.version,'R2013')
+    FrameL = im2double(read(utvid.Tracking.ObjL,utvid.Tracking.n));
+    FrameR = im2double(read(utvid.Tracking.ObjR,utvid.Tracking.n));
+    FrameM = im2double(read(utvid.Tracking.ObjM,utvid.Tracking.n));
+else
+    disp('Version not yet implemented')
+end

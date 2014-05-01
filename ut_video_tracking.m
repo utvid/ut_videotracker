@@ -1,4 +1,5 @@
 function ut_video_tracking
+clc
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
 cd(path);
@@ -21,7 +22,7 @@ scrsize = monpos(1,3:4);
 winsize = [600 150];
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
-hMainFigure = figure(	'Color',[1 1 1],...
+hMainFigure = figure('Color',[0.94 0.94 0.94],...
     'MenuBar','none',...
     'Name','UT VIDEO TRACKER',...
     'PaperPositionMode','auto',...
@@ -69,7 +70,6 @@ utvid.handle.h3 = uicontrol(...
     'horizontalalignment','center',...
     'enable','on',...
     'callback',@utvid_calibration);
-
 
 nbutton = 4;
 posx = mod(nbutton-1,Nx);
@@ -299,12 +299,12 @@ else
             utvid.coords.nOrMar = 0;
         else
             prompt = 'How many orientation markers to follow? Minimal of 3.';
-            utvid.coords.nOrMar = str2num(input(prompt, 's'));
+            utvid.coords.nOrMar = str2double(input(prompt, 's'));
         end
     end           
         
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2num(input(prompt, 's'));
+    utvid.coords.nMar = str2double(input(prompt, 's'));
 end
 
 cam ={'left','right','center'};
@@ -390,7 +390,7 @@ end
 %% Marker tracking
     function markertracker(hMainFigure,utvid)
         utvid = guidata(hMainFigure);
-        utvid.Tracking.n = 1;
+        
         utvid = markerTracking(utvid);
         % verschillende opties toevoegen:
         %  templatematching

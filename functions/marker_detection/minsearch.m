@@ -1,21 +1,20 @@
-function [Meas] = minsearch(im,Xpred,n,Meas,nMar,utvid)
+function [x,y] = minsearch(x,y,im,roi)
 
-coord = round(Xpred(:,:,n));
+%% check boundaries
+% roi is number of pixels to left, right, up and down of center pixel
+imsize = size(im);
+y(y>imsize(1)-roi) = imsize(1)-(roi+1);
+x(x>imsize(2)-roi) = imsize(2)-(roi+1); 
+y(y<1+roi) = 1+(roi+1);
+x(x<1+roi) = 1+(roi+1); 
 
-% check boundaries
-coord(coord>(size(im,1)-utvid.settings.searchregion-1)) = size(im,1)-utvid.settings.searchregion-1;
-coord(coord<1+utvid.settings.searchregion) = 1+utvid.settings.searchregion;
-
-% marker detection
-for i = 1:nMar
-    imfoo = im(coord(2,i)-utvid.settings.searchregion:coord(2,i)+utvid.settings.searchregion,...
-        coord(1,i)-utvid.settings.searchregion:coord(1,i)+utvid.settings.searchregion);
+%% marker detection
+for i = 1:size(x,1) 
+    imfoo = im(ceil(y(i))-roi:floor(y(i))+roi,ceil(x(i))-roi:floor(x(i))+roi);
     [~,imin]= min(imfoo(:));
     [rmin,cmin] = ind2sub(size(imfoo),imin);
-    
-    x(i) = coord(1,i)-utvid.settings.searchregion-1+cmin;
-    y(i) = coord(2,i)-utvid.settings.searchregion-1+rmin;
+    x1(i) = x(i)-(roi+1)+cmin;
+    y1(i) = y(i)-(roi+1)+rmin;
 end
-Meas.coor(:,:,n) = [x;y];
  
 end
