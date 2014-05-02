@@ -86,7 +86,7 @@ Kal = updateKal(Kal,n);
 Xest = getAllRep(Xest,n, Kal.Xest(1:end/2,n), Kal.Cest(1:end/2,1:end/2,n), Pstruct);
 
 compVec = T*[Kal.Xest(1:end/6,n)';Kal.Xest(end/6+1:end/6*2,n)';Kal.Xest(end/6*2+1:end/6*3,n)';ones(1,handles.nMar)]; compVec = transpose(compVec(1:3,:)); compVec = compVec(:);
-Dn = min(pdist2(compVec',PCAcoords'))
+Dn = min(pdist2(compVec',PCAcoords'));
 
 if Dn > lim
 %     PCAcoords = [PCAcoords,Kal.Xest(1:end/2,n)];

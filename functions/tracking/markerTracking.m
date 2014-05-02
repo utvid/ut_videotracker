@@ -38,11 +38,6 @@ elseif utvid.settings.nrOrMar ~= 0
     end
 end
 
-utvid.Tracking.ObjL = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,1)).name]);
-utvid.Tracking.ObjR = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,1)).name]);
-utvid.Tracking.ObjM = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,1)).name]);
-
-
 Nx = 4;
 bsize = [100 100];
 
@@ -107,14 +102,35 @@ handles.h{5} = uicontrol(...
 %place edit boxes for Tracking settings
 %{
 Er moet nog een knop voor utvid.settings.Measmethod
+Limieten plaatje instellen rondom interesse gebied
+
 Default knop inbouwen?
 %}
-Ny = 6;
+Ny = 7;
+
+nbutton = 7;
+posx = (2/3)*winsize(1);
+posy = 20+(0.2*winsize(2))/Ny*(nbutton-1);
+nbsize = [winsize(1)/3/2 0.15*winsize(2)/Ny];
+uicontrol(...
+    'Parent',trackingFigure,...
+    'position', [posx posy nbsize],...
+    'style','text',...
+    'string','PCA expansion limit (mm)',...
+    'background','white','BackgroundColor',[0.94 0.94 0.94]);
+
+posx = (2/3)*winsize(1)+nbsize(1);
+handles.h{12} = uicontrol(...
+    'Parent',trackingFigure,...
+    'position', [posx posy nbsize],...
+    'style','edit',....
+    'string','4','Callback',@gettextvalues,...
+    'background','white');
+utvid.Tracking.lim = str2double(get(handles.h{12},'string'));
 
 nbutton = 6;
 posx = (2/3)*winsize(1);
 posy = 20+(0.2*winsize(2))/Ny*(nbutton-1);
-nbsize = [winsize(1)/3/2 0.15*winsize(2)/Ny];
 uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
@@ -226,6 +242,7 @@ handles.h{11} = uicontrol(...
     'background','white');
 utvid.settings.PCs = str2double(get(handles.h{11},'string'));
 
+
 utvid = initializeTracking(utvid,handles);
 
 set(gcf,'CloseRequestFcn',@utvid_close);
@@ -246,6 +263,7 @@ uiwait(trackingFigure);
         utvid.Tracking.sigVz =     str2num(get(handles.h{10},'string'));
         % search region
         utvid.Tracking.roi=        str2double(get(handles.h{6},'string'));
+        utvid.Tracking.lim=        str2double(get(handles.h{6},'string'));
         
         % check for empty input, if so use defaults
         if isempty(utvid.settings.PCs);        utvid.settings.PCs = 6;
@@ -263,7 +281,6 @@ uiwait(trackingFigure);
         
         guidata(trackingFigure,handles);
     end
-
 
 %% step back callback
     function utvid_back(trackingFigure,handles)
@@ -296,10 +313,17 @@ uiwait(trackingFigure);
 %% step forward callback
     function utvid_step(trackingFigure,handles)
         handles = guidata(trackingFigure);
-        
-        utvid.Tracking.n = utvid.Tracking.n+1;
-        utvid = Tracking(utvid,handles);
-        
+        if strcmp(utvid.settings.version,'R2012')
+            if utvid.Tracking.n+1 < utvid.Tracking.NoF
+                utvid.Tracking.n = utvid.Tracking.n+1;
+                utvid = Tracking(utvid,handles);
+
+            end
+        elseif strcmp(utvid.settings.version,'R2013')
+            if utvid.Tracking.n < utvid.Tracking.NoF
+                utvid.Tracking.n = utvid.Tracking.n+1;
+                utvid = Tracking(utvid,handles);
+            end        
         guidata(trackingFigure,handles);
     end
 
@@ -313,7 +337,6 @@ uiwait(trackingFigure);
         while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n <= utvid.Tracking.FrameNum;
             utvid.Tracking.n = utvid.Tracking.n+1;
             utvid = Tracking(utvid,handles);
-            pause(0.5)
         end
         
         guidata(trackingFigure,handles);
