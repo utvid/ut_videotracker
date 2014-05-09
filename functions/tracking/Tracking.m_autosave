@@ -1,15 +1,42 @@
 function utvid = Tracking(utvid,handles)
 utvid.Tracking.n
+
 % Update PCA model (if enough measurements regarding number of Principal components)
 if size(utvid.pca.PCAcoords,2) > 3*utvid.settings.PCs
     utvid = PCAmodelUpdate(utvid);
 end
 
 % Load and show corresponding frames
+%HET PLOTTEN MOET NOG NETJES IN EEN FUNCTIE GEZET WORDEN
 utvid = loadFrames(utvid,handles);
 
+% axes(handles.hax{1}), hold on
+% plot(utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n),'ob')
+% 
+% axes(handles.hax{2}), hold on
+% plot(utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n),'ob')
+
+% axes(handles.hax{3}), hold on
+% plot(utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n),'ob')
+
 %Measurement
+%HET PLOTTEN MOET NOG NETJES IN EEN FUNCTIE GEZET WORDEN
+
 utvid = measurement(utvid);
+
+% axes(handles.hax{1}), hold on
+% plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
+%     utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r*')
+% [utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
+%     utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n)]
+% 
+% axes(handles.hax{2}), hold on
+% plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:utvid.settings.nrMarkers*2,utvid.Tracking.n),...
+%     utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*4+1:utvid.settings.nrMarkers*5,utvid.Tracking.n),'r*')
+
+% axes(handles.hax{3}), hold on
+% plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*2+1:utvid.settings.nrMarkers*3,utvid.Tracking.n),...
+%     utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*5+1:utvid.settings.nrMarkers*6,utvid.Tracking.n),'r*')
 
 if utvid.settings.nrOrMar ~= 0
     %Head orientation
@@ -35,18 +62,22 @@ utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct, utvid.Tr
 utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal, utvid.Tracking.n);
 
 %Space representations Estimations
-utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,1), ...
-    utvid.Tracking.Kal.Cest(1:end/2,1:end/2,1), utvid.Pstruct);
+utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
+    utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
 %PCA Expansion
-% D should be set in GUI
-D = min(pdist2(Kal.Xest(1:end/2,Q+n)',PCAcoords'));
-if D > lim
-    [PCAcoords,PCAmodel,Xest,Kal,PCAmodel2] = PCAExpansion(FrameL,FrameR,FrameM,handles,Q+n,PCAcoords,Kal,Xest,PCAmodel,Pstruct,lim);
+% lim should be set in GUI
+D = min(pdist2(utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n)',utvid.pca.PCAcoords'));
+if D > utvid.Tracking.lim
+    [utvid.pca.PCAcoords,utvid.pca.PCAmodel,utvid.Tracking.Xest,utvid.Tracking.Kal] ...
+        = PCAExpansion(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
+        utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
+        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.pca.PCAmodel,utvid.Pstruct,utvid.Tracking.lim);
 end
 
 %Space representations Prediction
-
+utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n+1, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n+1), ...
+    utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n+1), utvid.Pstruct);
 
 end
 

@@ -63,6 +63,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     
     if j == 1
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+%         mean(abs(utvid.Tracking.Kal.meas(:,1)-utvid.Tracking.Kal.meas(:,utvid.Tracking.n)))
     elseif j == 2
         utvid.Tracking.Kal.measor(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end

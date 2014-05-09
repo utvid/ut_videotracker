@@ -348,7 +348,7 @@ function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
 %imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+utvid = utvid_imenhanceGUI(utvid);
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');

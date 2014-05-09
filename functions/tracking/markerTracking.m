@@ -202,7 +202,7 @@ handles.h{9} = uicontrol(...
     'style','edit',....
     'string','2','Callback',@gettextvalues,...
     'background','white');
-utvid.Tracking.sigVy =     str2num(get(handles.h{9},'string'));
+utvid.Tracking.sigVy = str2num(get(handles.h{9},'string'));
 
 nbutton = 2;
 posx = (2/3)*winsize(1);
@@ -325,6 +325,7 @@ uiwait(trackingFigure);
                 utvid = Tracking(utvid,handles);
             end        
         guidata(trackingFigure,handles);
+        end
     end
 
 %% continue callback

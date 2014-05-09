@@ -49,8 +49,8 @@ switch choice
         close
         h1 = figure; imshow(imnL,[]);
         [Xest.x1(:,1,n),Xest.x1(:,2,n)] = getpts();
-        close(h1)
 end
+close(h1)
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnR,[]);  hold on
@@ -77,7 +77,7 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnM,[]); 
+        h1 = figure, imshow(imnM,[]); 
         [Xest.x3(:,1,n),Xest.x3(:,2,n)] = getpts();
         close(h1)
 end

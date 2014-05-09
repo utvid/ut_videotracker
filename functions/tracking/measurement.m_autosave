@@ -10,7 +10,7 @@ else
     jmax = 1;
 end
 
-for j = 1:jmax % j = 1
+for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
     cam = {'left','right','center'};
     if isfield(utvid.settings,'Measmethod')~=1
@@ -23,7 +23,6 @@ for j = 1:jmax % j = 1
         im  = frames{i};
         if j == 1
             if i == 1
-                utvid.Tracking.Xpred.x1
                 x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
                 y   = utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n) ;
             elseif i == 2
@@ -50,7 +49,9 @@ for j = 1:jmax % j = 1
             case 'findblue'
                 [x,y] = findblue(x,y,im,utvid.Tracking.roi);
             case 'minsearch'
-                [x,y] = minsearch(x,y,im,utvid.Tracking.roi);
+                j
+                [x,y] = minsearch(x,y,im,utvid.Tracking.roi)
+                size(x), size(y)
             case 'templatematching'
                 [x,y] = templatematching(x,y,im,utvid.Tracking.roi);
             case 'findcircle'
@@ -64,6 +65,7 @@ for j = 1:jmax % j = 1
     
     if j == 1
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+%         mean(abs(utvid.Tracking.Kal.meas(:,1)-utvid.Tracking.Kal.meas(:,utvid.Tracking.n)))
     elseif j == 2
         utvid.Tracking.Kal.measor(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end
