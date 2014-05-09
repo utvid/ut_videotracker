@@ -3,7 +3,6 @@ function [utvid] = measurement(utvid)
 %            frames = {FrameL,FrameR,FrameM}
 %            str = or / shape
 %            n = framenumber
-str = {'or','shape'};
 
 if utvid.settings.nrOrMar ~= 0
     jmax = 2;
@@ -11,7 +10,7 @@ else
     jmax = 1;
 end
 
-for j = 1:jmax
+for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
     cam = {'left','right','center'};
     if isfield(utvid.settings,'Measmethod')~=1
@@ -24,7 +23,6 @@ for j = 1:jmax
         im  = frames{i};
         if j == 1
             if i == 1
-                utvid.Tracking.Xpred.x1
                 x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
                 y   = utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n) ;
             elseif i == 2
@@ -65,6 +63,7 @@ for j = 1:jmax
     
     if j == 1
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+%         mean(abs(utvid.Tracking.Kal.meas(:,1)-utvid.Tracking.Kal.meas(:,utvid.Tracking.n)))
     elseif j == 2
         utvid.Tracking.Kal.measor(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end

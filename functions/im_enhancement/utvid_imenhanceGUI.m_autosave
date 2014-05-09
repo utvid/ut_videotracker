@@ -383,7 +383,7 @@ set(handles.h{3},'background','g')
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';
 guidata(enhanceFigure,handles);
@@ -396,7 +396,7 @@ set(handles.text.sigma_up,'String',handles.sigma_up);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -409,7 +409,7 @@ set(handles.text.sigma_down,'String',handles.sigma_down);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -422,7 +422,7 @@ set(handles.text.alpha,'String',handles.alpha);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true'; set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -435,7 +435,7 @@ set(handles.text.vertical,'String',handles.vertical);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -448,7 +448,7 @@ set(handles.text.horizontal,'String',handles.horizontal);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -461,7 +461,7 @@ set(handles.text.a,'String',handles.a);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -474,7 +474,7 @@ set(handles.text.b,'String',handles.b);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -487,7 +487,7 @@ set(handles.text.region,'String',handles.region);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+handles.F = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -500,7 +500,7 @@ set(handles.text.window,'String',handles.window);
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+[handles.F,handles] = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
@@ -513,7 +513,7 @@ for i = 1:size(handles.h,2)
     set(handles.h{1,i},'background','default');
     try
         utvid.enhancement.(field{i}) = 'false';
-    catch, end
+    catch end
 end
 handles.J = handles.I;
 axes(handles.hax2);imshow(handles.J);title('Enhanced Image');
@@ -566,7 +566,7 @@ end
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
-[handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
+[handles.F,handles] = utvid_applyfilter(handles.J,handles.coords,handles);
 axes(handles.hax2); imshow(handles.F);title('Enhanced Image');
 guidata(enhanceFigure,handles)
 end

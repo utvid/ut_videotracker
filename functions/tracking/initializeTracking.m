@@ -1,6 +1,6 @@
 function utvid = initializeTracking(utvid,handles)
 
-utvid.Tracking.n = 1;
+utvid.Tracking.n = 1; 
 
 utvid.Tracking.ObjL = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,1)).name]);
 utvid.Tracking.ObjR = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,1)).name]);

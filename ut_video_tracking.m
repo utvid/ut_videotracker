@@ -244,6 +244,7 @@ guidata(hMainFigure,utvid);
 set(utvid.handle.h2,'backgroundcolor','g');
 
 end
+
 %{
 Ideas to add:
 -   Choose compression method: motion jpg avi, motion jpg 2000 mpeg 4 etc
@@ -347,14 +348,13 @@ function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
 %imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+utvid = utvid_imenhanceGUI(utvid);
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
 set(utvid.handle.h5,'backgroundcolor','g');
 end
-
 %% PCA model
     function utvid_selectpca(hMainFigure,utvid)
         utvid = guidata(hMainFigure);
@@ -394,7 +394,6 @@ end
         guidata(hMainFigure,utvid);
         set(utvid.handle.h6,'backgroundcolor','g');
     end
-
 %% Marker tracking
     function markertracker(hMainFigure,utvid)
         utvid = guidata(hMainFigure);

@@ -1,4 +1,4 @@
-function PCAmodel = getPCAmodel(utvid)
+function PCAmodel = getPCAmodel(PCAcoords)
 % Generates a PCA model of the markers on the tongue based on selected
 % marker locations in various frames of the tongue. Method is based on
 % taking several frames of a movie incorporating tongue motion. The
@@ -19,11 +19,11 @@ function PCAmodel = getPCAmodel(utvid)
 % 
 
 %PCA component subtraction of the 3D tongue-shapes
-utvid.pca.meanShape = mean(utvid.pca.PCAcoords,2);
+utvid.pca.meanShape = mean(PCAcoords,2);
 %principal component subtraction
-[utvid.pca.V, utvid.pca.y, utvid.pca.eigVal] = princomp(utvid.pca.PCAcoords'- repmat(utvid.pca.meanShape,1,size(utvid.pca.PCAcoords,2))','econ'); 
-if size(PCAmodel.V,2)>handles.nrPCs
-    PCAmodel.V = PCAmodel.V(:,1:handles.nrPCs);
+[utvid.pca.V, utvid.pca.y, utvid.pca.eigVal] = princomp(PCAcoords'- repmat(utvid.pca.meanShape,1,size(PCAcoords,2))','econ'); 
+if size(utvi.V,2)>handles.nrPCs
+    utvid.pca.V = utvid.pca.V(:,1:utvid.settings.PCs);
 end
 
 end          

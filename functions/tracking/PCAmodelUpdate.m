@@ -1,12 +1,12 @@
 function utvid = PCAmodelUpdate(utvid)
 %construct PCA model (if enough measurements in training set)
-utvid.pca.PCAmodel = getPCAmodel(utvid.pca.PCAcoords);
+utvid = getPCAmodel(utvid);
 
 % Rotate PCA model, when using orientation markers
-if utvid.nOrMar ~= 0
-    [utvid.pca.PCAmodel_rot, utvid.pca.R_init] = rotatePCA(PCAmodel_red, Xinit_or, settings);
+if utvid.settings.nrOrMar ~= 0
+    [utvid.pca_rot, utvid.pca.R_init] = rotatePCA(utvid.pca, utvid.coords.Xinit_or, utvid.settings.nrMarkers, utvid.Tracking.n);
 else
-    utvid.pca.PCAmodel_rot = PCAmodel; utvid.Tracking.R_init = eye(3);
+    utvid.pca_rot = utvid.pca; utvid.Tracking.R_init = eye(3);
 end
 
 end
