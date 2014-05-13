@@ -257,23 +257,24 @@ function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 cam ={'left','right','center'};
 for i = 1:utvid.settings.nrcams;
-    if strcmp(utvid.version,'R2012')
+    if strcmp(utvid.settings.version,'R2012')
         [utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]),2);
 %         I = demosaic(I(:,:,1),'rggb');
-    elseif strcmp(utvid.version,'R2013')
+    elseif strcmp(utvid.settings.version,'R2013')
         I = demosaic((read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i}).name]),1)),'rggb');
     else
         disp('Version not yet implemented')
     end
     % calibration using script of Hageman and van der Heijden
-    [K, R, T, P,avgEr,stdEr] = utvid_camcalibration(I,50);
+    [K, R, T, P,Ximage,avgEr,stdEr] = utvid_camcalibration(I,50);
     utvid.calbMat.(cam{i}){1,1} = K;
     utvid.calbMat.(cam{i}){1,2} = R;
     utvid.calbMat.(cam{i}){1,3} = T;
     utvid.calbMat.(cam{i}){1,4} = P;
-    utvid.calbMat.(cam{i}){1,5} = avgEr;
-    utvid.calbMat.(cam{i}){1,6} = stdEr;
+    utvid.calbMat.(cam{i}){1,5} = Ximage;
+    utvid.calbMat.(cam{i}){1,6} = avgEr;
+    utvid.calbMat.(cam{i}){1,7} = stdEr;
     utvid.calb{i}.P = utvid.calbMat.(cam{i}){1,4};
 end
 
@@ -319,9 +320,9 @@ end
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
-        if strcmp(utvid.version,'R2012')
+        if strcmp(utvid.settings.version,'R2012')
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
-        elseif strcmp(utvid.version,'R2013')
+        elseif strcmp(utvid.settings.version,'R2013')
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
         else
             disp('Version not yet implemented')
@@ -370,7 +371,7 @@ end
                 
                 utvid.settings.pca = 'expansion';
                 for i = 1:size(utvid.coords.shape.left.x,2)
-                   size(utvid.coords.shape.left.x(:,i))
+                   size(utvid.coords.shape.left.x(:,i));
                     [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
                     utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
                     utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
@@ -388,7 +389,7 @@ end
             utvid = getPCApoints(utvid);
             utvid.settings.pca = 'predefined';
         end
-        utvid.pca.PCAcoords
+        utvid.pca.PCAcoords;
         utvid.settings.state = 6; % update state
         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
         guidata(hMainFigure,utvid);

@@ -67,18 +67,24 @@ function X = getSpatialRep(X, iter, vec, unc, Pstruct)
     
     %defines 2D state
 %     if settings.nrCam==3
-        [X.x1(:,:,iter), X.x2(:,:,iter), X.x3(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter), X.C_x3(:,:,:,iter)] = ...
-            threeDto2D_3cam(vec, unc, Pstruct);
+% % % % % % %         [X.x1(:,:,iter), X.x2(:,:,iter), X.x3(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter), X.C_x3(:,:,:,iter)] = ...
+% % % % % % %             threeDto2D_3cam(vec, unc, Pstruct);
 %     else
 %         [X.x1(:,:,iter), X.x2(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter)] = ...
 %             threeDto2D(vec, unc, Pstruct);
 %     end
+       [x1,x2,x3,X.Cx_1(:,:,:,iter),X.Cx_2(:,:,:,iter),X.Cx_3(:,:,:,iter)] = threeDto2D_3cam(vec, unc, Pstruct);
+
+        X.x1(:,:,iter) = x1';
+        X.x2(:,:,iter) = x2'; 
+        X.x3(:,:,iter) = x3'; 
     
+
     %defines 3D state
     N = length(vec)/3;
-    X.X(1,:,iter) = vec(1:N);
-    X.X(2,:,iter) = vec(N+1:2*N);
-    X.X(3,:,iter) = vec(2*N+1:end); 
+    X.X(:,1,iter) = vec(1:N);
+    X.X(:,2,iter) = vec(N+1:2*N);
+    X.X(:,3,iter) = vec(2*N+1:end); 
     for n=1:N
         X.C_X(:,:,n,iter) = unc([n, n+N, n+2*N], [n, n+N, n+2*N]);
     end
