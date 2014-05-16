@@ -73,7 +73,8 @@ function X = getSpatialRep(X, iter, vec, unc, Pstruct)
 %         [X.x1(:,:,iter), X.x2(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter)] = ...
 %             threeDto2D(vec, unc, Pstruct);
 %     end
-       [x1,x2,x3,X.Cx_1(:,:,:,iter),X.Cx_2(:,:,:,iter),X.Cx_3(:,:,:,iter)] = threeDto2D_3cam(vec, unc, Pstruct);
+       [x1,x2,x3,X.Cx_1(:,:,:,iter),X.Cx_2(:,:,:,iter),X.Cx_3(:,:,:,iter)] ...
+           = threeDto2D_3cam(vec, unc, Pstruct);
 
         X.x1(:,:,iter) = x1';
         X.x2(:,:,iter) = x2'; 

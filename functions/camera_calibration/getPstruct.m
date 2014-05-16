@@ -27,7 +27,6 @@ catch
     nrMarkers_or = 6;
 end
 
-
 %creation of Pext is performed in four steps, each step creating only a
 %fourth part of the matrix
 Pext    = zeros(3*nrCam*nrMarkers,4*nrMarkers);

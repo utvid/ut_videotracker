@@ -40,6 +40,7 @@ end
 
 Nx = 4;
 bsize = [100 100];
+utvid.plotting = 1;
 
 nbutton = 1;
 posx = mod(nbutton-1,8);
@@ -97,7 +98,8 @@ posx = 4.5;
 handles.h{5} = uicontrol(...
     'Parent',trackingFigure,...
     'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)-winsize(2)*.85 bsize],...
-    'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94]);
+    'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94],...
+    'callback',@utvid_plot);
 
 %place edit boxes for Tracking settings
 %{
@@ -253,7 +255,7 @@ uiwait(trackingFigure);
         handles = guidata(trackingFigure);
         
         % number of principle components
-        utvid.settings.PCs =       str2num(get(handles.h{11},'string'));
+        utvid.settings.PCs =       str2double(get(handles.h{11},'string'));
         % measurement noise
         utvid.Tracking.sigMeas =   str2num(get(handles.h{7},'string'));
         % process noise x y z
@@ -338,6 +340,13 @@ uiwait(trackingFigure);
             utvid = Tracking(utvid,handles);
         end
         
+        guidata(trackingFigure,handles);
+    end
+%% checkbox plot
+    function utvid_plot(trackingFigure,handles)
+        handles = guidata(trackingFigure);
+        utvid.Tracking.plotting = get(handles.h{5},'Value');
+         
         guidata(trackingFigure,handles);
     end
 
