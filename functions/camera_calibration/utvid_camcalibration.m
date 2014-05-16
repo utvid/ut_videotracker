@@ -49,7 +49,7 @@ function [K, R, T, P,Ximage,avgEr,stdEr] = ut_camera_calibration_cube2(Ximage, v
 testing = false;
 
 figure(100); imshow(Ximage); title('Cube image');
-set(gca,'YDir','normal');
+% set(gca,'YDir','normal');
 if ~testing
     %Lets user select point after point
     Ximage = [];

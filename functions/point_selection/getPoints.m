@@ -1,5 +1,6 @@
 function [x,y] = getPoints(Im,nrMarkers,str);
 figure; imshow(Im); title(str);
+% set(gca,'Ydir','normal');
 hold on;
 x=[];y=[];
 k = 1;
