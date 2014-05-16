@@ -217,7 +217,7 @@ uiwait(pcaselectFig);
 %             Dit gaat niet goed met de naamgeving, hij kent blijkbaar  de
 %             data nog niet, volgens mij hadden we dat nu als PCA set in
 %             coords opgeslagen?
-utvid.coords.data(handles.curNoF,j)
+                utvid.coords.data(handles.curNoF,j)
 %             [utvid.coords.data(handles.curNoF,j).x, utvid.coords.data.data(handles.curNoF,j).y] = ...
                [utvid.coords.data(handles.curNoF,j).x, utvid.coords.data(handles.curNoF,j).y] = getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrMarkers, 'Select shape markers');
         end

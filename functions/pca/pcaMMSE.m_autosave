@@ -1,0 +1,14 @@
+function utvid = pcaMMSE(utvid)
+
+X = utvid.pca.PCAcoords;
+Gamma = diag(ones(size(X,1),1));
+meanX = mean(X,2);
+
+if utvid.pca.Normed == 1
+Xnormed = Gamma\(X(:,1:end)-repmat(meanX,1,size(X,2)));
+else
+Xnormed = PCAcoords-repmat(meanX,1,size(X,2));
+end
+
+[PCAmodel.V,PCAmodel.S,~] = svd(PCAmodel.Xnormed,'econ');
+PCAmodel.Cb = (1/(size(PCAmodel.Xnormed,2)))*PCAmodel.S.^2;

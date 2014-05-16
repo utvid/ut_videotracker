@@ -1,9 +1,9 @@
 function ut_video_tracking
+clc, close all
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
 cd(path);
 addpath(genpath([path '\functions']));
-
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');
@@ -143,7 +143,7 @@ utvid.handle.h10 = uicontrol(...
     'enable','on');
 
 try
-load historyfolder.mat
+    load historyfolder.mat
 catch
     historyfolder = {''};
     save('historyfolder.mat','historyfolder');
@@ -169,7 +169,6 @@ utvid.handle.h9 = uicontrol(...
 
 guidata(hMainFigure,utvid);
 end
-
 %% initialise marker tracking process
 function utvid_initialise(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
@@ -182,21 +181,26 @@ end
 
 guidata(hMainFigure,utvid)
 end
-
 %% close Marker Tracker GUI
 function utvid_close(hMainFigure,utvid)
 % utvid = guidata(hMainFigure);
 delete(gcf);
 end
-
 %% Warning function for not yet implemented functions
 function utvid_na(hMainFigure,utvid)
 warndlg('not yet implemented',' ','modal')
 end
-
 %% Bayerfilter and compress videos
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
+
+prompt = 'Give standard name (e.g. NEW): '
+result = input(prompt,'s');
+if isempty(result)
+    utvid.setttings.stname = 'NEW'
+else
+    utvid.settings.stname = result;
+end
 
 % Ask for using compression or not
 prompt = 'Use compression (y/n)? ';
@@ -235,13 +239,13 @@ guidata(hMainFigure,utvid);
 set(utvid.handle.h2,'backgroundcolor','g');
 
 end
+
 %{
 Ideas to add:
 -   Choose compression method: motion jpg avi, motion jpg 2000 mpeg 4 etc
 -   Choose new standard filenames for videos + location,
     these standard filenames must also be added to utvid_init
 %}
-
 %% Calibration process
 function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
@@ -250,7 +254,7 @@ for i = 1:utvid.settings.nrcams;
     if strcmp(utvid.version,'R2012')
         [utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]),2);
-%         I = demosaic(I(:,:,1),'rggb');
+        %         I = demosaic(I(:,:,1),'rggb');
     elseif strcmp(utvid.version,'R2013')
         I = demosaic((read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i}).name]),1)),'rggb');
     else
@@ -284,44 +288,44 @@ prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
 result = input(prompt, 's');
 
 if strcmp(result,'n')
-    utvid.coords.nOrMar = 0;
+    utvid.settings.nrOrMar = 0;
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2double(input(prompt, 's'));
+    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 else
     prompt = 'How many orientation markers to follow?';
-    utvid.coords.nOrMar = str2double(input(prompt, 's'));
-    if utvid.coords.nOrMar < 3
+    utvid.settings.nrOrMar = str2double(input(prompt, 's'));
+    if utvid.settings.nrOrMar < 3
         prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)?';
-        utvid.coords.nOrMar = str2double(input(prompt, 's'));
+        utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         result = input(prompt, 's');
         if strcmp(result,'n')
-            utvid.coords.nOrMar = 0;
+            utvid.settings.nrOrMar = 0;
         else
             prompt = 'How many orientation markers to follow? Minimal of 3.';
-            utvid.coords.nOrMar = str2double(input(prompt, 's'));
+            utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         end
-    end           
-        
+    end
+    
     prompt = 'How many markers to follow?';
-    utvid.coords.nMar = str2double(input(prompt, 's'));
+    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 end
 
 cam ={'left','right','center'};
 for j = 1:size(utvid.movs.instrstart,2)
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.version,'R2012')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
         elseif strcmp(utvid.version,'R2013')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
+            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
         else
             disp('Version not yet implemented')
         end
         
-        if utvid.coords.nOrMar == 0
-            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nMar,'Select shape markers');
+        if utvid.settings.nrOrMar == 0
+            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
         else
-            [utvid.coords.or.(cam{i}).x(:,j),utvid.coords.or.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nOrMar,'Select Orientation markers');
-            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.coords.nMar,'Select shape markers');
+            [utvid.coords.or.(cam{i}).x(:,j),utvid.coords.or.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrOrMar,'Select Orientation markers');
+            [utvid.coords.shape.(cam{i}).x(:,j),utvid.coords.shape.(cam{i}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
         end
     end
 end
@@ -338,101 +342,114 @@ function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
 %imenhanceGUI moet nog verbeterd worden met meer opties
-utvid = utvid_imenhanceGUI(hMainFigure,utvid);
+utvid = utvid_imenhanceGUI(utvid);
 
 utvid.settings.state = 5; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
 set(utvid.handle.h5,'backgroundcolor','g');
 end
-
 %% PCA model
-    function utvid_selectpca(hMainFigure,utvid)
-        utvid = guidata(hMainFigure);
-        
-        prompt = 'Do you want to use a predefined PCA model (y/n)? ';
-        result = input(prompt, 's');
-        if isempty(result)
-            result = 'y';
-        end
-        
-        while isempty(regexpi(result,'y'))
-            if regexpi(result,'n')==1
-                
-                utvid.settings.pca = 'expansion';
-                for i = 1:size(utvid.coords.shape.left.x,2)
-                   size(utvid.coords.shape.left.x(:,i))
-                    [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
-                    utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
-                    utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
-                    utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
-                end
-                break
-            else
-                prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
-                result = input(prompt, 's');
-            end
-        end
-        if regexpi(result,'y');
-            %% hier moet de PCA selectie GUI aangeroepen worden
-            %  met mogelijkheid tot het laden van een opgeslagen pcamodel
-            utvid = getPCApoints(utvid);
-            utvid.settings.pca = 'predefined';
-        end
-        utvid.pca.PCAcoords
-        utvid.settings.state = 6; % update state
-        save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-        guidata(hMainFigure,utvid);
-        set(utvid.handle.h6,'backgroundcolor','g');
-    end
+function utvid_selectpca(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
 
+prompt = 'Do you want to use a predefined PCA model (y/n)? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
+        
+        utvid.settings.pca = 'expansion';
+        for i = 1:size(utvid.coords.shape.left.x,2)
+            size(utvid.coords.shape.left.x(:,i))
+            [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
+                utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
+                utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
+                utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
+        end
+        break
+    else
+        prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
+        result = input(prompt, 's');
+    end
+end
+
+if regexpi(result,'y');
+    %% hier moet de PCA selectie GUI aangeroepen worden
+    %  met mogelijkheid tot het laden van een opgeslagen pcamodel
+    utvid = getPCApoints(utvid);
+    utvid.settings.pca = 'predefined';
+end
+prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
+        utvid.pca.MMSE = 0;
+        disp('LSE not working yet')
+        break
+    else
+        prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+        result = input(prompt, 's');
+    end
+end
+if regexpi(result,'y');
+    utvid.pca.MMSE = 1;
+    prompt = 'Do you want to normalize data (y/n)? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = 'y';
+    end
+    while isempty(regexpi(result,'y'))
+        if regexpi(result,'n')==1
+            utvid.pca.Normed = 0;
+            break
+        else
+            prompt = 'Do you want to normalize data (y/n)? ';
+            result = input(prompt, 's');
+        end
+    end
+    if regexpi(result,'y');
+        
+    end
+    
+    utvid.settings.state = 6; % update state
+    save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+    guidata(hMainFigure,utvid);
+    set(utvid.handle.h6,'backgroundcolor','g');
+end
 %% Marker tracking
     function markertracker(hMainFigure,utvid)
         utvid = guidata(hMainFigure);
         
         utvid = markerTracking(utvid);
-        % verschillende opties toevoegen:
-        %  templatematching
-        %  circle search
-        %  minimum search
-        %  findblue
-        %  active appearance
-        %  et cetera
-%         switch(result)
-%             case templatematching
-%                 disp('Not yet implemented');
-%             case minsearch
-%                 disp('Not yet implemented');
-%             case bluesearch
-%                 disp('Not yet implemented');
-%             case circlesearch
-%                 disp('Not yet implemented');
-%             case aam
-%                 disp('Not yet implemented');
-%         end
-
-%         utvid.settings.state = 7; % update state
-%         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-%         guidata(hMainFigure);
-%         set(utvid.handle.h7,'backgroundcolor','g');
+        
+        %         utvid.settings.state = 7; % update state
+        %         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+        %         guidata(hMainFigure);
+        %         set(utvid.handle.h7,'backgroundcolor','g');
     end
-    
-%%    
-function utvid_history(hMainFigure,utvid)
-utvid = guidata(hMainFigure);
-
-if iscell(utvid.settings.historyfolder)
-    num = get(hMainFigure,'value');
-    utvid.settings.dir_data = utvid.settings.historyfolder{num};
-    disp(['Measurement folder: ' utvid.settings.dir_data])
-end
-
-%proceed with initialization
-utvid = utvid_init(hMainFigure,utvid);
-% make buttons of completed steps green
-for i = 1:utvid.settings.state
-    set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
-end
-
-guidata(hMainFigure,utvid)
-end
+%%
+    function utvid_history(hMainFigure,utvid)
+        utvid = guidata(hMainFigure);
+        
+        if iscell(utvid.settings.historyfolder)
+            num = get(hMainFigure,'value');
+            utvid.settings.dir_data = utvid.settings.historyfolder{num};
+            disp(['Measurement folder: ' utvid.settings.dir_data])
+        end
+        
+        %proceed with initialization
+        utvid = utvid_init(hMainFigure,utvid);
+        % make buttons of completed steps green
+        for i = 1:utvid.settings.state
+            set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
+        end
+        
+        guidata(hMainFigure,utvid)
+    end

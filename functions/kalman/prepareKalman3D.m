@@ -1,4 +1,4 @@
-function [Kal] = prepareKalman3D(Kal, Pstruct, i)
+function [Kal] = prepareKalman3D(Kal,Pstruct, i)
 % Prepares the Kalman filter for a Kalman update. For this purpose the
 % vector z and matrix H are determined, describing the relation z=HX, X
 % being the state vector

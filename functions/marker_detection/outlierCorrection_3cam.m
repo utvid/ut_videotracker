@@ -27,7 +27,7 @@ function [utvid] = outlierCorrection_3cam(utvid)
 %                       marked as 'outliers'
 %
 % Adjusted using the utvid struct, 
-
+Pstruct = utvid.Pstruct;
 nrCam = utvid.settings.nrcams;
 N = utvid.settings.nrMarkers;
 subsetNr = round(0.7*N);
@@ -66,7 +66,7 @@ for i=1:nrIter
     markCntSub{3} = markCntMasked{3}(markCntMaskedInd{3});
     ind_sub = [markCntSub{1}, markCntSub{2}+N, markCntSub{3}+2*N, markCntSub{1}+3*N, markCntSub{2}+4*N, markCntSub{3}+5*N]';
 
-    dataVec_sub = utvid.Tracking.Kal.meas(ind_sub,utvid.Tracking.n);
+    dataVec_sub = utvid.Tracking.Kal.Xest(ind_sub,utvid.Tracking.n);
     
     %changes the PCA model accordingly
     ind_sub_P = [markCntSub{1}, markCntSub{2}+N, markCntSub{3}+2*N, markCntSub{1}+3*N, ...
@@ -76,7 +76,7 @@ for i=1:nrIter
               
     %Least squares estimation   
     [PCAscore(:,i), ~] = twoDtoPCA_3cam(dataVec_sub, 2, PCAmodel_sub, Pstruct_sub);
-    [pts2D_1, pts2D_2, pts2D_3, ~, ~, ~] = PCAto2D_3cam(PCAscore(:,i), eye(utvid.settings.PCs), PCAmodel, Pstruct);
+    [pts2D_1, pts2D_2, pts2D_3, ~, ~, ~] = PCAto2D_3cam(PCAscore(:,i), eye(utvid.settings.PCs), utvid.pca.PCAmodel_rot, Pstruct);
     dataVec_recon(:,i) = [pts2D_1(1,:), pts2D_2(1,:), pts2D_3(1,:), pts2D_1(2,:), pts2D_2(2,:), pts2D_3(2,:)]';
    
     %Reconstruction error
@@ -113,6 +113,6 @@ utvid.Tracking.outliers{1} = C{maxInd}(C{maxInd}<=N);
 utvid.Tracking.outliers{2} = C{maxInd}(C{maxInd}>N & C{maxInd}<=2*N)-N;
 utvid.Tracking.outliers{3} = C{maxInd}(C{maxInd}>2*N)-2*N;
 
-utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = ptsCorr;
+utvid.Tracking.Kal.Xest(:,utvid.Tracking.n) = ptsCorr;
 
 end

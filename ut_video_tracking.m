@@ -1,10 +1,9 @@
 function ut_video_tracking
-clc
+clc, close all
 p = mfilename('fullpath');
 [path,~,~] = fileparts(p);
 cd(path);
 addpath(genpath([path '\functions']));
-
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');
@@ -144,7 +143,7 @@ utvid.handle.h10 = uicontrol(...
     'enable','on');
 
 try
-load historyfolder.mat
+    load historyfolder.mat
 catch
     historyfolder = {''};
     save('historyfolder.mat','historyfolder');
@@ -170,7 +169,6 @@ utvid.handle.h9 = uicontrol(...
 
 guidata(hMainFigure,utvid);
 end
-
 %% initialise marker tracking process
 function utvid_initialise(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
@@ -183,23 +181,20 @@ end
 
 guidata(hMainFigure,utvid)
 end
-
 %% close Marker Tracker GUI
 function utvid_close(hMainFigure,utvid)
 % utvid = guidata(hMainFigure);
 delete(gcf);
 end
-
 %% Warning function for not yet implemented functions
 function utvid_na(hMainFigure,utvid)
 warndlg('not yet implemented',' ','modal')
 end
-
 %% Bayerfilter and compress videos
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
-prompt = 'Give standard name (e.g. NEW): ' 
+prompt = 'Give standard name (e.g. NEW): '
 result = input(prompt,'s');
 if isempty(result)
     utvid.setttings.stname = 'NEW'
@@ -251,7 +246,6 @@ Ideas to add:
 -   Choose new standard filenames for videos + location,
     these standard filenames must also be added to utvid_init
 %}
-
 %% Calibration process
 function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
@@ -260,7 +254,7 @@ for i = 1:utvid.settings.nrcams;
     if strcmp(utvid.version,'R2012')
         [utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]),2);
-%         I = demosaic(I(:,:,1),'rggb');
+        %         I = demosaic(I(:,:,1),'rggb');
     elseif strcmp(utvid.version,'R2013')
         I = demosaic((read(VideoReader([utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i}).name]),1)),'rggb');
     else
@@ -310,8 +304,8 @@ else
             prompt = 'How many orientation markers to follow? Minimal of 3.';
             utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         end
-    end           
-        
+    end
+    
     prompt = 'How many markers to follow?';
     utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 end
@@ -356,57 +350,91 @@ guidata(hMainFigure,utvid);
 set(utvid.handle.h5,'backgroundcolor','g');
 end
 %% PCA model
-    function utvid_selectpca(hMainFigure,utvid)
-        utvid = guidata(hMainFigure);
+function utvid_selectpca(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
+
+prompt = 'Do you want to use a predefined PCA model (y/n)? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
         
-        prompt = 'Do you want to use a predefined PCA model (y/n)? ';
+        utvid.settings.pca = 'expansion';
+        for i = 1:size(utvid.coords.shape.left.x,2)
+            [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
+                utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
+                utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
+                utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
+        end
+        break
+    else
+        prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
         result = input(prompt, 's');
-        if isempty(result)
-            result = 'y';
-        end
-        
-        while isempty(regexpi(result,'y'))
-            if regexpi(result,'n')==1
-                
-                utvid.settings.pca = 'expansion';
-                for i = 1:size(utvid.coords.shape.left.x,2)
-                   size(utvid.coords.shape.left.x(:,i))
-                    [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
-                    utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
-                    utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
-                    utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
-                end
-                break
-            else
-                prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
-                result = input(prompt, 's');
-            end
-        end
-        if regexpi(result,'y');
-            %% hier moet de PCA selectie GUI aangeroepen worden
-            %  met mogelijkheid tot het laden van een opgeslagen pcamodel
-            utvid = getPCApoints(utvid);
-            utvid.settings.pca = 'predefined';
-        end
-        utvid.pca.PCAcoords
-        utvid.settings.state = 6; % update state
-        save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-        guidata(hMainFigure,utvid);
-        set(utvid.handle.h6,'backgroundcolor','g');
     end
+end
+
+if regexpi(result,'y');
+    %% hier moet de PCA selectie GUI aangeroepen worden
+    %  met mogelijkheid tot het laden van een opgeslagen pcamodel
+    utvid = getPCApoints(utvid);
+    utvid.settings.pca = 'predefined';
+end
+prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
+        utvid.pca.MMSE = 0;
+        disp('LSE not working yet')
+        break
+    else
+        prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+        result = input(prompt, 's');
+    end
+end
+if regexpi(result,'y');
+    utvid.pca.MMSE = 1;
+    prompt = 'Do you want to normalize data (y/n)? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = 'y';
+    end
+    while isempty(regexpi(result,'y'))
+        if regexpi(result,'n')==1
+            utvid.pca.Normed = 0;
+            break
+        else
+            prompt = 'Do you want to normalize data (y/n)? ';
+            result = input(prompt, 's');
+        end
+    end
+    if regexpi(result,'y');
+        utvid.pca.Normed = 1;
+    end
+end
+
+utvid.settings.state = 6; % update state
+save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+guidata(hMainFigure,utvid);
+set(utvid.handle.h6,'backgroundcolor','g');
+end
 %% Marker tracking
-    function markertracker(hMainFigure,utvid)
-        utvid = guidata(hMainFigure);
-        
-        utvid = markerTracking(utvid);
+function markertracker(hMainFigure,utvid)
+utvid = guidata(hMainFigure);
+
+utvid = markerTracking(utvid);
 
 %         utvid.settings.state = 7; % update state
 %         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 %         guidata(hMainFigure);
 %         set(utvid.handle.h7,'backgroundcolor','g');
-    end
-    
-%%    
+end
+%%
 function utvid_history(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
