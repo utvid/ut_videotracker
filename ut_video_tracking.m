@@ -378,7 +378,6 @@ while isempty(regexpi(result,'y'))
         
         utvid.settings.pca = 'expansion';
         for i = 1:size(utvid.coords.shape.left.x,2)
-            size(utvid.coords.shape.left.x(:,i));
             [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
                 utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
                 utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
@@ -390,13 +389,49 @@ while isempty(regexpi(result,'y'))
         result = input(prompt, 's');
     end
 end
+
 if regexpi(result,'y');
     %% hier moet de PCA selectie GUI aangeroepen worden
     %  met mogelijkheid tot het laden van een opgeslagen pcamodel
     utvid = getPCApoints(utvid);
     utvid.settings.pca = 'predefined';
 end
-utvid.pca.PCAcoords;
+prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = 'y';
+end
+while isempty(regexpi(result,'y'))
+    if regexpi(result,'n')==1
+        utvid.pca.MMSE = 0;
+        disp('LSE not working yet')
+        break
+    else
+        prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
+        result = input(prompt, 's');
+    end
+end
+if regexpi(result,'y');
+    utvid.pca.MMSE = 1;
+    prompt = 'Do you want to normalize data (y/n)? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = 'y';
+    end
+    while isempty(regexpi(result,'y'))
+        if regexpi(result,'n')==1
+            utvid.pca.Normed = 0;
+            break
+        else
+            prompt = 'Do you want to normalize data (y/n)? ';
+            result = input(prompt, 's');
+        end
+    end
+    if regexpi(result,'y');
+        utvid.pca.Normed = 1;
+    end
+end
+
 utvid.settings.state = 6; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
