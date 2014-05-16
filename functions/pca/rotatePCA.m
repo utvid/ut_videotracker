@@ -14,7 +14,8 @@ function [PCAmodel_rot, Rext] = rotatePCA(PCAmodel, X, nMar,n)
 %                           3D coordinates resulting from 'PCAmodel'
 %                           towards the 'PCAmodel_rot' coordinates
 % 
-or = X(:,:,1)'; new  = X(:,:,n)';
+% % % % or = X(:,:,1)'; new  = X(:,:,n)';
+or = X(:,:,1); new  = X(:,:,n);
 T  = rigid_transform_3D(new,or); R = T(1:3,1:3);
 Rext = getRext(R, nMar);    
 PCAmodel_rot = PCAmodel;

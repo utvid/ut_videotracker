@@ -244,7 +244,6 @@ handles.h{11} = uicontrol(...
     'background','white');
 utvid.settings.PCs = str2double(get(handles.h{11},'string'));
 
-
 utvid = initializeTracking(utvid,handles);
 
 set(gcf,'CloseRequestFcn',@utvid_close);
@@ -319,7 +318,6 @@ uiwait(trackingFigure);
             if utvid.Tracking.n+1 < utvid.Tracking.NoF
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);
-
             end
         elseif strcmp(utvid.settings.version,'R2013')
             if utvid.Tracking.n < utvid.Tracking.NoF
@@ -336,7 +334,7 @@ uiwait(trackingFigure);
         if get(handles.h{2},'Value')
             set(handles.h{2},'Value',0)
         end
-        utvid.Tracking.FrameNum =  VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(1).name]).NumberOfFrames;
+        utvid.Tracking.FrameNum =  VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(1).name]).NumberOfFrames;
         while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n <= utvid.Tracking.FrameNum;
             utvid.Tracking.n = utvid.Tracking.n+1;
             utvid = Tracking(utvid,handles);

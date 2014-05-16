@@ -31,9 +31,10 @@ utvid.Tracking.FrameRate = utvid.Tracking.ObjL.FrameRate;
 
 %initial head orientation
 if utvid.settings.nrOrMar ~= 0
-    [utvid.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x;utvid.coords.or.right.x;...
-        utvid.coords.or.center.x; utvid.coords.or.left.y;utvid.coords.or.right.y;...
-        utvid.coords.or.center.y],0, utvid.Pstruct_or.Pext);
+    i = 1;
+    [utvid.coords.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x(:,i);utvid.coords.or.right.x(:,i);...
+        utvid.coords.or.center.x(:,i); utvid.coords.or.left.y(:,i);utvid.coords.or.right.y(:,i);...
+        utvid.coords.or.center.y(:,i)],0, utvid.Pstruct_or.Pext);
 end
 
 % Create Kalman Filter
@@ -54,10 +55,10 @@ utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, 2, utvid.Tracking.Kal.Xp
     utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,2), utvid.Pstruct);
 
 if utvid.settings.nrOrMar ~= 0
-    utvid.Tracking.Xest_or     = []; utvid.Tracking.Xest_or.Rext(:,:,1) = R_init;
+    utvid.Tracking.Xest_or     = []; utvid.Tracking.Xest_or.Rext(:,:,1) = utvid.coords.Xinit_or; % R_init
     utvid.Tracking.Xpred_or    = [];
-    utvid.Tracking.Xest_or     = getSpatialRep(utvid.Tracking.Xest_or, 1, utvid.Tracking.Kal.Xestor(1:end/2,1), utvid.Tracking.Kal.Cestor(1:end/2,1:end/2,1),utvid.Pstruct_or);
-    utvid.Tracking.Xpred_or    = getSpatialRep(utvid.Tracking.Xpred_or, 2, utvid.Tracking.Kal.Xpredor(1:end/2,2), utvid.Tracking.Kal.Cpredor(1:end/2,1:end/2,2),utvid.Pstruct_or);
+    utvid.Tracking.Xest_or     = getSpatialRep(utvid.Tracking.Xest_or, 1, utvid.Tracking.Kal_or.Xest(1:end/2,1), utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,1),utvid.Pstruct_or);
+    utvid.Tracking.Xpred_or    = getSpatialRep(utvid.Tracking.Xpred_or, 2, utvid.Tracking.Kal_or.Xpred(1:end/2,2), utvid.Tracking.Kal_or.Cpred(1:end/2,1:end/2,2),utvid.Pstruct_or);
 end
 
 utvid.Tracking.Meas1.coor(:,:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.left.y];

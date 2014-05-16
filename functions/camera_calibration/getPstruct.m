@@ -19,8 +19,8 @@ function [Pstruct, Pstruct_or] = getPstruct(mov, utvid)
 
 nrCam        = utvid.settings.nrcams;
 try
-nrMarkers    = utvid.coords.nMar;
-nrMarkers_or = utvid.coords.nOrMar;
+nrMarkers    = utvid.settings.nrMarkers;
+nrMarkers_or = utvid.settings.nrOrMar;
 catch 
     disp('using defaults');
     nrMarkers = 10;

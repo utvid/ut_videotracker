@@ -5,6 +5,7 @@ if strcmpi(handles.mono,'false')==1
             -(handles.alpha-1)*ut_gauss(im(:,:,i),handles.sigma_up),...
             handles.sigma_down);
     end
+    Trgb2gray = [];
     
 elseif strcmpi(handles.mono,'true')==1
     try

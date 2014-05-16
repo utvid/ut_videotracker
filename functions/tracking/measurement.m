@@ -34,14 +34,14 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
             end
         elseif j == 2
             if i == 1
-                x   = utvid.Tracking.Xpredor.x1(:,1,utvid.Tracking.n) ;
-                y   = utvid.Tracking.Xpredor.x1(:,2,utvid.Tracking.n) ;
+                x   = utvid.Tracking.Xpred_or.x1(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred_or.x1(:,2,utvid.Tracking.n) ;
             elseif i == 2
-                x   = utvid.Tracking.Xpredor.x2(:,1,utvid.Tracking.n) ;
-                y   = utvid.Tracking.Xpredor.x2(:,2,utvid.Tracking.n) ;
+                x   = utvid.Tracking.Xpred_or.x2(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred_or.x2(:,2,utvid.Tracking.n) ;
             elseif i == 3
-                x   = utvid.Tracking.Xpredor.x3(:,1,utvid.Tracking.n) ;
-                y   = utvid.Tracking.Xpredor.x3(:,2,utvid.Tracking.n) ;
+                x   = utvid.Tracking.Xpred_or.x3(:,1,utvid.Tracking.n) ;
+                y   = utvid.Tracking.Xpred_or.x3(:,2,utvid.Tracking.n) ;
             end
         end
         
@@ -65,7 +65,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
 %         mean(abs(utvid.Tracking.Kal.meas(:,1)-utvid.Tracking.Kal.meas(:,utvid.Tracking.n)))
     elseif j == 2
-        utvid.Tracking.Kal.measor(:,utvid.Tracking.n) = [Xstacked; Ystacked];
+        utvid.Tracking.Kal.meas_or(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end
 
 end

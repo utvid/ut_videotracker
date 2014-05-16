@@ -61,9 +61,10 @@ measVecX = []; measVecY = [];
 %     measVecX = [measVecX; handles.xm((i-1)*7+1:(i-1)*7+7)'];
 %     measVecY = [measVecY; handles.ym((i-1)*7+1:(i-1)*7+7)'];
 % end
-utvid.Tracking.Kal.meas(:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.right.x;...
-    utvid.coords.shape.center.x;utvid.coords.shape.left.y;utvid.coords.shape.right.y;...
-    utvid.coords.shape.center.y];
+i = 1; % eerste filmpje 
+utvid.Tracking.Kal.meas(:,1) = [utvid.coords.shape.left.x(:,i);utvid.coords.shape.right.x(:,i);...
+    utvid.coords.shape.center.x(:,i);utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
+    utvid.coords.shape.center.y(:,i)];
 
 %define measurement matrix, which is determined every new iteration
 utvid.Tracking.Kal.H = zeros(N, M, utvid.Tracking.NoF);
