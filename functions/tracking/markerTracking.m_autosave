@@ -40,6 +40,7 @@ end
 
 Nx = 4;
 bsize = [100 100];
+utvid.Tracking.plotting = 1;
 
 nbutton = 1;
 posx = mod(nbutton-1,8);
@@ -97,7 +98,10 @@ posx = 4.5;
 handles.h{5} = uicontrol(...
     'Parent',trackingFigure,...
     'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)-winsize(2)*.85 bsize],...
-    'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94]);
+    'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94],...
+    'callback',@utvid_plot);
+
+
 
 %place edit boxes for Tracking settings
 %{
@@ -202,7 +206,7 @@ handles.h{9} = uicontrol(...
     'style','edit',....
     'string','2','Callback',@gettextvalues,...
     'background','white');
-utvid.Tracking.sigVy =     str2num(get(handles.h{9},'string'));
+utvid.Tracking.sigVy = str2num(get(handles.h{9},'string'));
 
 nbutton = 2;
 posx = (2/3)*winsize(1);
@@ -242,7 +246,6 @@ handles.h{11} = uicontrol(...
     'background','white');
 utvid.settings.PCs = str2double(get(handles.h{11},'string'));
 
-
 utvid = initializeTracking(utvid,handles);
 
 set(gcf,'CloseRequestFcn',@utvid_close);
@@ -254,7 +257,7 @@ uiwait(trackingFigure);
         handles = guidata(trackingFigure);
         
         % number of principle components
-        utvid.settings.PCs =       str2num(get(handles.h{11},'string'));
+        utvid.settings.PCs =       str2double(get(handles.h{11},'string'));
         % measurement noise
         utvid.Tracking.sigMeas =   str2num(get(handles.h{7},'string'));
         % process noise x y z
@@ -314,13 +317,17 @@ uiwait(trackingFigure);
     function utvid_step(trackingFigure,handles)
         handles = guidata(trackingFigure);
         if strcmp(utvid.settings.version,'R2012')
-            utvid.Tracking.n < utvid.Tracking.NoF
-            
-        utvid.Tracking.n = utvid.Tracking.n+1;
-        
-        utvid = Tracking(utvid,handles);
-        
+            if utvid.Tracking.n+1 < utvid.Tracking.NoF
+                utvid.Tracking.n = utvid.Tracking.n+1;
+                utvid = Tracking(utvid,handles);
+            end
+        elseif strcmp(utvid.settings.version,'R2013')
+            if utvid.Tracking.n < utvid.Tracking.NoF
+                utvid.Tracking.n = utvid.Tracking.n+1;
+                utvid = Tracking(utvid,handles);
+            end        
         guidata(trackingFigure,handles);
+        end
     end
 
 %% continue callback
@@ -329,12 +336,19 @@ uiwait(trackingFigure);
         if get(handles.h{2},'Value')
             set(handles.h{2},'Value',0)
         end
-        utvid.Tracking.FrameNum =  VideoReader([utvid.settings.dir_data '\Video\' utvid.movs.list(1).name]).NumberOfFrames;
+        utvid.Tracking.FrameNum =  VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(1).name]).NumberOfFrames;
         while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n <= utvid.Tracking.FrameNum;
             utvid.Tracking.n = utvid.Tracking.n+1;
             utvid = Tracking(utvid,handles);
         end
         
+        guidata(trackingFigure,handles);
+    end
+%% checkbox plot
+    function utvid_plot(trackingFigure,handles)
+        handles = guidata(trackingFigure);
+        utvid.Tracking.plotting = get(handles.h{5},'Value');
+         
         guidata(trackingFigure,handles);
     end
 

@@ -1,4 +1,4 @@
-function [PCAcoords,PCAmodel,Xest,Kal] = PCAExpansion(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,PCAmodel,Pstruct,lim,utvid)
+function [PCAcoords,Xest,Kal] = PCAExpansion(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,Pstruct,lim,utvid)
 
 imnL = FrameL; imnR = FrameR; imnM = FrameM;
 
@@ -21,13 +21,10 @@ switch choice
         close
     case 'No'
         close
-        imshow(imnL,[]),
-        [Xest_or.x1(1,:,n),Xest_or.x1(2,:,n)] = getpts();
-        imshow(imnR,[]),
-        [Xest_or.x2(1,:,n),Xest_or.x2(2,:,n)] = getpts();
-        
-        imshow(imnM,[]),
-        [Xest_or.x3(1,:,n),Xest_or.x3(2,:,n)] = getpts();
+        Xest_or.x1(:,:,n) = correctPoints(imnL,utvid.settings.nrOrMar,Xest_or.x1(:,:,n),'orientation');
+        Xest_or.x2(:,:,n) = correctPoints(imnR,utvid.settings.nrOrMar,Xest_or.x2(:,:,n),'orientation'); 
+        Xest_or.x3(:,:,n) = correctPoints(imnM,utvid.settings.nrOrMar,Xest_or.x3(:,:,n),'orientation');
+
         Kal_or.meas(:,n) = [Xest_or.x1(1,:,n)';Xest_or.x2(1,:,n)';Xest_or.x3(1,:,n)';Xest_or.x1(2,:,n)';Xest_or.x2(2,:,n)';Xest_or.x3(2,:,n)'];
         Kal_or      = prepareKalman3D(Kal_or, Pstruct_or, n);
         Kal_or      = updateKal(Kal_or, n);
@@ -49,8 +46,8 @@ switch choice
         close
         h1 = figure; imshow(imnL,[]);
         [Xest.x1(:,1,n),Xest.x1(:,2,n)] = getpts();
+        close(h1)
 end
-close(h1)
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnR,[]);  hold on
@@ -77,7 +74,7 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure, imshow(imnM,[]); 
+        h1 = figure; imshow(imnM,[]); 
         [Xest.x3(:,1,n),Xest.x3(:,2,n)] = getpts();
         close(h1)
 end
@@ -95,7 +92,7 @@ Dn = min(pdist2(compVec',PCAcoords'));
 if Dn > lim
 %     PCAcoords = [PCAcoords,Kal.Xest(1:end/2,n)];
     PCAcoords = [PCAcoords,compVec];
-    PCAmodel = getPCAmodel(utvid);
+%     PCAmodel = getPCAmodel(utvid);
 end
 
 end

@@ -40,7 +40,7 @@ end
 
 Nx = 4;
 bsize = [100 100];
-utvid.plotting = 1;
+utvid.Tracking.plotting = 1;
 
 nbutton = 1;
 posx = mod(nbutton-1,8);

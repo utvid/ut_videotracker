@@ -15,7 +15,7 @@ utvid = pcaMMSE(utvid);
 %HET PLOTTEN MOET NOG NETJES IN EEN FUNCTIE GEZET WORDEN
 utvid = loadFrames(utvid,handles);
 
-if utvid.plotting == 1
+if utvid.Tracking.plotting == 1
     axes(handles.hax{1}), hold on
     plot(utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n),'ob')
     
@@ -31,7 +31,7 @@ end
 
 utvid = measurement(utvid);
 
-if utvid.plotting == 1
+if utvid.Tracking.plotting == 1
     axes(handles.hax{1}), hold on
     plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r*')
@@ -72,7 +72,7 @@ utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal, utvid.Tracking.n);
 utvid.Tracking.Xest = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
-if utvid.plotting == 1
+if utvid.Tracking.plotting == 1
     axes(handles.hax{1}), hold on
     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
     
@@ -93,7 +93,7 @@ end
 utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
-if utvid.plotting == 1
+if utvid.Tracking.plotting == 1
     axes(handles.hax{1}), hold on
     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'y.')
     

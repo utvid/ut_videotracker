@@ -21,11 +21,9 @@ switch choice
         close
     case 'No'
         close
-        correctPoints(imnL,utvid.settings.nrOrMar,Xest_or.x1(:,:,n),'orientation')
-
-        correctPoints(imnR,utvid.settings.nrOrMar,Xest_or.x2(:,:,n),'orientation')
-
-        correctPoints(imnM,utvid.settings.nrOrMar,Xest_or.x3(:,:,n),'orientation')
+        Xest_or.x1(:,:,n) = correctPoints(imnL,utvid.settings.nrOrMar,Xest_or.x1(:,:,n),'orientation');
+        Xest_or.x2(:,:,n) = correctPoints(imnR,utvid.settings.nrOrMar,Xest_or.x2(:,:,n),'orientation'); 
+        Xest_or.x3(:,:,n) = correctPoints(imnM,utvid.settings.nrOrMar,Xest_or.x3(:,:,n),'orientation');
 
         Kal_or.meas(:,n) = [Xest_or.x1(1,:,n)';Xest_or.x2(1,:,n)';Xest_or.x3(1,:,n)';Xest_or.x1(2,:,n)';Xest_or.x2(2,:,n)';Xest_or.x3(2,:,n)'];
         Kal_or      = prepareKalman3D(Kal_or, Pstruct_or, n);
@@ -46,9 +44,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnL,[]);
-        [Xest.x1(:,1,n),Xest.x1(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x1(:,:,n)] = correctPoints(imnL,utvid.settings.nrMarkers,Xest.x1(:,:,n),'shape');
+
 end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
@@ -61,9 +58,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnR,[]);
-        [Xest.x2(:,1,n),Xest.x2(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x2(:,:,n)] = correctPoints(imnR,utvid.settings.nrMarkers,Xest.x2(:,:,n),'shape');
+
 end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
@@ -76,9 +72,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnM,[]); 
-        [Xest.x3(:,1,n),Xest.x3(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x3(:,:,n)] = correctPoints(imnM,utvid.settings.nrMarkers,Xest.x3(:,:,n),'shape');
+
 end
 
 Kal.meas(:,n) = [Xest.x1(:,1,n);Xest.x2(:,1,n);Xest.x3(:,1,n);Xest.x1(:,2,n);Xest.x2(:,2,n);Xest.x3(:,2,n)];
