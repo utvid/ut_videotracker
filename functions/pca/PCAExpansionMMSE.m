@@ -1,4 +1,4 @@
-function [PCAcoords,Xest,Kal] = PCAExpansion(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,Pstruct,lim,utvid)
+function [PCAcoords,Xest,Kal] = PCAExpansionMMSE(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,Pstruct,lim,utvid)
 
 imnL = FrameL; imnR = FrameR; imnM = FrameM;
 
@@ -44,9 +44,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnL,[]);
-        [Xest.x1(:,1,n),Xest.x1(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x1(:,:,n)] = correctPoints(imnL,utvid.settings.nrMarkers,Xest.x1(:,:,n),'shape');
+
 end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
@@ -59,9 +58,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnR,[]);
-        [Xest.x2(:,1,n),Xest.x2(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x2(:,:,n)] = correctPoints(imnR,utvid.settings.nrMarkers,Xest.x2(:,:,n),'shape');
+
 end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
@@ -74,9 +72,8 @@ switch choice
         close
     case 'No'
         close
-        h1 = figure; imshow(imnM,[]); 
-        [Xest.x3(:,1,n),Xest.x3(:,2,n)] = getpts();
-        close(h1)
+        [Xest.x3(:,:,n)] = correctPoints(imnM,utvid.settings.nrMarkers,Xest.x3(:,:,n),'shape');
+
 end
 
 Kal.meas(:,n) = [Xest.x1(:,1,n);Xest.x2(:,1,n);Xest.x3(:,1,n);Xest.x1(:,2,n);Xest.x2(:,2,n);Xest.x3(:,2,n)];

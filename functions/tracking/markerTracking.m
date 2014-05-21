@@ -26,7 +26,7 @@ trackingFigure = figure('Color',[0.94 0.94 0.94],...
 
 if utvid.settings.nrOrMar == 0
     for i = 1:3
-        handles.hax{i} = axes('Parent',trackingFigure,'position',[(i-1)*(1/3) 0.2 1/3 0.75]);
+        handles.hax{1,i} = axes('Parent',trackingFigure,'position',[(i-1)*(1/3) 0.2 1/3 0.75]);
     end
 elseif utvid.settings.nrOrMar ~= 0
     for i = 1:6
@@ -40,7 +40,7 @@ end
 
 Nx = 4;
 bsize = [100 100];
-utvid.plotting = 1;
+utvid.Tracking.plotting = 1;
 
 nbutton = 1;
 posx = mod(nbutton-1,8);

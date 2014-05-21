@@ -10,5 +10,6 @@ else
 Xnormed = X-repmat(utvid.pca.meanX,1,size(X,2));
 end
 
-[utvid.pca.V,utvid.pca.S,~] = svd(PCAmodel.Xnormed,'econ');
-utvid.pca.Cb = (1/(size(PCAmodel.Xnormed,2)))*PCAmodel.S.^2;
+[utvid.pca.V,utvid.pca.S,~] = svd(Xnormed,'econ');
+utvid.pca.Cb = (1/(size(Xnormed,2)))*utvid.pca.S.^2;
+end

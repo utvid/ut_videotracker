@@ -15,14 +15,14 @@ utvid = pcaMMSE(utvid);
 %HET PLOTTEN MOET NOG NETJES IN EEN FUNCTIE GEZET WORDEN
 utvid = loadFrames(utvid,handles);
 
-if utvid.plotting == 1
-    axes(handles.hax{1}), hold on
+if utvid.Tracking.plotting == 1
+    axes(handles.hax{1,1}), hold on
     plot(utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n),'ob')
     
-    axes(handles.hax{2}), hold on
+    axes(handles.hax{1,2}), hold on
     plot(utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n),'ob')
     
-    axes(handles.hax{3}), hold on
+    axes(handles.hax{1,3}), hold on
     plot(utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n),'ob')
 end
 
@@ -31,16 +31,16 @@ end
 
 utvid = measurement(utvid);
 
-if utvid.plotting == 1
-    axes(handles.hax{1}), hold on
+if utvid.Tracking.plotting == 1
+    axes(handles.hax{1,1}), hold on
     plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r*')
     
-    axes(handles.hax{2}), hold on
+    axes(handles.hax{1,2}), hold on
     plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:utvid.settings.nrMarkers*2,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*4+1:utvid.settings.nrMarkers*5,utvid.Tracking.n),'r*')
     
-    axes(handles.hax{3}), hold on
+    axes(handles.hax{1,3}), hold on
     plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*2+1:utvid.settings.nrMarkers*3,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*5+1:utvid.settings.nrMarkers*6,utvid.Tracking.n),'r*')
 end
@@ -64,52 +64,43 @@ end
     utvid = PCAmodelUpdate(utvid);
 % end
 
-%Outlier Detection 
-%{
-    Outlier detection moet na Kalman update etc, ga ik aanpassen
-%}
-if size(utvid.pca.PCAcoords,2) > 3*utvid.settings.PCs
-    ptsMask{1} = []; ptsMask{2} = []; ptsMask{3} = [];
-    [utvid] = outlierCorrection_3cam(utvid);
-end
 
 %Prepare and update Kalman (estimaion is found here)
 utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct, utvid.Tracking.n);
 utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal, utvid.Tracking.n);
 
-
 utvid.Tracking.Xest = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
-if utvid.plotting == 1
-    axes(handles.hax{1}), hold on
+if utvid.Tracking.plotting == 1
+    axes(handles.hax{1,1}), hold on
     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
     
-    axes(handles.hax{2}), hold on
+    axes(handles.hax{1,2}), hold on
     plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'go')
     
-    axes(handles.hax{3}), hold on
+    axes(handles.hax{1,3}), hold on
     plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'go')
 end
 
 %Outlier Detection
 if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
     ptsMask{1} = []; ptsMask{2} = []; ptsMask{3} = [];
-    [utvid] = outlierCorrection_3cam(utvid);
+    [utvid] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
 end
 
 %Space representations Estimations
 utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
-if utvid.plotting == 1
-    axes(handles.hax{1}), hold on
+if utvid.Tracking.plotting == 1
+    axes(handles.hax{1,1}), hold on
     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'y.')
     
-    axes(handles.hax{2}), hold on
+    axes(handles.hax{1,2}), hold on
     plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'y.')
     
-    axes(handles.hax{3}), hold on
+    axes(handles.hax{1,3}), hold on
     plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'y.')
 end
 
@@ -117,10 +108,10 @@ end
 % lim should be set in GUI
 D = min(pdist2(utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n)',utvid.pca.PCAcoords'));
 if D > utvid.Tracking.lim
-    [utvid.pca.PCAcoords,utvid.pca.PCAmodel_rot,utvid.Tracking.Xest,utvid.Tracking.Kal] ...
-        = PCAExpansion(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
+    [utvid.pca.PCAcoords,utvid.Tracking.Xest,utvid.Tracking.Kal] ...
+        = PCAExpansionMMSE(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
         utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
-        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.pca.PCAmodel_rot,utvid.Pstruct,utvid.Tracking.lim,utvid);
+        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
 end
 
 %Space representations Prediction

@@ -28,6 +28,7 @@ else
 end
 
 utvid.Tracking.FrameRate = utvid.Tracking.ObjL.FrameRate;
+utvid.pca.sigv = 0.1;
 
 %initial head orientation
 if utvid.settings.nrOrMar ~= 0
