@@ -21,13 +21,12 @@ switch choice
         close
     case 'No'
         close
-        imshow(imnL,[]),
-        [Xest_or.x1(1,:,n),Xest_or.x1(2,:,n)] = getpts();
-        imshow(imnR,[]),
-        [Xest_or.x2(1,:,n),Xest_or.x2(2,:,n)] = getpts();
-        
-        imshow(imnM,[]),
-        [Xest_or.x3(1,:,n),Xest_or.x3(2,:,n)] = getpts();
+        correctPoints(imnL,utvid.settings.nrOrMar,Xest_or.x1(:,:,n),'orientation')
+
+        correctPoints(imnR,utvid.settings.nrOrMar,Xest_or.x2(:,:,n),'orientation')
+
+        correctPoints(imnM,utvid.settings.nrOrMar,Xest_or.x3(:,:,n),'orientation')
+
         Kal_or.meas(:,n) = [Xest_or.x1(1,:,n)';Xest_or.x2(1,:,n)';Xest_or.x3(1,:,n)';Xest_or.x1(2,:,n)';Xest_or.x2(2,:,n)';Xest_or.x3(2,:,n)'];
         Kal_or      = prepareKalman3D(Kal_or, Pstruct_or, n);
         Kal_or      = updateKal(Kal_or, n);
