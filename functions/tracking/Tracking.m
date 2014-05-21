@@ -64,19 +64,10 @@ end
     utvid = PCAmodelUpdate(utvid);
 % end
 
-%Outlier Detection 
-%{
-    Outlier detection moet na Kalman update etc, ga ik aanpassen
-%}
-if size(utvid.pca.PCAcoords,2) > 3*utvid.settings.PCs
-    ptsMask{1} = []; ptsMask{2} = []; ptsMask{3} = [];
-    [utvid] = outlierCorrection_3cam(utvid);
-end
 
 %Prepare and update Kalman (estimaion is found here)
 utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct, utvid.Tracking.n);
 utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal, utvid.Tracking.n);
-
 
 utvid.Tracking.Xest = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
@@ -95,7 +86,7 @@ end
 %Outlier Detection
 if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
     ptsMask{1} = []; ptsMask{2} = []; ptsMask{3} = [];
-    [utvid] = outlierCorrection_3cam(utvid);
+    [utvid] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
 end
 
 %Space representations Estimations
@@ -117,10 +108,10 @@ end
 % lim should be set in GUI
 D = min(pdist2(utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n)',utvid.pca.PCAcoords'));
 if D > utvid.Tracking.lim
-    [utvid.pca.PCAcoords,utvid.pca.PCAmodel_rot,utvid.Tracking.Xest,utvid.Tracking.Kal] ...
-        = PCAExpansion(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
+    [utvid.pca.PCAcoords,utvid.Tracking.Xest,utvid.Tracking.Kal] ...
+        = PCAExpansionMMSE(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
         utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
-        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.pca.PCAmodel_rot,utvid.Pstruct,utvid.Tracking.lim,utvid);
+        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
 end
 
 %Space representations Prediction

@@ -1,4 +1,4 @@
-function [PCAcoords,Xest,Kal] = PCAExpansion(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,Pstruct,lim,utvid)
+function [PCAcoords,Xest,Kal] = PCAExpansionMMSE(FrameL,FrameR,FrameM,n,PCAcoords,Kal,Xest,Pstruct,lim,utvid)
 
 imnL = FrameL; imnR = FrameR; imnM = FrameM;
 
