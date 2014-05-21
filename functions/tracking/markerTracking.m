@@ -38,7 +38,7 @@ elseif utvid.settings.nrOrMar ~= 0
     end
 end
 
-Nx = 4;
+Nx = 8;
 bsize = [100 100];
 utvid.Tracking.plotting = 1;
 
@@ -94,12 +94,49 @@ handles.h{nbutton} = uicontrol(...
     'enable','on',...
     'callback',@utvid_run);
 
-posx = 4.5;
+posx = 4.1;
 handles.h{5} = uicontrol(...
     'Parent',trackingFigure,...
     'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)-winsize(2)*.85 bsize],...
     'style','checkbox','string','show images','value',1,'BackgroundColor',[0.94 0.94 0.94],...
     'callback',@utvid_plot);
+
+nbutton = 6;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+handles.h{20} = uicontrol(...
+    'Parent',trackingFigure,...
+    'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)/3-winsize(2)*.85 bsize(1)*2 bsize(2)/3],...
+    'Style','edit',...
+    'fontsize',10,...
+    'string','init',...
+    'horizontalalignment','center',...
+    'enable','on');
+
+nbutton = 8;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+handles.h{21} = uicontrol(...
+    'Parent',trackingFigure,...
+    'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)/3-winsize(2)*.85 bsize(1) bsize(2)/3],...
+    'Style','pushbutton',...
+    'fontsize',10,...
+    'string','Save',...
+    'horizontalalignment','center',...
+    'enable','on','callback',@utvid_Save);
+
+
+nbutton = 6;
+posx = mod(nbutton-1,Nx);
+posy = floor((nbutton-1)/Nx)+1;
+handles.h{22} = uicontrol(...
+    'Parent',trackingFigure,...
+    'position',[posx*bsize(1)+.05*winsize(1) winsize(2)-posy*bsize(2)-winsize(2)*.85  bsize(1)*3 bsize(2)/3],...
+    'Style','pushbutton',...
+    'fontsize',10,...
+    'string','load',...
+    'horizontalalignment','center',...
+    'enable','on','callback',@utvid_Load);
 
 %place edit boxes for Tracking settings
 %{
@@ -282,7 +319,28 @@ uiwait(trackingFigure);
         
         guidata(trackingFigure,handles);
     end
+%% Save callback
+    function utvid_Save(trackingFigure,handles)
+        handles = guidata(trackingFigure);
+        set(handles.h{2},'Value',1)
+        set(handles.h{4},'Value',0)
+        
+    if exist([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'file') ~=0        
+        save([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'utvid','-append');
+    else
+        save([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'utvid')
+    end
+        guidata(trackingFigure,handles);
+    end
+%% load callback
+ function utvid_Load(trackingFigure,handles)
+        handles = guidata(trackingFigure);
+        
+        filename = uigetfile(utvid.settings.dir_data);
+        disp([filename '.mat loaded succesfully']);
 
+        guidata(trackingFigure,handles);
+    end
 %% step back callback
     function utvid_back(trackingFigure,handles)
         handles = guidata(trackingFigure);
@@ -323,8 +381,8 @@ uiwait(trackingFigure);
             if utvid.Tracking.n < utvid.Tracking.NoF
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);
-            end        
-        guidata(trackingFigure,handles);
+            end
+            guidata(trackingFigure,handles);
         end
     end
 
@@ -346,7 +404,7 @@ uiwait(trackingFigure);
     function utvid_plot(trackingFigure,handles)
         handles = guidata(trackingFigure);
         utvid.Tracking.plotting = get(handles.h{5},'Value');
-         
+        
         guidata(trackingFigure,handles);
     end
 
