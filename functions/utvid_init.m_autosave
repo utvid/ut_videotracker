@@ -49,12 +49,24 @@ v = version;
 utvid.settings.version = v(end-6:end-2);
 
 cd(utvid.settings.dir_data);        % change directory to data directory
-if  exist('init.mat','file') ~=0    % check for existence of init.mat file
-    handles = utvid.handle;
-    disp('Loading init.mat')
-    load('init.mat','utvid')                % load init.mat
-    disp('init.mat loaded succesfully')
-    utvid.handle = handles;
+Files = dir('*.mat');
+numFiles = size(dir('*.mat'),1);
+if  numFiles ~=0    % check for existence of init.mat file
+    if numFiles == 1
+        handles = utvid.handle;
+        disp(['Loading ' Files(1).name])
+        load(Files(1).name,'utvid')                % load init.mat
+        
+        disp([Files(1).name ' loaded succesfully'])
+        utvid.handle = handles;
+    else
+        FileName = uigetfile('*.mat');
+        handles = utvid.handle;
+        disp(['Loading ' Files(1).name])
+        load(FileName,'utvid')                % load init.mat
+        disp([FileName ' loaded succesfully'])
+        utvid.handle = handles;
+    end
 else                                % if init.mat doesnot exist execute the following:
     %% Sort videos in left , center, and, right camera
     utvid.settings.cam.left = '21301891_';   % string in videofilename of left camera

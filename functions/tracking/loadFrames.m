@@ -51,4 +51,5 @@ if utvid.Tracking.plotting == 1
     axes(handles.hax{1,2}), imshow(utvid.Tracking.FrameR,[]);
     axes(handles.hax{1,3}), imshow(utvid.Tracking.FrameM,[]);
 end
+
 end

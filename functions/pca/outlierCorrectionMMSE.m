@@ -14,7 +14,7 @@ for i = 1:iter
     bEst{i} = inv(V(p,1:utvid.settings.PCs)'*V(p,1:utvid.settings.PCs)+...
         (utvid.pca.sigv^2*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
         *V(p,1:utvid.settings.PCs)'*z(p);
-    
+    size(V), size(bEst{i})
     reconVec = V*bEst{i};
     %Reconstruction error
     reconVecN = [reconVec(1:end/3),reconVec(end/3+1:end/3*2),reconVec(end/3*2+1:end)];

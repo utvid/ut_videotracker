@@ -408,7 +408,7 @@ while isempty(regexpi(result,'y'))
         break
     else
         prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
-        result = input(prompt, 's');
+        result = input(prompt, 's');    
     end
 end
 if regexpi(result,'y');

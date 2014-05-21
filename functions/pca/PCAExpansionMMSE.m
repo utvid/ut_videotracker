@@ -33,7 +33,7 @@ switch choice
 end
 close
 end
-size(Xest.x1)
+
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnL,[]); hold on
 h2 = plot(Xest.x1(:,1,n),Xest.x1(:,2,n),'*r');
