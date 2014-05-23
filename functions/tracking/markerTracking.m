@@ -41,6 +41,7 @@ end
 Nx = 8;
 bsize = [100 100];
 utvid.Tracking.plotting = 1;
+utvid.pca.outlier = 0; 
 
 nbutton = 1;
 posx = mod(nbutton-1,8);
@@ -393,12 +394,13 @@ uiwait(trackingFigure);
         set(handles.h{2},'Value',1)
         set(handles.h{4},'Value',0)
         
+        utvid.Tracking.n = utvid.Tracking.n-1;
     if exist([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'file') ~=0        
         save([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'utvid','-append');
-        disp('file save succesfull')
+        disp('file saved succesfull')
     else
         save([utvid.settings.dir_data '\' get(handles.h{20},'string') '.mat'],'utvid')
-        disp('file save succesfull')
+        disp('file saved succesfull')
     end
         guidata(trackingFigure,handles);
     end
@@ -423,6 +425,7 @@ uiwait(trackingFigure);
 %% step back callback
     function utvid_back(trackingFigure,handles)
         handles = guidata(trackingFigure);
+        
         if utvid.Tracking.n > 1
             utvid.Tracking.n = utvid.Tracking.n-1;
             utvid = Tracking(utvid,handles);

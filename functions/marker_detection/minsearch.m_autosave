@@ -1,4 +1,4 @@
-function [x,y] = minsearch(x,y,im,roi)
+function [xnew,ynew] = minsearch(x,y,im,roi)
 
 %% check boundaries
 % roi is number of pixels to left, right, up and down of center pixel
@@ -10,13 +10,13 @@ x(x<1+roi) = 1+(roi+1);
 
 %% marker detection
 for i = 1:size(x,1) 
-    imfoo = im(ceil(y(i))-roi:floor(y(i))+roi,ceil(x(i))-roi:floor(x(i))+roi);
-    imshow(imfoo,[]), pause
+    imfoo = im(ceil(y(i))-roi:floor(y(i))+roi,ceil(x(i))-roi:floor(x(i))+roi,:);
+    imfoo = sqrt(mean(imfoo.^2,3));
+ figure, imshow(imfoo,[])
     [~,imin]= min(imfoo(:));
     [rmin,cmin] = ind2sub(size(imfoo),imin);
-    hold on, plot(cmin,rmin,
-    x1(i) = x(i)-(roi+1)+cmin;
-    y1(i) = y(i)-(roi+1)+rmin;
+    xnew(i) = x(i)-(roi+1)+cmin;
+    ynew(i) = y(i)-(roi+1)+rmin;
 end
- 
+xnew = xnew'; ynew = ynew';
 end
