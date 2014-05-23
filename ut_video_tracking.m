@@ -5,6 +5,7 @@ p = mfilename('fullpath');
 cd(path);
 addpath(genpath([path '\functions']));
 
+warning off;
 %% set up the main figure window
 utvid =[];
 monpos = get(0,'monitorposition');
@@ -440,13 +441,16 @@ end
 %% Marker tracking
 function markertracker(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
+for i = 1%1:size(utvid.movs.instrstart,2)
+    utvid.Tracking.instr = i;
+%     utvid.settings.nrOrMar = 0;
+    utvid = markerTracking(utvid);
+%     save([utvid.settings.dir_data '\tracking' num2str(i) '.mat'],'utvid','-append');    
+end
+utvid.settings.state = 7; % update state
+guidata(hMainFigure);
+set(utvid.handle.h7,'backgroundcolor','g');
 
-utvid = markerTracking(utvid);
-
-%         utvid.settings.state = 7; % update state
-%         save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-%         guidata(hMainFigure);
-%         set(utvid.handle.h7,'backgroundcolor','g');
 end
 
 %%

@@ -1,41 +1,60 @@
 function utvid = initializeTracking(utvid,handles)
 
 utvid.Tracking.n = 1; 
+if utvid.Tracking.instr < size(utvid.movs.instrstart,2);
+    utvid.Tracking.NoV = utvid.movs.instrstart(utvid.Tracking.instr+1)-utvid.movs.instrstart(utvid.Tracking.instr);
+elseif utvid.Tracking.instr == size(utvid.movs.instrstart,2);
+    utvid.Tracking.NoV = size(utvid.movs.left,2)-utvid.movs.instrstart(utvid.Tracking.instr);
+end
 
-utvid.Tracking.ObjL = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,1)).name]);
-utvid.Tracking.ObjR = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,1)).name]);
-utvid.Tracking.ObjM = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,1)).name]);
+utvid.Tracking.ObjL =[];utvid.Tracking.ObjR =[];utvid.Tracking.ObjM =[];
+for j = 1:utvid.Tracking.NoV;
+    nr = utvid.Tracking.instr+j-1;
+    utvid.Tracking.ObjL{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,nr)).name]);
+    utvid.Tracking.ObjR{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,nr)).name]);
+    utvid.Tracking.ObjM{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,nr)).name]);
+    
+    NoF(j,1) = utvid.Tracking.ObjL{j}.NumberOfFrames;
+    NoF(j,2) = utvid.Tracking.ObjR{j}.NumberOfFrames;
+    NoF(j,3) = utvid.Tracking.ObjM{j}.NumberOfFrames;
+    utvid.Tracking.NoF = min(NoF,[],2);
+end
 
 if strcmp(utvid.settings.version,'R2012')
-    axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL,utvid.Tracking.n+1),[]);
-    axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR,utvid.Tracking.n+1),[]);
-    axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM,utvid.Tracking.n+1),[]);
+    utvid.Tracking.NoF = utvid.Tracking.NoF-1;
+    axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n+1),[]);
+    axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n+1),[]);
+    axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n+1),[]);
     
-    % Video characteristics
-    utvid.Tracking.NoF = min([utvid.Tracking.ObjL.NumberOfFrames-1,... %NoF (sometimes one movie contains one frame more or less)
-        utvid.Tracking.ObjR.NumberOfFrames-1,utvid.Tracking.ObjM.NumberOfFrames-1]);
+    if utvid.settings.nrOrMar~=0; 
+        axes(handles.hax{2,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n),[]);
+        axes(handles.hax{2,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n),[]);
+        axes(handles.hax{2,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n),[]);
+    end
     
 elseif strcmp(utvid.settings.version,'R2013')
-    axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL,utvid.Tracking.n),[]);
-    axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR,utvid.Tracking.n),[]);
-    axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM,utvid.Tracking.n),[]);
-    
-    % Video characteristics
-    utvid.Tracking.NoF = min([utvid.Tracking.ObjL.NumberOfFrames,... %NoF (sometimes one movie contains one frame more or less)
-        utvid.Tracking.ObjR.NumberOfFrames,utvid.Tracking.ObjM.NumberOfFrames]);
+    axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n),[]);
+    axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n),[]);
+    axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n),[]);
+    if utvid.settings.nrOrMar~=0; 
+        axes(handles.hax{2,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n),[]);
+        axes(handles.hax{2,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n),[]);
+        axes(handles.hax{2,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n),[]);
+    end
 else
     disp('Version not yet implemented')
 end
-
-utvid.Tracking.FrameRate = utvid.Tracking.ObjL.FrameRate;
+utvid.Tracking.FrameNum = sum(utvid.Tracking.NoF);
+utvid.Tracking.FrameRate = utvid.Tracking.ObjL{1}.FrameRate;
 utvid.pca.sigv = 0.1;
 
 %initial head orientation
-if utvid.settings.nrOrMar ~= 0
-    i = 1;
-    [utvid.coords.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x(:,i);utvid.coords.or.right.x(:,i);...
-        utvid.coords.or.center.x(:,i); utvid.coords.or.left.y(:,i);utvid.coords.or.right.y(:,i);...
-        utvid.coords.or.center.y(:,i)],0, utvid.Pstruct_or.Pext);
+if utvid.Tracking.instr == 1
+if utvid.settings.nrOrMar ~= 0 
+    [utvid.coords.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x(:,utvid.Tracking.instr);utvid.coords.or.right.x(:,utvid.Tracking.instr);...
+        utvid.coords.or.center.x(:,utvid.Tracking.instr); utvid.coords.or.left.y(:,utvid.Tracking.instr);utvid.coords.or.right.y(:,utvid.Tracking.instr);...
+        utvid.coords.or.center.y(:,utvid.Tracking.instr)],0, utvid.Pstruct_or.Pext);
+end
 end
 
 % Create Kalman Filter

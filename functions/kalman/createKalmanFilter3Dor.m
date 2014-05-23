@@ -40,20 +40,20 @@ Pext        = utvid.Pstruct_or.Pext;
 % nrMarkers   = handles.nMar;
 N           = 2*3*utvid.settings.nrOrMar;
 M           = 6*utvid.settings.nrOrMar;
-% nrOfFrames  = ObjM.NumberOfFrames;
+nrOfFrames  = sum(utvid.Tracking.NoF);
 
 % utvid.Tracking.sigMeas = 3;    %measurement error expressed in pixels
 
 %create state variables
-utvid.Tracking.Kal_or.meas     = zeros(N, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.z        = zeros(N, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Xest     = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Xpred    = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Xest_b   = zeros(M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Cest     = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Cpred    = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Cest_b   = zeros(M, M, utvid.Tracking.NoF);
-utvid.Tracking.Kal_or.Cn       = zeros(N, N, utvid.Tracking.NoF);
+utvid.Tracking.Kal_or.meas     = zeros(N,nrOfFrames);
+utvid.Tracking.Kal_or.z        = zeros(N,nrOfFrames);
+utvid.Tracking.Kal_or.Xest     = zeros(M,nrOfFrames);
+utvid.Tracking.Kal_or.Xpred    = zeros(M,nrOfFrames);
+utvid.Tracking.Kal_or.Xest_b   = zeros(M,nrOfFrames);
+utvid.Tracking.Kal_or.Cest     = zeros(M, M,nrOfFrames);
+utvid.Tracking.Kal_or.Cpred    = zeros(M, M,nrOfFrames);
+utvid.Tracking.Kal_or.Cest_b   = zeros(M, M,nrOfFrames);
+utvid.Tracking.Kal_or.Cn       = zeros(N, N,nrOfFrames);
 
 %initializes first measurement vector
 measVecX = []; measVecY = [];
@@ -68,7 +68,7 @@ utvid.Tracking.Kal_or.meas(:,1) = [utvid.coords.or.left.x(:,i);utvid.coords.or.r
     utvid.coords.or.center.y(:,i)];
 
 %define measurement matrix, which is determined every new iteration
-utvid.Tracking.Kal_or.H = zeros(N, M, utvid.Tracking.NoF);
+utvid.Tracking.Kal_or.H = zeros(N, M,nrOfFrames);
 
 %define measurement noise
 Ppart1          = sum(Pext(N+1:end, 3*utvid.settings.nrOrMar+1:end), 2);

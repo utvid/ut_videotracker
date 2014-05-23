@@ -79,6 +79,7 @@ function X = getAllRep(X, iter, vec, unc, Pstruct)
     
     %defines 2D state
 %     if settings.nrCam==3
+
          [x1,x2,x3,X.Cx_1(:,:,:,iter),X.Cx_2(:,:,:,iter),X.Cx_3(:,:,:,iter)] = threeDto2D_3cam(vec, unc, Pstruct);
         X.x1(:,:,iter) = x1';
         X.x2(:,:,iter) = x2'; 

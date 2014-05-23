@@ -1,13 +1,21 @@
 function utvid = loadFrames(utvid,handles)
+cf = cumsum(utvid.Tracking.NoF);
+idx = find(cf>utvid.Tracking.n,1,'first');
+if idx>1
+    n = utvid.Tracking.n-cf(idx-1);
+else
+    n = utvid.Tracking.n;
+end
+
 
 if strcmp(utvid.settings.version,'R2012')
-    utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL,utvid.Tracking.n+1));
-    utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR,utvid.Tracking.n+1));
-    utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM,utvid.Tracking.n+1));
+    utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL{idx},n+1));
+    utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR{idx},n+1));
+    utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM{idx},n+1));
 elseif strcmp(utvid.settings.version,'R2013')
-    utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL,utvid.Tracking.n));
-    utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR,utvid.Tracking.n));
-    utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM,utvid.Tracking.n));
+    utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL{idx},n));
+    utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR{idx},n));
+    utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM{idx},n));
 else
     disp('Version not yet implemented')
 end
@@ -46,9 +54,4 @@ for j = 1:utvid.settings.nrcams
     
 end
 
-if utvid.Tracking.plotting == 1
-    axes(handles.hax{1,1}), imshow(utvid.Tracking.FrameL,[]);
-    axes(handles.hax{1,2}), imshow(utvid.Tracking.FrameR,[]);
-    axes(handles.hax{1,3}), imshow(utvid.Tracking.FrameM,[]);
-end
 end
