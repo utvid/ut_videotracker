@@ -200,7 +200,7 @@ end
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
-prompt = 'Give standard name (e.g. NEW): '
+prompt = 'Give standard name (e.g. NEW): ';
 result = input(prompt,'s');
 if isempty(result)
     utvid.setttings.stname = 'NEW'
@@ -325,8 +325,8 @@ else
 end
 
 cam ={'left','right','center'};
-for j = 1%:size(utvid.movs.instrstart,2)
-    j
+for j = 1:size(utvid.movs.instrstart,2)
+    
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.settings.version,'R2012')
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);

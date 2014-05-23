@@ -1,10 +1,13 @@
-function [coords] = correctPoints(Im,nrMar,coords,str)
+function [coords] = correctPoints(Im,nrMar,coords,str,mins,maxs)
 f = figure; 
 
 % axes(h1)
 aH= axes('ButtonDownFcn', @startDragFcn);
 hold on
-imshow(Im,[]); title(str);
+imshow(Im,[]); title(str); 
+xlim([mins(1)-25 maxs(1)+25]);
+ylim([mins(2)-25 maxs(2)+25]);
+
 for i = 1:nrMar
     h{i} = line([coords(i,1)-5 coords(i,1)-5 coords(i,1)+5 coords(i,1)+5 coords(i,1)-5],...
         [coords(i,2)-5 coords(i,2)+5 coords(i,2)+5 coords(i,2)-5 coords(i,2)-5], ...

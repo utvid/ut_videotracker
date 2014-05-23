@@ -50,7 +50,7 @@ switch choice
         close
     case 'No'
         close
-        [Xest.x1(:,:,n)] = correctPoints(imnL,utvid.settings.nrMarkers,Xest.x1(:,:,n),'shape',mins,maxs);
+        [Xest.x1(:,:,n)] = correctPoints(imnL,utvid.settings.nrMarkers,Xest.x1(:,:,n),'shape');
 
 end
 
@@ -69,17 +69,12 @@ switch choice
         close
     case 'No'
         close
-        [Xest.x2(:,:,n)] = correctPoints(imnR,utvid.settings.nrMarkers,Xest.x2(:,:,n),'shape',mins,maxs);
+        [Xest.x2(:,:,n)] = correctPoints(imnR,utvid.settings.nrMarkers,Xest.x2(:,:,n),'shape');
 
 end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnM,[]);  hold on
-mins = min(utvid.Tracking.Xest.x3);
-maxs = max(utvid.Tracking.Xest.x3);
-xlim([mins(1)-25 maxs(1)+25]);
-ylim([mins(2)-25 maxs(2)+25]);
-    
 h2 = plot(Xest.x3(:,1,n),Xest.x3(:,2,n),'*r');
 choice = questdlg('Markers located correct', 'User input', ...
     'Yes','No','No');
@@ -88,7 +83,7 @@ switch choice
         close
     case 'No'
         close
-        [Xest.x3(:,:,n)] = correctPoints(imnM,utvid.settings.nrMarkers,Xest.x3(:,:,n),'shape',mins,maxs);
+        [Xest.x3(:,:,n)] = correctPoints(imnM,utvid.settings.nrMarkers,Xest.x3(:,:,n),'shape');
 
 end
 
