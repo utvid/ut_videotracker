@@ -47,9 +47,9 @@ utvid.Tracking.Xest = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tr
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
 %Outlier Detection
-if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
-    ptsMask{1} = []; ptsMask{2} = []; ptsMask{3} = [];
-    [utvid] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
+if size(utvid.pca.PCAcoords,2) > 4*utvid.settings.PCs
+    if utvid.pca.outlier == 0, disp('Outlier detection performed'), utvid.pca.outlier = 1; end
+    [utvid] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n));
 end
 
 %Space representations Estimations

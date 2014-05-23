@@ -210,8 +210,11 @@ uiwait(pcaselectFig);
         for j = 1:utvid.settings.nrcams
             utvid.coords.data(handles.curNoF,j).video = utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name;
             utvid.coords.data(handles.curNoF,j).frame = handles.frame_selected;
+            
+            if utvid.settings.nrOrMar ~= 0
             [utvid.coords.data(handles.curNoF,j).x_or,utvid.coords.data.data(handles.curNoF,j).y_or] = ...
                 getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings. stname utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrOrMar,'Select orientation markers');
+            end
             [utvid.coords.data(handles.curNoF,j).x,utvid.coords.data.data(handles.curNoF,j).y] = ...
                 getPoints(im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{j})(1,handles.vid_selected)).name]),handles.frame_selected)), nrMarkers, 'Select lip markers');
         end
