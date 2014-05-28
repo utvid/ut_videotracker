@@ -51,7 +51,7 @@ cd(utvid.settings.dir_data);        % change directory to data directory
 %%
 Files = dir('*.mat');
 numFiles = size(dir('*.mat'),1);
-if  numFiles ~=0    % check for existence of init.mat file
+if  numFiles ~=0    % check for existence of .mat file
     if numFiles == 1
         handles = utvid.handle;
         disp(['Loading ' Files(1).name])

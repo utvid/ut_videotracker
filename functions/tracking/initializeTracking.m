@@ -1,6 +1,7 @@
 function utvid = initializeTracking(utvid,handles)
 
 utvid.Tracking.n = 1; 
+
 if utvid.Tracking.instr < size(utvid.movs.instrstart,2);
     utvid.Tracking.NoV = utvid.movs.instrstart(utvid.Tracking.instr+1)-utvid.movs.instrstart(utvid.Tracking.instr);
 elseif utvid.Tracking.instr == size(utvid.movs.instrstart,2);

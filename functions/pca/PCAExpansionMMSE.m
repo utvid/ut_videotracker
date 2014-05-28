@@ -37,8 +37,8 @@ end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnL,[]); hold on  
-mins = min(utvid.Tracking.Xest.x1); 
-maxs = max(utvid.Tracking.Xest.x1);
+mins = min(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n)); 
+maxs = max(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
 xlim([mins(1)-25 maxs(1)+25]);
 ylim([mins(2)-25 maxs(2)+25]);
 
@@ -56,8 +56,8 @@ end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnR,[]);  hold on
-mins = min(utvid.Tracking.Xest.x2);
-maxs = max(utvid.Tracking.Xest.x2);
+mins = min(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
+maxs = max(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
 xlim([mins(1)-25 maxs(1)+25]);
 ylim([mins(2)-25 maxs(2)+25]);
     
@@ -75,8 +75,8 @@ end
 
 h1 = figure; set(gcf, 'Position', get(0,'Screensize'));
 imshow(imnM,[]);  hold on
-mins = min(utvid.Tracking.Xest.x3);
-maxs = max(utvid.Tracking.Xest.x3);
+mins = min(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
+maxs = max(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
 xlim([mins(1)-25 maxs(1)+25]);
 ylim([mins(2)-25 maxs(2)+25]);
     
@@ -93,6 +93,9 @@ switch choice
 end
 
 Kal.meas(:,n) = [Xest.x1(:,1,n);Xest.x2(:,1,n);Xest.x3(:,1,n);Xest.x1(:,2,n);Xest.x2(:,2,n);Xest.x3(:,2,n)];
+Kal.Xpred(:,n) = Kal.meas(:,n);
+Kal.Xpred(:,n+1) = Kal.meas(:,n);
+
 Kal = prepareKalman3D(Kal, Pstruct,n);
 Kal = updateKal(Kal,n);
 

@@ -56,6 +56,7 @@ end
 utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
+%Plot if tracking is 1
 if utvid.Tracking.plotting == 1
     axes(handles.hax{1,1}), hold on
     imshow(utvid.Tracking.FrameL,[]);
@@ -64,8 +65,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest.x1);
-    maxs = max(utvid.Tracking.Xest.x1);
+    mins = min(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     
@@ -77,8 +78,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:utvid.settings.nrMarkers*2,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*4+1:utvid.settings.nrMarkers*5,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest.x2);
-    maxs = max(utvid.Tracking.Xest.x2);
+    mins = min(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     
@@ -89,8 +90,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*2+1:utvid.settings.nrMarkers*3,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*5+1:utvid.settings.nrMarkers*6,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest.x3);
-    maxs = max(utvid.Tracking.Xest.x3);
+    mins = min(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     drawnow
@@ -103,8 +104,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal_or.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal_or.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest_or.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x1(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest_or.x1);
-    maxs = max(utvid.Tracking.Xest_or.x1);
+    mins = min(utvid.Tracking.Xest_or.x1(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest_or.x1(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     
@@ -116,8 +117,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal_or.meas(utvid.settings.nrMarkers+1:utvid.settings.nrMarkers*2,utvid.Tracking.n),...
         utvid.Tracking.Kal_or.meas(utvid.settings.nrMarkers*4+1:utvid.settings.nrMarkers*5,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest_or.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x2(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest_or.x2);
-    maxs = max(utvid.Tracking.Xest_or.x2);
+    mins = min(utvid.Tracking.Xest_or.x2(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest_or.x2(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     
@@ -128,8 +129,8 @@ if utvid.Tracking.plotting == 1
     plot(utvid.Tracking.Kal_or.meas(utvid.settings.nrMarkers*2+1:utvid.settings.nrMarkers*3,utvid.Tracking.n),...
         utvid.Tracking.Kal_or.meas(utvid.settings.nrMarkers*5+1:utvid.settings.nrMarkers*6,utvid.Tracking.n),'r*')
     plot(utvid.Tracking.Xest_or.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x3(:,2,utvid.Tracking.n),'go')
-    mins = min(utvid.Tracking.Xest_or.x3);
-    maxs = max(utvid.Tracking.Xest_or.x3);
+    mins = min(utvid.Tracking.Xest_or.x3(:,:,utvid.Tracking.n));
+    maxs = max(utvid.Tracking.Xest_or.x3(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
     ylim([mins(2)-25 maxs(2)+25]);
     drawnow
