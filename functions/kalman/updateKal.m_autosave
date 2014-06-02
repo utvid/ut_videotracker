@@ -9,11 +9,11 @@ function Kal = updateKal(Kal, i)
 % 
 
 %estimation step
-Kal.Cpred(:,:,i);
-Kal.Cn(:,:,i);
+num2str(Kal.Cpred(:,:,i))
+Kal.Cn(:,:,i)
 
 Kal.Cest(:,:,i) = inv( inv(Kal.Cpred(:,:,i)) + Kal.H(:,:,i)'/Kal.Cn(:,:,i)*Kal.H(:,:,i) );
-Kal.Cest(:,:,i);
+num2str(Kal.Cest(:,:,i))
 
 Kal.Xest(:,i)   = Kal.Cest(:,:,i) * (Kal.Cpred(:,:,i)\Kal.Xpred(:,i) ...
     + Kal.H(:,:,i)'/Kal.Cn(:,:,i)*Kal.z(:,i));

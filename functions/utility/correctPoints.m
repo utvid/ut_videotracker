@@ -5,8 +5,8 @@ f = figure;
 aH= axes('ButtonDownFcn', @startDragFcn);
 hold on
 imshow(Im,[]); title(str); 
-xlim([mins(1)-25 maxs(1)+25]);
-ylim([mins(2)-25 maxs(2)+25]);
+% xlim([mins(1)-25 maxs(1)+25]);
+% ylim([mins(2)-25 maxs(2)+25]);
 
 for i = 1:nrMar
     h{i} = line([coords(i,1)-5 coords(i,1)-5 coords(i,1)+5 coords(i,1)+5 coords(i,1)-5],...

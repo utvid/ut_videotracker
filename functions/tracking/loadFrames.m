@@ -7,7 +7,6 @@ else
     n = utvid.Tracking.n;
 end
 
-
 if strcmp(utvid.settings.version,'R2012')
     utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL{idx},n+1));
     utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR{idx},n+1));
