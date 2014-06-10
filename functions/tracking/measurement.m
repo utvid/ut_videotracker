@@ -3,7 +3,7 @@ function [utvid] = measurement(utvid)
 %            frames = {FrameL,FrameR,FrameM}
 %            str = or / shape
 %            n = framenumber
-
+utvid.settings.Measmethod = 'reducecolor';
 if utvid.settings.nrOrMar ~= 0
     jmax = 2;
 else
@@ -44,16 +44,18 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
                 y   = utvid.Tracking.Xpred_or.x3(:,2,utvid.Tracking.n) ;
             end
         end
-        
+%         utvid.settings.Measmethod = 'findblue'
         switch utvid.settings.Measmethod
             case 'findblue'
-                [x,y] = findblue(x,y,im,utvid.Tracking.roi);
+                [x,y] = findblue(x,y,im,utvid.Tracking.roi,2);
             case 'minsearch'
                 [x,y] = minsearch(x,y,im,utvid.Tracking.roi);
             case 'templatematching'
                 [x,y] = templatematching(x,y,im,utvid.Tracking.roi);
             case 'findcircle'
                 [x,y] = findcircle(x,y,im,utvid.Tracking.roi);
+            case 'reducecolor'
+                [x,y] = reducecolor(x,y,im,utvid.Tracking.roi);
             otherwise
                 disp('No valid measurement setting selected');
         end

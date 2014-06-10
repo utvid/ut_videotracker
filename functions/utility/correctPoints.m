@@ -5,6 +5,11 @@ f = figure;
 aH= axes('ButtonDownFcn', @startDragFcn);
 hold on
 imshow(Im,[]); title(str);
+mins = min(coords);
+maxs = max(coords);
+xlim([mins(1)-25 maxs(1)+25]);
+ylim([mins(2)-25 maxs(2)+25]);
+set(f,'Position',get(0,'screensize')); 
 for i = 1:nrMar
     h{i} = line([coords(i,1)-5 coords(i,1)-5 coords(i,1)+5 coords(i,1)+5 coords(i,1)-5],...
         [coords(i,2)-5 coords(i,2)+5 coords(i,2)+5 coords(i,2)-5 coords(i,2)-5], ...

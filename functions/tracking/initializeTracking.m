@@ -54,6 +54,9 @@ if utvid.settings.nrOrMar ~= 0
     [utvid.coords.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x(:,utvid.Tracking.instr);utvid.coords.or.right.x(:,utvid.Tracking.instr);...
         utvid.coords.or.center.x(:,utvid.Tracking.instr); utvid.coords.or.left.y(:,utvid.Tracking.instr);utvid.coords.or.right.y(:,utvid.Tracking.instr);...
         utvid.coords.or.center.y(:,utvid.Tracking.instr)],0, utvid.Pstruct_or.Pext);
+    utvid.Tracking.base_or(:,1) = utvid.coords.Xinit_or(1:6,1);
+    utvid.Tracking.base_or(:,2) = utvid.coords.Xinit_or(7:12,1);
+    utvid.Tracking.base_or(:,3) = utvid.coords.Xinit_or(13:18,1);
 end
 end
 

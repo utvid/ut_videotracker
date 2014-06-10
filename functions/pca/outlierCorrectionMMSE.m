@@ -1,4 +1,4 @@
-function utvid = outlierCorrectionMMSE(utvid,z)
+function [utvid,ptsCorr,c] = outlierCorrectionMMSE(utvid,z)
 
 N = utvid.settings.nrMarkers;
 % [V,S,~] = svd(utvid.pca.PCAcoords,'econ');
@@ -10,7 +10,7 @@ if utvid.pca.Normed == 1
     zCor = zCor./diag(utvid.pca.Gamma);
 end
 
-iter = 150;
+iter = 550;
 for i = 1:iter
     p = sort(randperm(utvid.settings.nrMarkers,round(0.7*utvid.settings.nrMarkers)));
     p = [p,p+utvid.settings.nrMarkers,p+2*utvid.settings.nrMarkers];
@@ -32,9 +32,9 @@ for i = 1:iter
     PCAreconEr = sqrt(sum([reconVecN{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
     
     %Calculation of benefit
-    thres = 5;     %threshold (euclidian distance for labeling marker as outlier)
+    thres = 2;     %threshold (euclidian distance for labeling marker as outlier)
 %     M = markCntMasked_ext(1:end/2);
-    C{i} = PCAreconEr > thres;        %determine outliers
+    C{i} = PCAreconEr > thres;       %determine outliers
     D{i} = PCAreconEr <= thres;       %determine inliers
     residualSum(i) = sum(PCAreconEr(D{i}));
     beta = 1/6;
@@ -43,20 +43,18 @@ end
 
 [~, maxInd] = max(benefit);
 reconVecN = reconVecN{maxInd}(:);
-
 if size(C{maxInd},1)~= 0
     ptsCorr = z;
     for c = find(C{maxInd})%(C{maxInd}<=N)
+        c
         if c == 1
             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
         else
             ptsCorr(c:N:N*2+c) = (reconVecN(c:N:N*2+c));
         end
-
     end
 else
     ptsCorr = z;
 end
 
-utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n) = ptsCorr;
 end

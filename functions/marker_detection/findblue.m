@@ -1,4 +1,4 @@
-function [x,y] = findblue(x,y,im,roi,method);
+function [xnew,ynew] = findblue(x,y,im,roi,method);
 
 %% check boundaries
 % roi is number of pixels to left, right, up and down of center pixel
@@ -20,8 +20,8 @@ if method == 1
         imfoo_ssd = sum(imfoo1.^2,3);
         [rmin,cmin] = find(imfoo_ssd == min(imfoo_ssd(:)),1,'first');
         
-        x(i) = x(i)-(roi+1)+cmin;
-        y(i) = y(i)-(roi+1)+rmin; 
+        xnew(i) = x(i)-(roi+1)+cmin;
+        ynew(i) = y(i)-(roi+1)+rmin; 
     end
     toc
 elseif method == 2
@@ -33,6 +33,7 @@ elseif method == 2
     for i = 1:size(x,1)
         imfoo = im(round(y(i))-roi:round(y(i))+roi,round(x(i))-roi:round(x(i))+roi,:);
         imfoo1 = imfoo-opt;
+%         imfoo_ssd = sum(imfoo1(:,:,3).^2,3);
         imfoo_ssd = sum(imfoo1.^2,3);
         imfoo_ssd2 = imfilter(imfoo_ssd,f,'replicate');
         level = graythresh(imfoo_ssd2);
@@ -42,12 +43,11 @@ elseif method == 2
         numPixels = cellfun(@numel,cc.PixelIdxList);
         [~,idx] = max(numPixels);
         centroids = regionprops(cc,'centroid');
-        
-        x(i) = x(i)-(roi+1)+  centroids(idx).Centroid(1);
-        y(i) = y(i)-(roi+1)+  centroids(idx).Centroid(2);
+        xnew(i) = x(i)-(roi+1) +  centroids(idx).Centroid(1);
+        ynew(i) = y(i)-(roi+1) +  centroids(idx).Centroid(2);
     end
     toc
 end
-
+xnew = xnew'; ynew = ynew';
 
 end

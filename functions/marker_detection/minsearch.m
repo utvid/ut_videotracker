@@ -10,7 +10,8 @@ x(x<1+roi) = 1+(roi+1);
 
 %% marker detection
 for i = 1:size(x,1)
-    imfoo = im(ceil(y(i))-roi:floor(y(i))+roi,ceil(x(i))-roi:floor(x(i))+roi,:);
+%     imfoo = im(ceil(y(i))-roi:floor(y(i))+roi,ceil(x(i))-roi:floor(x(i))+roi,:);
+    imfoo = im(round(y(i))-roi:round(y(i))+roi,round(x(i))-roi:round(x(i))+roi,:);
     if size(imfoo,3) ~= 1
         imfoo = sqrt(mean(imfoo.^2,3));
     end
