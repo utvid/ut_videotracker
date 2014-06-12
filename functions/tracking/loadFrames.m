@@ -4,6 +4,7 @@ idx = find(cf>utvid.Tracking.n,1,'first');
 if idx>1
     n = utvid.Tracking.n-cf(idx-1);
 else
+    idx = 1;
     n = utvid.Tracking.n;
 end
 

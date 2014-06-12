@@ -1,5 +1,6 @@
 function [utvid,ptsCorr,c] = outlierCorrectionMMSE(utvid,z)
-
+utvid.pca.sigv = 0.3;
+disp(num2str(utvid.pca.sigv))
 N = utvid.settings.nrMarkers;
 % [V,S,~] = svd(utvid.pca.PCAcoords,'econ');
 utvid.pca.S = diag(utvid.pca.SM);

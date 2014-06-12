@@ -123,7 +123,7 @@ if utvid.settings.nrOrMar ~=0
     compVec = utvid.Tracking.T(:,:,utvid.Tracking.instr,utvid.Tracking.n)*compVec;
 end
 compVec = transpose(compVec(1:3,:)); compVec = compVec(:);
-% Dn = min(pdist2(compVec',PCAcoords'));
+Dn = min(pdist2(compVec',PCAcoords'));
 
 % figure(22);
 % plot3(compVec(1:10),compVec(11:20),compVec(21:30),'*r')
@@ -132,10 +132,10 @@ compVec = transpose(compVec(1:3,:)); compVec = compVec(:);
 % plot3(PCAcoords(1:10,1),PCAcoords(11:20,1),PCAcoords(21:30,1),'*g');
 % plot3(utvid.Tracking.rt_coor(1:10,n),utvid.Tracking.rt_coor(11:20,4),utvid.Tracking.rt_coor(21:30,4),'*c')
 
-% if Dn > lim
-    %     PCAcoords = [PCAcoords,Kal.Xest(1:end/2,n)];
+if Dn > 3% lim
+        PCAcoords = [PCAcoords,Kal.Xest(1:end/2,n)];
     PCAcoords = [PCAcoords,compVec];
-    %     PCAmodel = getPCAmodel(utvid);
-% end
+        PCAmodel = getPCAmodel(utvid);
+end
 
 end
