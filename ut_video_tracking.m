@@ -325,7 +325,7 @@ else
 end
 
 cam ={'left','right','center'};
-for j = 1%:size(utvid.movs.instrstart,2)
+for j = 2:size(utvid.movs.instrstart,2)
     j
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.settings.version,'R2012')
@@ -383,6 +383,8 @@ while isempty(regexpi(result,'y'))
                 utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
                 utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
                 utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
+            utvid.pca.info(1,i) = i;
+            utvid.pca.info(2,i) = 1;
         end
         break
     else
@@ -441,11 +443,12 @@ end
 %% Marker tracking
 function markertracker(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-for i = 1%1:size(utvid.movs.instrstart,2)
+for i = 13%size(utvid.movs.instrstart,2)
+    utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);
-%     save([utvid.settings.dir_data '\tracking' num2str(i) '.mat'],'utvid','-append');    
+    save([utvid.settings.dir_data '\tracking' num2str(i) '.mat'],'utvid');    
 end
 utvid.settings.state = 7; % update state
 guidata(hMainFigure);

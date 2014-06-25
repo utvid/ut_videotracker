@@ -31,6 +31,7 @@ elseif method == 2
     opt = repmat(Opt,[2*roi+1,2*roi+1,1]);
     f = fspecial('average',3);
     for i = 1:size(x,1)
+        
         imfoo = im(round(y(i))-roi:round(y(i))+roi,round(x(i))-roi:round(x(i))+roi,:);
         imfoo1 = imfoo-opt;
 %         imfoo_ssd = sum(imfoo1(:,:,3).^2,3);

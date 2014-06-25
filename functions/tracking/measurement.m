@@ -47,7 +47,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
 %         utvid.settings.Measmethod = 'findblue'
         switch utvid.settings.Measmethod
             case 'findblue'
-                [x,y] = findblue(x,y,im,utvid.Tracking.roi,2);
+                [x,y] = findblue(x,y,im,utvid.Tracking.roi,1);
             case 'minsearch'
                 [x,y] = minsearch(x,y,im,utvid.Tracking.roi);
             case 'templatematching'

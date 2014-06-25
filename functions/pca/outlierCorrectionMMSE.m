@@ -1,6 +1,4 @@
 function [utvid,ptsCorr,c] = outlierCorrectionMMSE(utvid,z)
-utvid.pca.sigv = 0.3;
-disp(num2str(utvid.pca.sigv))
 N = utvid.settings.nrMarkers;
 % [V,S,~] = svd(utvid.pca.PCAcoords,'econ');
 utvid.pca.S = diag(utvid.pca.SM);
@@ -11,7 +9,7 @@ if utvid.pca.Normed == 1
     zCor = zCor./diag(utvid.pca.Gamma);
 end
 
-iter = 550;
+iter = 150;
 for i = 1:iter
     p = sort(randperm(utvid.settings.nrMarkers,round(0.7*utvid.settings.nrMarkers)));
     p = [p,p+utvid.settings.nrMarkers,p+2*utvid.settings.nrMarkers];
@@ -33,26 +31,30 @@ for i = 1:iter
     PCAreconEr = sqrt(sum([reconVecN{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
     
     %Calculation of benefit
-    thres = 2;     %threshold (euclidian distance for labeling marker as outlier)
+    thres = 3;     %threshold (euclidian distance for labeling marker as outlier)
 %     M = markCntMasked_ext(1:end/2);
     C{i} = PCAreconEr > thres;       %determine outliers
     D{i} = PCAreconEr <= thres;       %determine inliers
-    residualSum(i) = sum(PCAreconEr(D{i}));
+    residualSum(i) = sum(PCAreconEr); %sum(PCAreconEr(D{i}));
     beta = 1/6;
     benefit(i) = length(D{i}) - beta*residualSum(i);
 end
 
 [~, maxInd] = max(benefit);
+disp(['Number of inliers: ' num2str(length(find(D{maxInd})))]);
+disp(['Number of outliers: ' num2str(length(find(C{maxInd})))]);
 reconVecN = reconVecN{maxInd}(:);
 if size(C{maxInd},1)~= 0
     ptsCorr = z;
     for c = find(C{maxInd})%(C{maxInd}<=N)
+        disp('Corrected markers: ')
         c
         if c == 1
             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
         else
             ptsCorr(c:N:N*2+c) = (reconVecN(c:N:N*2+c));
         end
+        
     end
 else
     ptsCorr = z;

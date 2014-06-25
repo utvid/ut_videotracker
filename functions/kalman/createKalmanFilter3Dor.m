@@ -62,7 +62,7 @@ measVecX = []; measVecY = [];
 %     measVecY = [measVecY; handles.ym((i-1)*7+1:(i-1)*7+7)'];
 % end
 
-i = 1; % eerste filmpje nog aanpassen
+i = utvid.Tracking.instr; % eerste filmpje nog aanpassen
 utvid.Tracking.Kal_or.meas(:,1) = [utvid.coords.or.left.x(:,i);utvid.coords.or.right.x(:,i);...
     utvid.coords.or.center.x(:,i);utvid.coords.or.left.y(:,i);utvid.coords.or.right.y(:,i);...
     utvid.coords.or.center.y(:,i)];

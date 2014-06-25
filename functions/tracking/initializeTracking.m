@@ -8,11 +8,13 @@ elseif utvid.Tracking.instr == size(utvid.movs.instrstart,2);
 end
 
 utvid.Tracking.ObjL =[];utvid.Tracking.ObjR =[];utvid.Tracking.ObjM =[];
+nr1 = utvid.movs.instrstart(utvid.Tracking.instr);
+
 for j = 1:utvid.Tracking.NoV;
-    nr = utvid.Tracking.instr+j-1;
-    utvid.Tracking.ObjL{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,nr)).name]);
-    utvid.Tracking.ObjR{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,nr)).name]);
-    utvid.Tracking.ObjM{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,nr)).name]);
+    nr2 = nr1+j-1;
+    utvid.Tracking.ObjL{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.left(1,nr2)).name]);
+    utvid.Tracking.ObjR{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.right(1,nr2)).name]);
+    utvid.Tracking.ObjM{j} = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,nr2)).name]);
     
     NoF(j,1) = utvid.Tracking.ObjL{j}.NumberOfFrames;
     NoF(j,2) = utvid.Tracking.ObjR{j}.NumberOfFrames;
@@ -60,7 +62,7 @@ if utvid.settings.nrOrMar ~= 0
 end
 end
 
-% Create Kalman Filter
+% % Create Kalman Filter
 %Possible addition could be a kalman filter over the PCA domain
 utvid = createKalmanFilter3D(utvid);
 
@@ -84,8 +86,8 @@ if utvid.settings.nrOrMar ~= 0
     utvid.Tracking.Xpred_or    = getSpatialRep(utvid.Tracking.Xpred_or, 2, utvid.Tracking.Kal_or.Xpred(1:end/2,2), utvid.Tracking.Kal_or.Cpred(1:end/2,1:end/2,2),utvid.Pstruct_or);
 end
 
-utvid.Tracking.Meas1.coor(:,:,1) = [utvid.coords.shape.left.x;utvid.coords.shape.left.y];
-utvid.Tracking.Meas2.coor(:,:,1) = [utvid.coords.shape.right.x;utvid.coords.shape.right.y];
-utvid.Tracking.Meas3.coor(:,:,1) = [utvid.coords.shape.center.x;utvid.coords.shape.center.y];
+utvid.Tracking.Meas1.coor(:,:,1) = [utvid.coords.shape.left.x(:,utvid.Tracking.instr);utvid.coords.shape.left.y(:,utvid.Tracking.instr)];
+utvid.Tracking.Meas2.coor(:,:,1) = [utvid.coords.shape.right.x(:,utvid.Tracking.instr);utvid.coords.shape.right.y(:,utvid.Tracking.instr)];
+utvid.Tracking.Meas3.coor(:,:,1) = [utvid.coords.shape.center.x(:,utvid.Tracking.instr);utvid.coords.shape.center.y(:,utvid.Tracking.instr)];
 
 end

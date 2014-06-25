@@ -7,6 +7,7 @@ disp(['Frame: ' num2str(utvid.Tracking.n)])
 
 % The original PCA model did not work for some reason. I implemented know
 % our MMSE method. Original should be fixed and be available as an option.
+utvid = pcaMMSE(utvid);
 
 % Load and show corresponding frames
 utvid = loadFrames(utvid,handles);
@@ -218,8 +219,8 @@ if D > utvid.Tracking.lim
         = PCAExpansionMMSE(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
         utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
         utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
-    utvid = pcaMMSE(utvid);
 end
+
 
 %Space representations Prediction
 utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n+1, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n+1), ...

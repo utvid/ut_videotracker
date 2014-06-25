@@ -15,8 +15,9 @@ for i = 1:nrMar
         [coords(i,2)-5 coords(i,2)+5 coords(i,2)+5 coords(i,2)-5 coords(i,2)-5], ...
         'color','green','linewidth', 3, ...
         'ButtonDownFcn', @startDragFcn);
+    t{i} = text(coords(i,1), coords(i,2), num2str(i),'color','green','FontSize',15,'HorizontalAlignment','center','ButtonDownFcn',@startDragFcn);
 end
-
+set(f,'WindowButtonDownFcn',@startDragFcn);
 set(f,'WindowButtonUpFcn', @stopDragFcn);
 % coords
 uiwait(f)
@@ -25,6 +26,7 @@ uiwait(f)
 %         coords
         for i = 1:length(h)
             set(h{i},'color','green');
+            set(t{i},'color','green');
         end
         guidata(f,coords)
     end
@@ -41,6 +43,7 @@ uiwait(f)
         end
         [~,I] = find(dist==min(dist));
         set(h{I},'XData',[pt(1)-5 pt(1)-5 pt(2)+5 pt(2)+5 pt(1)-5],'YData',[pt(3)-5 pt(4)+5 pt(4)+5 pt(3)-5 pt(3)-5],'color','red');
+        set(t{I},'position',[pt(1) pt(3)],'color','red');
         coords(I,1) = pt(1); coords(I,2) = pt(3);
     end
 
