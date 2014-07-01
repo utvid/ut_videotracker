@@ -1,8 +1,9 @@
 function utvid = Tracking(utvid,handles)
 disp(['Frame: ' num2str(utvid.Tracking.n)])
 % Update PCA model (if enough measurements regarding number of Principal components)
-% if size(utvid.pca.PCAcoords,2) > 3*utvid.settings.PCs
-%     utvid = PCAmodelUpdate(utvid);
+% if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
+% %     utvid = PCAmodelUpdate(utvid)
+%    
 % end
 
 % The original PCA model did not work for some reason. I implemented know
@@ -58,7 +59,7 @@ end
 %         utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
 % end
 
-if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
+if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
     if utvid.pca.outlier == 0, disp('Outlier detection performed'), utvid.pca.outlier = 1; end
     if utvid.settings.nrOrMar ~= 0
     

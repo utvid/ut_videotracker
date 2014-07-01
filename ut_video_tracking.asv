@@ -434,9 +434,7 @@ if regexpi(result,'y');
         utvid.pca.Normed = 1;
     end
 end
-if utvid.pca.MMSE == 1
-utvid = pcaMMSE(utvid);
-end
+
 utvid.settings.state = 6; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
