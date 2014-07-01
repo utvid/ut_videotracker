@@ -2,6 +2,9 @@ function [utvid] = PCAExpansionMMSE(utvid)
 
 imnL = utvid.Tracking.FrameL; imnR = utvid.Tracking.FrameR; imnM = utvid.Tracking.FrameM;
 n = utvid.Tracking.n;
+c1 = [];
+c2 = [];
+c3 = [];
 if utvid.settings.nrOrMar ~= 0
     figure(111)
     subplot(1,3,1), set(gcf, 'Position', get(0,'Screensize'));
@@ -104,7 +107,10 @@ switch choice
         [utvid.Tracking.Xest.x3(:,:,n),c3] = correctPoints(imnM,utvid.settings.nrMarkers,utvid.Tracking.Xest.x3(:,:,n),'shape');
         
 end
+
+
 c = unique([c1,c2,c3])
+
 
 utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n); ...
                                                utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n);...
@@ -119,6 +125,7 @@ utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [utvid.Tracking.Xest.x1(:,1,utvid.
 utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n)= vec3d;
 utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n+1)= vec3d;
 
+if length(c)>0
 for cc = 1:length(c)
     utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
     utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
@@ -128,7 +135,7 @@ for cc = 1:length(c)
     utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
     utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
 end
-
+end
 % zet estimate naar de gecorrigeerde versie
 utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,utvid.Tracking.n) = vec3d;
 
