@@ -30,9 +30,9 @@ handles.hax2 = axes('Parent',enhanceFigure,'position',[0.5 0.4 0.5 0.5]);
 % dit is een hard solution, moet nog een meer verfijnde oplossing komen
 
 
-    if strcmp(utvid.settings.version,'R2012')
+    if strcmp(utvid.settings.version,'R2013b')~= 1
         handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,1)).name]),2));
-    elseif strcmp(utvid.settings.version,'R2013')
+    elseif strcmp(utvid.settings.version,'R2013b')
         handles.I = im2double(read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.center(1,1)).name]),1));
     else
         disp('Version not yet implemented')

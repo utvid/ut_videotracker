@@ -3,7 +3,7 @@ function [utvid] = measurement(utvid)
 %            frames = {FrameL,FrameR,FrameM}
 %            str = or / shape
 %            n = framenumber
-utvid.settings.Measmethod = 'reducecolor';
+% utvid.settings.Measmethod = 'reducecolor';
 if utvid.settings.nrOrMar ~= 0
     jmax = 2;
 else

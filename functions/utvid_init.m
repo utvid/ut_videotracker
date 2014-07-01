@@ -46,7 +46,7 @@ else
     save([utvid.settings.cdir '\Functions\utility\historyfolder.mat'] ,'historyfolder')
 end
 v = version;
-utvid.settings.version = v(end-6:end-2);
+utvid.settings.version = v(end-6:end-1);
 cd(utvid.settings.dir_data);        % change directory to data directory
 %%
 Files = dir('*.mat');
@@ -65,17 +65,16 @@ if  numFiles ~=0    % check for existence of init.mat file
         utvid.handle = handles;
     else
         FileName = uigetfile('*.mat');
-      
         handles = utvid.handle;
         disp(['Loading ' FileName])
         load(FileName,'utvid')                % load init.mat
-        disp([FileName ' loaded succesfully'])
-        utvid.handle = handles;  
         if strcmp(FileName,'init.mat')
             utvid.settings.initTracking = 1;
         else
             utvid.settings.initTracking = 0;
         end
+        disp([FileName ' loaded succesfully'])
+        utvid.handle = handles;  
     end
 else                                % if init.mat doesnot exist execute the following:
     %% Sort videos in left , center, and, right camera
@@ -132,6 +131,8 @@ else                                % if init.mat doesnot exist execute the foll
         utvid.settings.nrcams = nrcams;    
         utvid.movs.list = movlist;
         utvid.movs.instrstart = find(utvid.movs.left(2,:)==0);
+        utvid.settings.initTracking = 1; 
+
         clear cL cM cR movlist i 
         save('init.mat');               % save everything to init.mat
     catch
@@ -139,7 +140,6 @@ else                                % if init.mat doesnot exist execute the foll
     end
 end
 cd(utvid.settings.cdir);                        % change directory back to current directory path
-utvid.settings.initTracking
 %% Geeft een error???
 % guidata(hMainFigure,utvid); 
 

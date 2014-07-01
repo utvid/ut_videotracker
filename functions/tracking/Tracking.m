@@ -48,6 +48,9 @@ rot_coor = Rrext*coor;
 utvid.Tracking.rt_coor(:,utvid.Tracking.n) = [rot_coor(1:utvid.settings.nrMarkers)+utvid.Tracking.T(1,4,utvid.Tracking.instr,utvid.Tracking.n); ...
           rot_coor(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers)+  utvid.Tracking.T(2,4,utvid.Tracking.instr,utvid.Tracking.n);...
           rot_coor(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers)+utvid.Tracking.T(3,4,utvid.Tracking.instr,utvid.Tracking.n)];
+else
+    utvid.Tracking.rt_coor(:,utvid.Tracking.n) = utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,utvid.Tracking.n);
+
 end
       
 %Outlier Detection
@@ -58,7 +61,7 @@ end
 %         utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
 % end
 
-if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
+if size(utvid.pca.PCAcoords,2) > 4*utvid.settings.PCs
     if utvid.pca.outlier == 0, disp('Outlier detection performed'), utvid.pca.outlier = 1; end
     if utvid.settings.nrOrMar ~= 0
     
@@ -97,7 +100,7 @@ end
     utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,utvid.Tracking.n) = coor_back;
 
     else    
-    [utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
+    [utvid,utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n));
     utvid.Tracking.rt_coor = utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,:);
     end
 end
@@ -107,7 +110,6 @@ utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.T
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
-
 
 
 if utvid.Tracking.plotting == 1
@@ -211,7 +213,7 @@ end
 D = min(pdist2(utvid.Tracking.rt_coor(:,utvid.Tracking.n)',utvid.pca.PCAcoords'));
 
 disp(['PCAsize: ' num2str(size(utvid.pca.PCAcoords,2))])
-disp(['Error: ' num2str(D)]);
+disp(['Dist PCA: ' num2str(D)]);
 disp(['Lim: ' num2str(utvid.Tracking.lim)]);
 if D > utvid.Tracking.lim
     [utvid.pca.PCAcoords,utvid.Tracking.Xest,utvid.Tracking.Kal,utvid.pca.info] ...

@@ -22,7 +22,7 @@ for j = 1:utvid.Tracking.NoV;
     utvid.Tracking.NoF = min(NoF,[],2);
 end
 
-if strcmp(utvid.settings.version,'R2012')
+if strcmp(utvid.settings.version,'R2013b')~=1 
     utvid.Tracking.NoF = utvid.Tracking.NoF-1;
     axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n+1),[]);
     axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n+1),[]);

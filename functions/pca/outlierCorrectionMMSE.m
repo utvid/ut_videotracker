@@ -31,12 +31,12 @@ for i = 1:iter
     PCAreconEr = sqrt(sum([reconVecN{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
     
     %Calculation of benefit
-    thres = 3;     %threshold (euclidian distance for labeling marker as outlier)
+    thres = 2;     %threshold (euclidian distance for labeling marker as outlier)
 %     M = markCntMasked_ext(1:end/2);
     C{i} = PCAreconEr > thres;       %determine outliers
     D{i} = PCAreconEr <= thres;       %determine inliers
     residualSum(i) = sum(PCAreconEr); %sum(PCAreconEr(D{i}));
-    beta = 1/6;
+    beta = 1/3;
     benefit(i) = length(D{i}) - beta*residualSum(i);
 end
 
@@ -48,7 +48,13 @@ if size(C{maxInd},1)~= 0
     ptsCorr = z;
     for c = find(C{maxInd})%(C{maxInd}<=N)
         disp('Corrected markers: ')
-        c
+        if size(c,1) == 0 
+            disp('No corrections performed')
+        else
+            for P = length(c)
+                disp(c(P))
+            end
+        end
         if c == 1
             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
         else

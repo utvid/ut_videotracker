@@ -447,12 +447,12 @@ uiwait(trackingFigure);
 %% step forward callback
     function utvid_step(trackingFigure,handles)
         handles = guidata(trackingFigure);
-        if strcmp(utvid.settings.version,'R2012')
+        if strcmp(utvid.settings.version,'R2013b')~=1
             if utvid.Tracking.n+1 < utvid.Tracking.FrameNum;
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);
             end
-        elseif strcmp(utvid.settings.version,'R2013')
+        elseif strcmp(utvid.settings.version,'R2013b')
             if utvid.Tracking.n < utvid.Tracking.FrameNum;
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);

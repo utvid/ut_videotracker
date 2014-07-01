@@ -132,11 +132,11 @@ Dn = min(pdist2(compVec',PCAcoords'));
 % plot3(PCAcoords(1:10,1),PCAcoords(11:20,1),PCAcoords(21:30,1),'*g');
 % plot3(utvid.Tracking.rt_coor(1:10,n),utvid.Tracking.rt_coor(11:20,4),utvid.Tracking.rt_coor(21:30,4),'*c')
 pcainfo = utvid.pca.info;
-if Dn > 1.5%lim
+% if Dn > 1.5%lim
 %         PCAcoords = [PCAcoords,Kal.Xest(1:end/2,n)];
         pcainfo = [pcainfo,[utvid.Tracking.instr;utvid.Tracking.n]];
         PCAcoords = [PCAcoords,compVec];
         PCAmodel = getPCAmodel(utvid);
-end
+% end
 
 end
