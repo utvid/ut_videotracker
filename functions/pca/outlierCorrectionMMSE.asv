@@ -49,11 +49,11 @@ if size(C{maxInd},1)~= 0
     ptsCorr = z;
     for cc = 1:length(c)%c = find(C{maxInd})%(C{maxInd}<=N)
         disp('Corrected marker: ')
-        c(cc)
+        cc
 %         if c == 1
 %             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
 %         else
-        ptsCorr(c(cc):N:N*2+c(cc)) = (reconVecN(c(cc):N:N*2+c(cc)));
+        ptsCorr(c:N:N*2+c) = (reconVecN(c:N:N*2+c));
 %         end
         
     end

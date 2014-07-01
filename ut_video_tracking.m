@@ -443,8 +443,8 @@ end
 %% Marker tracking
 function markertracker(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-for i = 13%size(utvid.movs.instrstart,2)
-    utvid.settings.initTracking  = 1;
+for i = 20%size(utvid.movs.instrstart,2)
+    utvid.settings.initTracking  = 0;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

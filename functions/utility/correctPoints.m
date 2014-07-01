@@ -1,6 +1,6 @@
-function [coords] = correctPoints(Im,nrMar,coords,str)
+function [coords,c] = correctPoints(Im,nrMar,coords,str)
 f = figure; 
-
+c = [];
 % axes(h1)
 aH= axes('ButtonDownFcn', @startDragFcn);
 hold on
@@ -45,6 +45,7 @@ uiwait(f)
         set(h{I},'XData',[pt(1)-5 pt(1)-5 pt(2)+5 pt(2)+5 pt(1)-5],'YData',[pt(3)-5 pt(4)+5 pt(4)+5 pt(3)-5 pt(3)-5],'color','red');
         set(t{I},'position',[pt(1) pt(3)],'color','red');
         coords(I,1) = pt(1); coords(I,2) = pt(3);
+        c = [c, I];
     end
 
 end

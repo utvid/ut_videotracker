@@ -74,27 +74,36 @@ if size(utvid.pca.PCAcoords,2) > 1*utvid.settings.PCs
 %     utvid.Tracking.Xest.X(:,1,utvid.Tracking.n)= [coor_back(1:utvid.settings.nrMarkers)
 %     utvid.Tracking.Xest.X(:,2,utvid.Tracking.n)= [coor_back(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers)
 %     utvid.Tracking.Xest.X(:,3,utvid.Tracking.n)= [coor_back(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers)
+    test.Xpred = utvid.Tracking.Xpred;
+    test.Xest = utvid.Tracking.Xest;
+    test.Kal.meas = utvid.Tracking.Kal.meas(:,utvid.Tracking.n);
     
 % zet predictie naar de gecorrigeerde versie
-for ii = 1:length(c)
-        utvid.Tracking.Kal.Xpred(c(ii),utvid.Tracking.n) = coor_back(c(ii));
-        utvid.Tracking.Kal.Xpred(c(ii)+10,utvid.Tracking.n) = coor_back(c(ii)+10);
-        utvid.Tracking.Kal.Xpred(c(ii)+20,utvid.Tracking.n) = coor_back(c(ii)+20);
-end
-        
-% zet meting ook naar de gecorrigeerde versie  
-    [c1,c2,c3,~,~,~]=threeDto2D_3cam(coor_back,utvid.Tracking.Kal.Cest(1:end/2,1:end/2),utvid.Pstruct);
-   
-    for ii = 1:length(c)
-        utvid.Tracking.Kal.meas(c(ii),utvid.Tracking.n) = c1(1,c(ii));
-        utvid.Tracking.Kal.meas(c(ii)+10,utvid.Tracking.n) = c2(1,c(ii));
-        utvid.Tracking.Kal.meas(c(ii)+20,utvid.Tracking.n) = c3(1,c(ii));
-        utvid.Tracking.Kal.meas(c(ii)+30,utvid.Tracking.n) = c1(2,c(ii));
-        utvid.Tracking.Kal.meas(c(ii)+40,utvid.Tracking.n) = c2(2,c(ii));
-        utvid.Tracking.Kal.meas(c(ii)+50,utvid.Tracking.n) = c3(2,c(ii));
-    end
+utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n)= coor_back;
+utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n+1)= coor_back;
 
-    utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,utvid.Tracking.n) = coor_back;
+for cc = 1:length(c)
+    utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    utvid.Tracking.Kal.Xpred(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    
+    utvid.Tracking.Kal.Xest(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+end
+
+% zet estimate naar de gecorrigeerde versie
+utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,utvid.Tracking.n) = coor_back;
+
+% zet meting ook naar de gecorrigeerde versie  
+[c1,c2,c3,~,~,~]=threeDto2D_3cam(coor_back,utvid.Tracking.Kal.Cest(1:end/2,1:end/2),utvid.Pstruct);
+  
+utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n) = c1(1,:)';
+utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(1,:)';
+utvid.Tracking.Kal.meas(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(1,:)';
+utvid.Tracking.Kal.meas(3*utvid.settings.nrMarkers+1:4*utvid.settings.nrMarkers,utvid.Tracking.n) = c1(2,:)';
+utvid.Tracking.Kal.meas(4*utvid.settings.nrMarkers+1:5*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(2,:)';
+utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
 
     else    
     [utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
@@ -102,11 +111,13 @@ end
     end
 end
 
+
 %Space representations Estimations
 utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
+
 
 
 
@@ -121,6 +132,11 @@ if utvid.Tracking.plotting == 1
     h14 = plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r.');
 %     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
+     plot(test.Xest.x1(:,1,utvid.Tracking.n),test.Xest.x1(:,2,utvid.Tracking.n),'m+','linewidth',2);
+     plot(test.Xpred.x1(:,1,utvid.Tracking.n),test.Xpred.x1(:,2,utvid.Tracking.n),'oc');
+     plot(test.Kal.meas(1:utvid.settings.nrMarkers), ...
+       test.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4),'g.');
+% 
     mins = min(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
     maxs = max(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
     xlim([mins(1)-25 maxs(1)+25]);
@@ -214,10 +230,12 @@ disp(['PCAsize: ' num2str(size(utvid.pca.PCAcoords,2))])
 disp(['Error: ' num2str(D)]);
 disp(['Lim: ' num2str(utvid.Tracking.lim)]);
 if D > utvid.Tracking.lim
-    [utvid.pca.PCAcoords,utvid.Tracking.Xest,utvid.Tracking.Kal,utvid.pca.info] ...
-        = PCAExpansionMMSE(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
-        utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
-        utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
+    utvid = PCAExpansionMMSE2(utvid);
+    
+%     [utvid.pca.PCAcoords,utvid.Tracking.Xest,utvid.Tracking.Kal,utvid.pca.info] ...
+%         = PCAExpansionMMSE(utvid.Tracking.FrameL,utvid.Tracking.FrameR,...
+%         utvid.Tracking.FrameM,utvid.Tracking.n,utvid.pca.PCAcoords,...
+%         utvid.Tracking.Kal,utvid.Tracking.Xest,utvid.Pstruct,utvid.Tracking.lim,utvid);
     utvid = pcaMMSE(utvid);
 end
 
