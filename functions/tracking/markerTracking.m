@@ -470,9 +470,11 @@ uiwait(trackingFigure);
         
         while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n < utvid.Tracking.FrameNum;
             utvid.Tracking.n = utvid.Tracking.n+1;
-            utvid = Tracking(utvid,handles);
+            utvid = Tracking(utvid,handles);        whos utvid
         end
-        
+        if utvid.Tracking.n == utvid.Tracking.FrameNum;
+            save(['NEWtracking' num2str(utvid.Tracking.instr) '.mat'],'utvid')
+        end
         guidata(trackingFigure,handles);
     end
 %% checkbox plot
