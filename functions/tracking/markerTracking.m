@@ -190,7 +190,7 @@ handles.h{6} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','10','Callback',@gettextvalues,...
+    'string','3','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -375,13 +375,13 @@ uiwait(trackingFigure);
         % check for empty input, if so use defaults
         if isempty(utvid.settings.PCs);        utvid.settings.PCs = 6;
             set(handles.h{11},'string','6');   end
-        if isempty(utvid.Tracking.sigMeas);    utvid.Tracking.sigMeas = 5;
+        if isempty(utvid.Tracking.sigMeas);    utvid.Tracking.sigMeas = 1;
             set(handles.h{7},'string','5');     end
-        if isempty(utvid.Tracking.sigVx);      utvid.Tracking.sigVx = 5;
+        if isempty(utvid.Tracking.sigVx);      utvid.Tracking.sigVx = 25;
             set(handles.h{8},'string','2');     end
-        if isempty(utvid.Tracking.sigVy);      utvid.Tracking.sigVy = 10;
+        if isempty(utvid.Tracking.sigVy);      utvid.Tracking.sigVy = 25;
             set(handles.h{9},'string','2');     end
-        if isempty(utvid.Tracking.sigVz);      utvid.Tracking.sigVz = 7;
+        if isempty(utvid.Tracking.sigVz);      utvid.Tracking.sigVz = 25;
             set(handles.h{10},'string','2');    end
         if isempty(utvid.Tracking.roi);    utvid.Tracking.roi  = 6;
             set(handles.h{6},'string','6');     end
@@ -447,12 +447,12 @@ uiwait(trackingFigure);
 %% step forward callback
     function utvid_step(trackingFigure,handles)
         handles = guidata(trackingFigure);
-        if strcmp(utvid.settings.version,'R2012')
+        if strcmp(utvid.settings.version,'R2013b')~=1
             if utvid.Tracking.n+1 < utvid.Tracking.FrameNum;
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);
             end
-        elseif strcmp(utvid.settings.version,'R2013')
+        elseif strcmp(utvid.settings.version,'R2013b')
             if utvid.Tracking.n < utvid.Tracking.FrameNum;
                 utvid.Tracking.n = utvid.Tracking.n+1;
                 utvid = Tracking(utvid,handles);

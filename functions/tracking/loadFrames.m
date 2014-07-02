@@ -9,11 +9,11 @@ else
 end
 
 
-if strcmp(utvid.settings.version,'R2012')
+if strcmp(utvid.settings.version,'R2013b')~=1
     utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL{idx},n+1));
     utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR{idx},n+1));
     utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM{idx},n+1));
-elseif strcmp(utvid.settings.version,'R2013')
+elseif strcmp(utvid.settings.version,'R2013b')
     utvid.Tracking.FrameLorig = im2double(read(utvid.Tracking.ObjL{idx},n));
     utvid.Tracking.FrameRorig = im2double(read(utvid.Tracking.ObjR{idx},n));
     utvid.Tracking.FrameMorig = im2double(read(utvid.Tracking.ObjM{idx},n));

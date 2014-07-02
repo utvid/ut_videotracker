@@ -200,43 +200,65 @@ end
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
-prompt = 'Give standard name (e.g. NEW): '
+prompt = 'Give standard name (e.g. NEW): ';
 result = input(prompt,'s');
 if isempty(result)
-    utvid.setttings.stname = 'NEW'
+    utvid.setttings.stname = 'NEW';
 else
     utvid.settings.stname = result;
+    for i = 1:length(utvid.movs.list)
+        if strcmp(utvid.movs.list(i).name(1:length(result)),result)
+            utvid.movs.list(i).name = utvid.movs.list(i).name(length(result)+1:end);
+        end
+    end
+    cam = {'left','right','center'};
+    for i = 1:utvid.settings.nrcams
+        %         utvid.movs.calb.(cam{i})(1).name
+        if strcmp(utvid.movs.calb.(cam{i})(1).name(1:length(result)),result)
+            utvid.movs.calb.(cam{i})(1).name = utvid.movs.calb.(cam{i})(1).name(length(result)+1:end);
+        end
+    end
 end
 
 % Ask for using compression or not
-prompt = 'Use compression (y/n)? ';
+prompt = 'Are movies debayered (y/n)? ';
 result = input(prompt, 's');
-if isempty(result)
-    result = 'y';
+while isempty(result) || strcmp(result,'y')~= 1 || strcmp(result,'n')
+    result = input(prompt, 's');
 end
 
-while isempty(regexpi(result,'y'));
-    if regexpi(result,'n')==1
-        break
-    else
-        prompt = 'Use compression (y/n)? Please type y for yes or n for no: ';
-        result = input(prompt, 's');
+if strcmp(result,'n')
+    disp('Movies get debayered... ')
+    prompt = 'Use compression (y/n)? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = 'y';
     end
-end
-
-% When using compression ask for video quality
-if regexpi(result,'y')==1
-    prompt = 'Set video quality (0 - 100): ';
-    result = str2num(input(prompt,'s'));
     
-    while isempty(result) || result<1 || result>100
-        prompt = 'Set video quality (0 - 100), please type a number between 0 and 100: ';
-        result = str2num(input(prompt,'s'));
+    while isempty(regexpi(result,'y'));
+        if regexpi(result,'n')==1
+            break
+        else
+            prompt = 'Use compression (y/n)? Please type y for yes or n for no: ';
+            result = input(prompt, 's');
+        end
     end
-    utvid.settings.vidquality = result;
-    utvid_bayerfilter(utvid,1);
-else
-    utvid_bayerfilter(utvid,0);
+    
+    
+    % When using compression ask for video quality
+    if regexpi(result,'y')==1
+        prompt = 'Set video quality (0 - 100): ';
+        result = str2num(input(prompt,'s'));
+        
+        while isempty(result) || result<1 || result>100
+            prompt = 'Set video quality (0 - 100), please type a number between 0 and 100: ';
+            result = str2num(input(prompt,'s'));
+        end
+        utvid.settings.vidquality = result;
+        utvid_bayerfilter(utvid,1);
+    else
+        utvid_bayerfilter(utvid,0);
+    end
 end
 
 utvid.settings.state = 2; % update state
@@ -258,13 +280,13 @@ function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 cam ={'left','right','center'};
 for i = 1:utvid.settings.nrcams;
-    if strcmp(utvid.settings.version,'R2012')
+    if strcmp(utvid.settings.version,'R2013b')~=1
         %         [utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\'  utvid.settings.stname utvid.movs.calb.(cam{i})(1).name]),2);
         if size(I,3) == 1
             I = demosaic(I,'rggb');
         end
-    elseif strcmp(utvid.settings.version,'R2013')
+    elseif strcmp(utvid.settings.version,'R2013b')
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\'  utvid.settings.stname utvid.movs.calb.(cam{i})(1).name]),1);
         if size(I,3) == 1
             I = demosaic(I,'rggb');
@@ -325,12 +347,12 @@ else
 end
 
 cam ={'left','right','center'};
-for j = 2:size(utvid.movs.instrstart,2)
-    j
+for j = 1:size(utvid.movs.instrstart,2)
+    
     for i = 1:utvid.settings.nrcams;
-        if strcmp(utvid.settings.version,'R2012')
+        if strcmp(utvid.settings.version,'R2013b')~=1
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
-        elseif strcmp(utvid.settings.version,'R2013')
+        elseif strcmp(utvid.settings.version,'R2013b')
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),1);
         else
             disp('Version not yet implemented')
@@ -435,7 +457,7 @@ if regexpi(result,'y');
     end
 end
 if utvid.pca.MMSE == 1
-utvid = pcaMMSE(utvid);
+    utvid = pcaMMSE(utvid);
 end
 utvid.settings.state = 6; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
@@ -445,12 +467,12 @@ end
 %% Marker tracking
 function markertracker(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-for i = 1:4%size(utvid.movs.instrstart,2)
-    utvid.settings.initTracking  = 1;
+for i = 1:size(utvid.movs.instrstart,2)
+%     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
-%     utvid.settings.nrOrMar = 0;
+    %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);
-    save([utvid.settings.dir_data '\NEWtracking' num2str(i) '.mat'],'utvid');    
+    save([utvid.settings.dir_data '\NEWtracking' num2str(i) '.mat'],'utvid');
 end
 utvid.settings.state = 7; % update state
 guidata(hMainFigure);

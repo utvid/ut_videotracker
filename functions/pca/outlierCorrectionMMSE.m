@@ -9,7 +9,7 @@ if utvid.pca.Normed == 1
     zCor = zCor./diag(utvid.pca.Gamma);
 end
 
-iter = 150;
+iter = 250;
 for i = 1:iter
     p = sort(randperm(utvid.settings.nrMarkers,round(0.7*utvid.settings.nrMarkers)));
     p = [p,p+utvid.settings.nrMarkers,p+2*utvid.settings.nrMarkers];
@@ -44,21 +44,28 @@ end
 disp(['Number of inliers: ' num2str(length(find(D{maxInd})))]);
 disp(['Number of outliers: ' num2str(length(find(C{maxInd})))]);
 reconVecN = reconVecN{maxInd}(:);
-c = find(C{maxInd})
-if size(C{maxInd},1)~= 0
-    ptsCorr = z;
+
+c = find(C{maxInd});
+ptsCorr = z;
+disp(['Corrected by OD: ' num2str(c')])
+if ~isempty(c)
+   
     for cc = 1:length(c)%c = find(C{maxInd})%(C{maxInd}<=N)
-        disp('Corrected marker: ')
-        c(cc)
+       
+        ptsCorr(c(cc):N:N*2+c(cc)) = (reconVecN(c(cc):N:N*2+c(cc)));
+      
+    end
+end
+% if size(C{maxInd},1)~= 0
+    
 %         if c == 1
 %             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
 %         else
-        ptsCorr(c(cc):N:N*2+c(cc)) = (reconVecN(c(cc):N:N*2+c(cc)));
+        
 %         end
         
-    end
-else
-    ptsCorr = z;
-end
-
+%     end
+% else
+%     ptsCorr = z;
+% end
 end

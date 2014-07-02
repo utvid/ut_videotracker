@@ -4,7 +4,7 @@ utvid.Tracking.n = 1;
 if utvid.Tracking.instr < size(utvid.movs.instrstart,2);
     utvid.Tracking.NoV = utvid.movs.instrstart(utvid.Tracking.instr+1)-utvid.movs.instrstart(utvid.Tracking.instr);
 elseif utvid.Tracking.instr == size(utvid.movs.instrstart,2);
-    utvid.Tracking.NoV = size(utvid.movs.left,2)-utvid.movs.instrstart(utvid.Tracking.instr);
+    utvid.Tracking.NoV = size(utvid.movs.left,2);%;-utvid.movs.instrstart(utvid.Tracking.instr);
 end
 
 utvid.Tracking.ObjL =[];utvid.Tracking.ObjR =[];utvid.Tracking.ObjM =[];
@@ -22,7 +22,7 @@ for j = 1:utvid.Tracking.NoV;
     utvid.Tracking.NoF = min(NoF,[],2);
 end
 
-if strcmp(utvid.settings.version,'R2012')
+if strcmp(utvid.settings.version,'R2013b')~= 1
     utvid.Tracking.NoF = utvid.Tracking.NoF-1;
     axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n+1),[]);
     axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n+1),[]);
@@ -34,7 +34,7 @@ if strcmp(utvid.settings.version,'R2012')
         axes(handles.hax{2,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n),[]);
     end
     
-elseif strcmp(utvid.settings.version,'R2013')
+elseif strcmp(utvid.settings.version,'R2013b')
     axes(handles.hax{1,1}), imshow(read(utvid.Tracking.ObjL{1},utvid.Tracking.n),[]);
     axes(handles.hax{1,2}), imshow(read(utvid.Tracking.ObjR{1},utvid.Tracking.n),[]);
     axes(handles.hax{1,3}), imshow(read(utvid.Tracking.ObjM{1},utvid.Tracking.n),[]);
