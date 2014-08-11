@@ -26,6 +26,12 @@ for j = 1:utvid.settings.nrcams
     elseif  j == 2; im = utvid.Tracking.FrameRorig;
     elseif  j == 3; im = utvid.Tracking.FrameMorig;
     end
+    if strcmpi(utvid.enhancement.histeq,'true')==1
+        for i = 1:size(im,3)
+            im2(:,:,i) = histeq(im(:,:,i)); 
+        end
+       im = im2; clear im2; 
+    end
     if strcmpi(utvid.enhancement.mono,'false')==1
         
         for i = 1:size(im,3)

@@ -13,9 +13,11 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
     cam = {'left','right','center'};
     if isfield(utvid.settings,'Measmethod')~=1
-        utvid.settings.Measmethod = 'minsearch';
+        utvid.settings.Measmethod = 'reducecolor';
+        
     end
-    
+    disp(utvid.settings.Measmethod);
+
     Xstacked = []; Ystacked = [];
     
     for i = 1:utvid.settings.nrcams

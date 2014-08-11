@@ -444,13 +444,14 @@ set(utvid.handle.h6,'backgroundcolor','g');
 end
 %% Marker tracking
 function markertracker(hMainFigure,utvid)
+
 utvid = guidata(hMainFigure);
-for i = 6%size(utvid.movs.instrstart,2)
+for i = 2%size(utvid.movs.instrstart,2)
     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);
-    save([utvid.settings.dir_data '\NEWtracking' num2str(i) '.mat'],'utvid');    
+    save([utvid.settings.dir_data '\trackingOK' num2str(i) '.mat'],'utvid');    
 end
 utvid.settings.state = 7; % update state
 guidata(hMainFigure);

@@ -133,10 +133,10 @@ if utvid.Tracking.plotting == 1
     h14 = plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r.');
 %     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
-     plot(test.Xest.x1(:,1,utvid.Tracking.n),test.Xest.x1(:,2,utvid.Tracking.n),'m+','linewidth',2);
-     plot(test.Xpred.x1(:,1,utvid.Tracking.n),test.Xpred.x1(:,2,utvid.Tracking.n),'oc');
-     plot(test.Kal.meas(1:utvid.settings.nrMarkers), ...
-       test.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4),'g.');
+%      plot(test.Xest.x1(:,1,utvid.Tracking.n),test.Xest.x1(:,2,utvid.Tracking.n),'m+','linewidth',2);
+%      plot(test.Xpred.x1(:,1,utvid.Tracking.n),test.Xpred.x1(:,2,utvid.Tracking.n),'oc');
+%      plot(test.Kal.meas(1:utvid.settings.nrMarkers), ...
+%        test.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4),'g.');
 % 
     mins = min(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
     maxs = max(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
@@ -228,6 +228,7 @@ end
 D = min(pdist2(utvid.Tracking.rt_coor(:,utvid.Tracking.n)',utvid.pca.PCAcoords'));
 
 disp(['PCAsize: ' num2str(size(utvid.pca.PCAcoords,2))])
+disp(['PCs: ' num2str(utvid.settings.PCs)])
 disp(['Error: ' num2str(D)]);
 disp(['Lim: ' num2str(utvid.Tracking.lim)]);
 if D > utvid.Tracking.lim

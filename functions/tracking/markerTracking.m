@@ -194,7 +194,7 @@ handles.h{6} = uicontrol(...
     'background','white');
 
 if utvid.settings.initTracking 
-    utvid.Tracking.roi = str2double(get(handles.h{12},'string'));
+    utvid.Tracking.roi = str2double(get(handles.h{6},'string'));
 else 
     set(handles.h{6},'string',num2str(utvid.Tracking.roi))
 end
@@ -238,7 +238,7 @@ handles.h{8} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','25','Callback',@gettextvalues,...
+    'string','50','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -262,7 +262,7 @@ handles.h{9} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','25','Callback',@gettextvalues,...
+    'string','50','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -286,7 +286,7 @@ handles.h{10} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','25','Callback',@gettextvalues,...
+    'string','50','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -310,7 +310,7 @@ handles.h{11} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','6','Callback',@gettextvalues,...
+    'string','10','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -375,16 +375,16 @@ uiwait(trackingFigure);
         % check for empty input, if so use defaults
         if isempty(utvid.settings.PCs);        utvid.settings.PCs = 6;
             set(handles.h{11},'string','6');   end
-        if isempty(utvid.Tracking.sigMeas);    utvid.Tracking.sigMeas = 5;
-            set(handles.h{7},'string','5');     end
-        if isempty(utvid.Tracking.sigVx);      utvid.Tracking.sigVx = 5;
-            set(handles.h{8},'string','2');     end
-        if isempty(utvid.Tracking.sigVy);      utvid.Tracking.sigVy = 10;
-            set(handles.h{9},'string','2');     end
-        if isempty(utvid.Tracking.sigVz);      utvid.Tracking.sigVz = 7;
-            set(handles.h{10},'string','2');    end
-        if isempty(utvid.Tracking.roi);    utvid.Tracking.roi  = 6;
-            set(handles.h{6},'string','6');     end
+        if isempty(utvid.Tracking.sigMeas);    utvid.Tracking.sigMeas = .5;
+            set(handles.h{7},'string','.5');     end
+        if isempty(utvid.Tracking.sigVx);      utvid.Tracking.sigVx = 50;
+            set(handles.h{8},'string','50');     end
+        if isempty(utvid.Tracking.sigVy);      utvid.Tracking.sigVy = 50;
+            set(handles.h{9},'string','50');     end
+        if isempty(utvid.Tracking.sigVz);      utvid.Tracking.sigVz = 50;
+            set(handles.h{10},'string','50');    end
+        if isempty(utvid.Tracking.roi);    utvid.Tracking.roi  = 10;
+            set(handles.h{6},'string','10');     end
         
         guidata(trackingFigure,handles);
     end
@@ -467,14 +467,14 @@ uiwait(trackingFigure);
         if get(handles.h{2},'Value')
             set(handles.h{2},'Value',0)
         end
-        
+        disp(utvid.Tracking.sigMeas)
         while get(handles.h{2},'value') ~= 1 && utvid.Tracking.n < utvid.Tracking.FrameNum;
             utvid.Tracking.n = utvid.Tracking.n+1;
-            utvid = Tracking(utvid,handles);        whos utvid
+            utvid = Tracking(utvid,handles);        
         end
-        if utvid.Tracking.n == utvid.Tracking.FrameNum;
-            save(['NEWtracking' num2str(utvid.Tracking.instr) '.mat'],'utvid')
-        end
+%         if utvid.Tracking.n == utvid.Tracking.FrameNum;
+%             save(['NEWtracking' num2str(utvid.Tracking.instr) '.mat'],'utvid')
+%         end
         guidata(trackingFigure,handles);
     end
 %% checkbox plot
