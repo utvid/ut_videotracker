@@ -446,7 +446,7 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 2%size(utvid.movs.instrstart,2)
+for i = 1%size(utvid.movs.instrstart,2)
     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;
@@ -466,7 +466,7 @@ utvid = guidata(hMainFigure);
 if iscell(utvid.settings.historyfolder)
     num = get(hMainFigure,'value');
     utvid.settings.dir_data = utvid.settings.historyfolder{num};
-    disp(['Measurement folder: ' utvid.settings.dir_data])
+    disp([  'Measurement folder: ' utvid.settings.dir_data])
 end
 
 %proceed with initialization

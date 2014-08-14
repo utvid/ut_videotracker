@@ -65,17 +65,17 @@ if utvid.settings.nrOrMar ~= 0
                 utvid.Tracking.Kal_or.Xpred(utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrOrMar);
                 utvid.Tracking.Kal_or.Xpred(2*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrOrMar);
                 
-                utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-                utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-                utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-                
-                utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-                utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-                utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-                
-                utvid.Tracking.Kal_or.Xest(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-                utvid.Tracking.Kal_or.Xest(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-                utvid.Tracking.Kal_or.Xest(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 
+% % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+% % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+% % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+% % %                 
+% % %                 utvid.Tracking.Kal_or.Xest(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 utvid.Tracking.Kal_or.Xest(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+% % %                 utvid.Tracking.Kal_or.Xest(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
                 
                 % zet estimate naar de gecorrigeerde versie
                 utvid.Tracking.Kal_or.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));
@@ -182,13 +182,13 @@ if length(c)>0
         utvid.Tracking.Kal.Xpred(utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrMarkers);
         utvid.Tracking.Kal.Xpred(2*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrMarkers);
         
-        utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        utvid.Tracking.Kal.Xpred(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        
-        utvid.Tracking.Kal.Xest(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         utvid.Tracking.Kal.Xpred(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         
+% % %         utvid.Tracking.Kal.Xest(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+% % %         utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
         
         % zet estimate naar de gecorrigeerde versie
         utvid.Tracking.Kal.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));

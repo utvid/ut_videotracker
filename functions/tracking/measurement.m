@@ -45,6 +45,9 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
                 y   = utvid.Tracking.Xpred_or.x3(:,2,utvid.Tracking.n) ;
             end
         end
+        
+%         figure; imshow(im); hold on ; plot(x,y,'*r');hold off;
+        
 %         utvid.settings.Measmethod = 'findblue'
         switch utvid.settings.Measmethod
             case 'findblue'
