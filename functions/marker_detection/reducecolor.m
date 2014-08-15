@@ -2,8 +2,8 @@ function [xnew,ynew] = reducecolor(x,y,im,roi)
 
 %% check boundaries
 % roi is number of pixels to left, right, up and down of center pixel
-yy = 2;
-xx = 2;
+yy = 1;
+xx = 1;
 
 imsize = size(im);
 y(y>imsize(1)-yy*roi) = imsize(1)-(yy*roi+1);

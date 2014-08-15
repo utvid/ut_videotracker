@@ -40,55 +40,58 @@ if utvid.settings.nrOrMar ~= 0
             [utvid.Tracking.Xest_or.x2(:,:,n),c2] = correctPoints(imnR,utvid.settings.nrOrMar,utvid.Tracking.Xest_or.x2(:,:,n),'orientation');
             [utvid.Tracking.Xest_or.x3(:,:,n),c3] = correctPoints(imnM,utvid.settings.nrOrMar,utvid.Tracking.Xest_or.x3(:,:,n),'orientation');
             
-            
-     
-            c = unique([c1,c2,c3]);       
-     if length(c)>0
-       
-            
-            utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n) = [utvid.Tracking.Xest_or.x1(:,1,utvid.Tracking.n); ...
-                utvid.Tracking.Xest_or.x2(:,1,utvid.Tracking.n);...
-                utvid.Tracking.Xest_or.x3(:,1,utvid.Tracking.n);...
-                utvid.Tracking.Xest_or.x1(:,2,utvid.Tracking.n);...
-                utvid.Tracking.Xest_or.x2(:,2,utvid.Tracking.n);...
-                utvid.Tracking.Xest_or.x3(:,2,utvid.Tracking.n)];
-            
-            [vec3d,~] = twoDto3D_3cam(utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n),0,utvid.Pstruct_or.Pext);
-            
-            % zet predictie naar de gecorrigeerde versie
-            utvid.Tracking.Kal_or.Xpred(1:3*utvid.settings.nrOrMar,utvid.Tracking.n)= vec3d;
-
-         
-            for cc = 1:length(c)
+            %% Correct markers
+            c = unique([c1,c2,c3]);
+            if length(c)>0
                 
-                utvid.Tracking.Kal_or.Xpred(c(cc),utvid.Tracking.n+1)= vec3d(c(cc));
-                utvid.Tracking.Kal_or.Xpred(utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrOrMar);
-                utvid.Tracking.Kal_or.Xpred(2*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrOrMar);
+                % correct Kal.meas
+                utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n) = [utvid.Tracking.Xest_or.x1(:,1,utvid.Tracking.n); ...
+                    utvid.Tracking.Xest_or.x2(:,1,utvid.Tracking.n);...
+                    utvid.Tracking.Xest_or.x3(:,1,utvid.Tracking.n);...
+                    utvid.Tracking.Xest_or.x1(:,2,utvid.Tracking.n);...
+                    utvid.Tracking.Xest_or.x2(:,2,utvid.Tracking.n);...
+                    utvid.Tracking.Xest_or.x3(:,2,utvid.Tracking.n)];
                 
-% % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-% % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-% % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-% % %                 
-% % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-% % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-% % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
-% % %                 
-% % %                 utvid.Tracking.Kal_or.Xest(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-% % %                 utvid.Tracking.Kal_or.Xest(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
-% % %                 utvid.Tracking.Kal_or.Xest(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                %
+                [vec3d,~] = twoDto3D_3cam(utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n),0,utvid.Pstruct_or.Pext);
                 
-                % zet estimate naar de gecorrigeerde versie
-                utvid.Tracking.Kal_or.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));
-                utvid.Tracking.Kal_or.Xest(utvid.settings.nrOrMar+c(cc),utvid.Tracking.n)= vec3d(c(cc)+utvid.settings.nrOrMar);
-                utvid.Tracking.Kal_or.Xest(2*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n)= vec3d(c(cc)+2*utvid.settings.nrOrMar);
+                % zet predictie naar de gecorrigeerde versie
+                utvid.Tracking.Kal_or.Xpred(1:3*utvid.settings.nrOrMar,utvid.Tracking.n)= vec3d;
                 
+                % update Kal or structure
+                utvid.Tracking.Kal_or = prepareKalman3D(utvid.Tracking.Kal_or, utvid.Pstruct_or,n);
+                utvid.Tracking.Kal_or = updateKal(utvid.Tracking.Kal_or,n);
                 
+                % %                 for cc = 1:length(c)
+                % %
+                % %                     utvid.Tracking.Kal_or.Xpred(c(cc),utvid.Tracking.n+1)= vec3d(c(cc));
+                % %                     utvid.Tracking.Kal_or.Xpred(utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrOrMar);
+                % %                     utvid.Tracking.Kal_or.Xpred(2*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrOrMar);
+                % %
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %                     % % %
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xpred(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n+1) = 0;
+                % %                     % % %
+                % %                     % % %                 utvid.Tracking.Kal_or.Xest(3*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xest(4*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %                     % % %                 utvid.Tracking.Kal_or.Xest(5*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n) = 0;
+                % %
+                % %                     % zet estimate naar de gecorrigeerde versie
+                % %                     utvid.Tracking.Kal_or.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));
+                % %                     utvid.Tracking.Kal_or.Xest(utvid.settings.nrOrMar+c(cc),utvid.Tracking.n)= vec3d(c(cc)+utvid.settings.nrOrMar);
+                % %                     utvid.Tracking.Kal_or.Xest(2*utvid.settings.nrOrMar+c(cc),utvid.Tracking.n)= vec3d(c(cc)+2*utvid.settings.nrOrMar);
+                % %
+                % %
+                % %                 end
             end
-     end
             utvid.Tracking.Xest_or     = getSpatialRep(utvid.Tracking.Xest_or, n, utvid.Tracking.Kal_or.Xest(1:end/2,n), utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,n), utvid.Pstruct_or);
             utvid.Tracking.Xpred_or     = getSpatialRep(utvid.Tracking.Xpred_or, n, utvid.Tracking.Kal_or.Xpred(1:end/2,n), utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,n), utvid.Pstruct_or);
             utvid.Tracking.Xpred_or     = getSpatialRep(utvid.Tracking.Xpred_or, n+1, utvid.Tracking.Kal_or.Xpred(1:end/2,n), utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,n), utvid.Pstruct_or);
-
+            
             
     end
     
@@ -162,8 +165,10 @@ end
 
 
 c = unique([c1,c2,c3]);
-
+%% correct shape markers
 if length(c)>0
+    
+    % correct kal.meas
     utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n); ...
         utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n);...
         utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n);...
@@ -176,37 +181,39 @@ if length(c)>0
     % zet predictie naar de gecorrigeerde versie
     utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n)= vec3d;
     
-    for cc = 1:length(c)
-        
-        utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n+1)= vec3d(c(cc));
-        utvid.Tracking.Kal.Xpred(utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrMarkers);
-        utvid.Tracking.Kal.Xpred(2*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrMarkers);
-        
-% % %         utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-% % %         utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-% % %         utvid.Tracking.Kal.Xpred(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-% % %         
-% % %         utvid.Tracking.Kal.Xest(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-% % %         utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-% % %         utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
-        
-        % zet estimate naar de gecorrigeerde versie
-        utvid.Tracking.Kal.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));
-        utvid.Tracking.Kal.Xest(utvid.settings.nrMarkers+c(cc),utvid.Tracking.n)= vec3d(c(cc)+utvid.settings.nrMarkers);
-        utvid.Tracking.Kal.Xest(2*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n)= vec3d(c(cc)+2*utvid.settings.nrMarkers);
-    end
+    % update Kal or structure
+    utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,n);
+    utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,n);
+    
+    
+    % %     for cc = 1:length(c)
+    % %
+    % % %         utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n+1)= vec3d(c(cc));
+    % % %         utvid.Tracking.Kal.Xpred(utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+utvid.settings.nrMarkers);
+    % % %         utvid.Tracking.Kal.Xpred(2*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n+1)= vec3d(c(cc)+2*utvid.settings.nrMarkers);
+    % %
+    % %         % % %         utvid.Tracking.Kal.Xpred(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %         % % %         utvid.Tracking.Kal.Xpred(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %         % % %         utvid.Tracking.Kal.Xpred(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %         % % %
+    % %         % % %         utvid.Tracking.Kal.Xest(3*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %         % % %         utvid.Tracking.Kal.Xest(4*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %         % % %         utvid.Tracking.Kal.Xest(5*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n) = 0;
+    % %
+    % % % %         % zet estimate naar de gecorrigeerde versie
+    % % % %         utvid.Tracking.Kal.Xest(c(cc),utvid.Tracking.n)= vec3d(c(cc));
+    % % % %         utvid.Tracking.Kal.Xest(utvid.settings.nrMarkers+c(cc),utvid.Tracking.n)= vec3d(c(cc)+utvid.settings.nrMarkers);
+    % % % %         utvid.Tracking.Kal.Xest(2*utvid.settings.nrMarkers+c(cc),utvid.Tracking.n)= vec3d(c(cc)+2*utvid.settings.nrMarkers);
+    % %     end
 end
 
-% % update prediction
-% vec1 = [Xest.x1(:,1,n);Xest.x2(:,1,n);Xest.x3(:,1,n);Xest.x1(:,2,n);Xest.x2(:,2,n);Xest.x3(:,2,n)];
-% vec = twoDto3D_3cam(vec1,0,utvid.Pstruct.Pext);
-% Kal.Xpred(1:length(vec),n)=vec;
-%
-% Kal = prepareKalman3D(Kal, Pstruct,n);
-% Kal = updateKal(Kal,n);
-
+            
+%% update Trackin Xest and Tracking Xpred structures current frame
 utvid.Tracking.Xest = getAllRep(utvid.Tracking.Xest,utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
+utvid.Tracking.Xpred= getSpatialRep(utvid.Tracking.Xpred, n, utvid.Tracking.Kal.Xpred(1:end/2,n), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,n), utvid.Pstruct);
+          
 
+%% compare new coordinates with PCA model
 compVec = [utvid.Tracking.Kal.Xest(1:end/6,utvid.Tracking.n)';utvid.Tracking.Kal.Xest(end/6+1:end/6*2,utvid.Tracking.n)';utvid.Tracking.Kal.Xest(end/6*2+1:end/6*3,utvid.Tracking.n)';ones(1,utvid.settings.nrMarkers)];
 % rotate and translate
 if utvid.settings.nrOrMar ~=0
@@ -215,12 +222,6 @@ end
 compVec = transpose(compVec(1:3,:)); compVec = compVec(:);
 Dn = min(pdist2(compVec',utvid.pca.PCAcoords'));
 
-% figure(22);
-% plot3(compVec(1:10),compVec(11:20),compVec(21:30),'*r')
-% view(2);axis equal
-% hold on;
-% plot3(PCAcoords(1:10,1),PCAcoords(11:20,1),PCAcoords(21:30,1),'*g');
-% plot3(utvid.Tracking.rt_coor(1:10,n),utvid.Tracking.rt_coor(11:20,4),utvid.Tracking.rt_coor(21:30,4),'*c')
 pcainfo = utvid.pca.info;
 pcacoords = utvid.pca.PCAcoords;
 % if Dn > utvid.Tracking.lim/2 || utvid.pca.outlier == 0
