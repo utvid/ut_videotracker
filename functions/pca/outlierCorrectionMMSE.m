@@ -9,11 +9,16 @@ if utvid.pca.Normed == 1
     zCor = zCor./diag(utvid.pca.Gamma);
 end
 
-iter = 150;
-for i = 1:iter
-    p = sort(randperm(utvid.settings.nrMarkers,round(0.7*utvid.settings.nrMarkers)));
+if exist('utvid.settings.nrOutlier','var')==0
+    utvid.settings.nrOutlier = 3;
+end
+A = nchoosek(1:utvid.settings.nrMarkers,utvid.settings.nrMarkers-utvid.settings.nrOutlier);
+
+for i = 1:size(A,1)
+    p = [];
+    p = A(i,:);
     p = [p,p+utvid.settings.nrMarkers,p+2*utvid.settings.nrMarkers];
-       
+    
     bEst{i} = inv(utvid.pca.V(p,1:utvid.settings.PCs)'*utvid.pca.V(p,1:utvid.settings.PCs)+...
         (utvid.pca.sigv^2*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
         *utvid.pca.V(p,1:utvid.settings.PCs)'*zCor(p);
@@ -27,54 +32,70 @@ for i = 1:iter
     %Reconstruction error
     reconVecN{i} = [reconVec(1:end/3),reconVec(end/3+1:end/3*2),reconVec(end/3*2+1:end)];
     origN = [z(1:end/3),z(end/3+1:(end/3*2)),z(end/3*2+1:end)];
-
+    
     PCAreconEr = sqrt(sum([reconVecN{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
     
     %Calculation of benefit
-    thres = 5;     %threshold (euclidian distance for labeling marker as outlier)
-%     M = markCntMasked_ext(1:end/2);
-    C{i} = PCAreconEr > thres;       %determine outliers
-    D{i} = PCAreconEr <= thres;       %determine inliers
-    residualSum(i) = sum(PCAreconEr); %sum(PCAreconEr(D{i}));
-    beta = 1/6;
-    benefit(i) = length(D{i}) - beta*residualSum(i);
+    if exist('utvid.pca.thres','var')==0
+        utvid.pca.thres = 1;
+    end
+     utvid.pca.thres = 1;
+    %     M = markCntMasked_ext(1:end/2);
+    C{i} = PCAreconEr > utvid.pca.thres;       %determine outliers
+    D{i} = PCAreconEr <= utvid.pca.thres;       %determine inliers
+    
+    %Determine new coefficient vector based on inliers
+    pn = find(D{i}); pn = [pn;pn+utvid.settings.nrMarkers;pn+2*utvid.settings.nrMarkers];
+    bN{i} =  inv(utvid.pca.V(pn,1:utvid.settings.PCs)'*utvid.pca.V(pn,1:utvid.settings.PCs)+...
+        (utvid.pca.sigv^2*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
+        *utvid.pca.V(pn,1:utvid.settings.PCs)'*zCor(pn);
+    
+    alfa = 1; beta = .25;
+    % nieuwe gereconstrueeerde vector
+    reconVec = utvid.pca.V(:,1:utvid.settings.PCs)*bN{i};
+    reconVecN2(:,i) = utvid.pca.Gamma * reconVec + utvid.pca.meanX;
+    
+    if exist('utvid.pca.errMethod','var') == 0; utvid.pca.errMethod = 'MahDist'; end
+    if strcmpi(utvid.pca.errMethod,'MahDist')==1
+        MahDist(i) = bN{i}'*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN{i};
+        benefit(i) = alfa*length(find(D{i})) - beta*MahDist(i);
+    elseif strcmpi(utvid.pca.errMethod,'3Ddist')==1
+        reconVecN3D{i} = [reconVecN2(1:end/3),reconVecN2(end/3+1:end/3*2),reconVecN2(end/3*2+1:end)];
+        PCAreconEr2 = sqrt(sum([reconVecN{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
+        residualSum(i) = sum(PCAreconEr(D{i}));
+        benefit(i) = length(find(D{i})) - beta*residualSum(i);
+    end
+    
+    
 end
 
 [~, maxInd] = max(benefit);
-disp(['Number of inliers: ' num2str(length(find(D{maxInd})))]);
-disp(['Number of outliers: ' num2str(length(find(C{maxInd})))]);
-reconVecN = reconVecN{maxInd}(:);
-c = find(C{maxInd})
-if size(C{maxInd},1)~= 0
-    ptsCorr = z;
+% disp(['Number of inliers: ' num2str(length(find(D{maxInd})))]);
+% disp(['Number of outliers: ' num2str(length(find(C{maxInd})))]);
+pcaVec = reconVecN2(:,maxInd);
+% reconVecN = reconVecN{maxInd}(:);
+
+c = find(C{maxInd});
+ptsCorr = z;
+disp(['Corrected by OD: ' num2str(c')])
+if ~isempty(c)
+    
     for cc = 1:length(c)%c = find(C{maxInd})%(C{maxInd}<=N)
-        disp('Corrected marker: ')
-        c(cc)
+        
+        ptsCorr(c(cc):N:N*2+c(cc)) = (pcaVec(c(cc):N:N*2+c(cc)));
+        
+    end
+end
+% if size(C{maxInd},1)~= 0
+
 %         if c == 1
 %             ptsCorr(1:N:N*2+1) = (reconVecN(1:N:N*2+1));
 %         else
-        ptsCorr(c(cc):N:N*2+c(cc)) = (reconVecN(c(cc):N:N*2+c(cc)));
-%         end
-        
-    end
-else
-    ptsCorr = z;
-end
 
-% % %     figure(111);
-% % %     subplot(2,2,1);
-% % %     plot3(ptsCorr(1:10),ptsCorr(11:20),ptsCorr(21:30),'og')
-% % %     hold on;
-% % %     plot3(z(1:10),z(11:20),z(21:30),'*r')
-% % %     hold off;
-% % %     view(2)
-% % %     subplot(2,2,2); imshow(utvid.Tracking.FrameL,[]);
-% % %     hold on; plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'*r')
-% % %     hold on; plot(utvid.Tracking.Kal.meas(1:10,utvid.Tracking.n),utvid.Tracking.Kal.meas(31:40,utvid.Tracking.n),'+g')
-% % %     subplot(2,2,3); imshow(utvid.Tracking.FrameR,[]);
-% % %     hold on; plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'*r')
-% % %     hold on; plot(utvid.Tracking.Kal.meas(11:20,utvid.Tracking.n),utvid.Tracking.Kal.meas(41:50,utvid.Tracking.n),'+g')
-% % %     subplot(2,2,4); imshow(utvid.Tracking.FrameM,[]);
-% % %     hold on; plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'*r')
-% % %     hold on; plot(utvid.Tracking.Kal.meas(21:30,utvid.Tracking.n),utvid.Tracking.Kal.meas(51:60,utvid.Tracking.n),'+g')
+%         end
+
+%     end
+% else
+%     ptsCorr = z;
+% end
 end

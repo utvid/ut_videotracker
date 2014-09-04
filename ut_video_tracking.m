@@ -325,7 +325,7 @@ else
 end
 
 cam ={'left','right','center'};
-for j = 2:size(utvid.movs.instrstart,2)
+for j = 1:size(utvid.movs.instrstart,2)
     j
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.settings.version,'R2012')
@@ -437,6 +437,22 @@ end
 if utvid.pca.MMSE == 1
 utvid = pcaMMSE(utvid);
 end
+prompt = 'Do you want to use Mahalanobis Distance (type 1) or 3D euclidean distance (type 2) as error measure? ';
+result = input(prompt, 's');
+if isempty(result)
+    result = '1';
+    utvid.pca.errMethod = 'MahDist';
+end
+while isempty(regexpi(result,'1'))
+    if regexpi(result,'2')==1
+       utvid.pca.errMethod = '3Ddist';
+       break
+    else
+        prompt = 'Type 1 for Mahalanobis distance, Type 2 for 3D euclidean distance : ';
+        result = input(prompt, 's');
+    end
+end
+
 utvid.settings.state = 6; % update state
 save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
@@ -446,7 +462,7 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 1%size(utvid.movs.instrstart,2)
+for i = 13%size(utvid.movs.instrstart,2)
     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;

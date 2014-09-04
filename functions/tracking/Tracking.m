@@ -110,6 +110,13 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
         utvid.Tracking.Kal.meas(4*utvid.settings.nrMarkers+1:5*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(2,:)';
         utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
         
+        for cc = 1:length(c)
+            % Correct prediction current frame
+            utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n)= coor_back(c(cc),1);
+            utvid.Tracking.Kal.Xpred(c(cc)+utvid.settings.nrMarkers,utvid.Tracking.n)= coor_back(c(cc)+utvid.settings.nrMarkers,1);
+            utvid.Tracking.Kal.Xpred(c(cc)+2*utvid.settings.nrMarkers,utvid.Tracking.n)= coor_back(c(cc)+2*utvid.settings.nrMarkers,1);
+        end
+        
         % update Kalman structure
         utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,utvid.Tracking.n);
         utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,utvid.Tracking.n);
@@ -121,6 +128,7 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
 % %             utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n)= coor_back(c(cc),1);
 % %             utvid.Tracking.Kal.Xpred(c(cc)+utvid.settings.nrMarkers,utvid.Tracking.n)= coor_back(c(cc)+utvid.settings.nrMarkers,1);
 % %             utvid.Tracking.Kal.Xpred(c(cc)+2*utvid.settings.nrMarkers,utvid.Tracking.n)= coor_back(c(cc)+2*utvid.settings.nrMarkers,1);
+% %         
 % %             % Correct prediction current frame + 1
 % %             utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n+1)= coor_back(c(cc),1);
 % %             utvid.Tracking.Kal.Xpred(c(cc)+utvid.settings.nrMarkers,utvid.Tracking.n+1)= coor_back(c(cc)+utvid.settings.nrMarkers,1);
@@ -295,10 +303,10 @@ end
 % lim should be set in GUI
 D = min(pdist2(utvid.Tracking.rt_coor(:,utvid.Tracking.n)',utvid.pca.PCAcoords'));
 
-disp(['PCAsize: ' num2str(size(utvid.pca.PCAcoords,2))])
-disp(['PCs: ' num2str(utvid.settings.PCs)])
-disp(['Error: ' num2str(D)]);
-disp(['Lim: ' num2str(utvid.Tracking.lim)]);
+disp(['PCA size: ' num2str(size(utvid.pca.PCAcoords,2))])
+% disp(['PCs: ' num2str(utvid.settings.PCs)])
+disp(['PCA distance: ' num2str(D)]);
+% disp(['Lim: ' num2str(utvid.Tracking.lim)]);
 if D > utvid.Tracking.lim
     % Correct possible faulty markers
     utvid = PCAExpansionMMSE2(utvid);

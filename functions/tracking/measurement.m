@@ -16,7 +16,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
         utvid.settings.Measmethod = 'reducecolor';
         
     end
-    disp(utvid.settings.Measmethod);
+%     disp(utvid.settings.Measmethod);
 
     Xstacked = []; Ystacked = [];
     

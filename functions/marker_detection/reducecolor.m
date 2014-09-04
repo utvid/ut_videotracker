@@ -12,12 +12,21 @@ y(y<1+yy*roi) = 1+(yy*roi+1);
 x(x<1+xx*roi) = 1+(xx*roi+1);
 
 %% marker detection
+if size(im,3) == 3
 Opt(:,:,1) = 0; Opt(:,:,2) = 0; Opt(:,:,3) = 1;
 opt = repmat(Opt,[2*yy*roi+1,2*xx*roi+1,1]);
 
+end
+
 for i = 1:size(x,1)
     imfoo = im(round(y(i))-yy*roi:round(y(i))+yy*roi,round(x(i))-xx*roi:round(x(i))+xx*roi,:);
-    imfoo2 = imfoo - opt;
+    if size(im,3) == 3
+        imfoo2 = imfoo;
+    imfoo2(:,:,3) = zeros(size(imfoo,1),size(imfoo,2));
+    imfoo2(:,:,1) = imfoo2(:,:,1).^2;
+    else
+    imfoo2(:,:,1) = imfoo; imfoo2(:,:,2) = imfoo; imfoo2(:,:,3) = imfoo;
+    end
     imfoo11= rgb2ind(imfoo2,12,'nodither');
     imfoo1 = im2double(imfoo11);
     imfoo1(imfoo1>min(imfoo1(:)))=1;

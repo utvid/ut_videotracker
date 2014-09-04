@@ -190,7 +190,7 @@ handles.h{6} = uicontrol(...
     'Parent',trackingFigure,...
     'position', [posx posy nbsize],...
     'style','edit',....
-    'string','10','Callback',@gettextvalues,...
+    'string','5','Callback',@gettextvalues,...
     'background','white');
 
 if utvid.settings.initTracking 
@@ -383,9 +383,11 @@ uiwait(trackingFigure);
             set(handles.h{9},'string','50');     end
         if isempty(utvid.Tracking.sigVz);      utvid.Tracking.sigVz = 50;
             set(handles.h{10},'string','50');    end
-        if isempty(utvid.Tracking.roi);    utvid.Tracking.roi  = 10;
-            set(handles.h{6},'string','10');     end
+        if isempty(utvid.Tracking.roi);    utvid.Tracking.roi  = 5;
+            set(handles.h{6},'string','5');     end
         
+            utvid = initializeTracking(utvid,handles);
+
         guidata(trackingFigure,handles);
     end
 %% Save callback
