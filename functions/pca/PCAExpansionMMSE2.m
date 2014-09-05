@@ -181,11 +181,30 @@ if length(c)>0
     % zet predictie naar de gecorrigeerde versie
     utvid.Tracking.Kal.Xpred(1:3*utvid.settings.nrMarkers,utvid.Tracking.n)= vec3d;
     
+%     % correct noise (set high pred/est error);
+%     disp(['Meas noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cn(:,:,utvid.Tracking.n))))])
+%     disp(['Predcur noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cpred(:,:,utvid.Tracking.n))))])
+%     disp(['Pred noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cpred(:,:,utvid.Tracking.n+1))))])
+%     disp(['Est noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cest(:,:,utvid.Tracking.n))))])
+    
+    
+%     for cc = 1:length(c)
+%         utvid.Tracking.Kal.Cest(c(cc),c(cc),utvid.Tracking.n) = 1E10;
+%         utvid.Tracking.Kal.Cpred(c(cc),c(cc),utvid.Tracking.n) = 1E10;
+%         utvid.Tracking.Kal.Cpred(c(cc),c(cc),utvid.Tracking.n+1) = 1E10;
+%     end
+    
+    
     % update Kal or structure
     utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,n);
     utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,n);
     
-    
+%     disp(['Meas noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cn(:,:,utvid.Tracking.n))))])
+%     disp(['Predcur noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cpred(:,:,utvid.Tracking.n))))])
+%     disp(['Pred noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cpred(:,:,utvid.Tracking.n+1))))])
+%     disp(['Est noise: ' num2str(mean(diag(utvid.Tracking.Kal.Cest(:,:,utvid.Tracking.n))))])
+%     
+%     pause
     % %     for cc = 1:length(c)
     % %
     % % %         utvid.Tracking.Kal.Xpred(c(cc),utvid.Tracking.n+1)= vec3d(c(cc));
@@ -207,11 +226,11 @@ if length(c)>0
     % %     end
 end
 
-            
+
 %% update Trackin Xest and Tracking Xpred structures current frame
 utvid.Tracking.Xest = getAllRep(utvid.Tracking.Xest,utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 utvid.Tracking.Xpred= getSpatialRep(utvid.Tracking.Xpred, n, utvid.Tracking.Kal.Xpred(1:end/2,n), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,n), utvid.Pstruct);
-          
+
 
 %% compare new coordinates with PCA model
 compVec = [utvid.Tracking.Kal.Xest(1:end/6,utvid.Tracking.n)';utvid.Tracking.Kal.Xest(end/6+1:end/6*2,utvid.Tracking.n)';utvid.Tracking.Kal.Xest(end/6*2+1:end/6*3,utvid.Tracking.n)';ones(1,utvid.settings.nrMarkers)];

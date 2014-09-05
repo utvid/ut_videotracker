@@ -446,7 +446,7 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 1%size(utvid.movs.instrstart,2)
+for i = 6%size(utvid.movs.instrstart,2)
     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;

@@ -109,11 +109,13 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
         utvid.Tracking.Kal.meas(3*utvid.settings.nrMarkers+1:4*utvid.settings.nrMarkers,utvid.Tracking.n) = c1(2,:)';
         utvid.Tracking.Kal.meas(4*utvid.settings.nrMarkers+1:5*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(2,:)';
         utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
-        
+   
+      
         % update Kalman structure
         utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,utvid.Tracking.n);
         utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,utvid.Tracking.n);
-                
+       
+   
         
         % only correct the outliers
 % %         for cc = 1:length(c)
