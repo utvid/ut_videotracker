@@ -37,7 +37,7 @@ for i = 1:size(A,1)
     
     %Calculation of benefit
     if exist('utvid.pca.thres','var')==0
-        utvid.pca.thres = 2;
+        utvid.pca.thres = 1;
     end
      utvid.pca.thres = 2;
     %     M = markCntMasked_ext(1:end/2);

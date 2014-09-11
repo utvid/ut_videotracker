@@ -4,7 +4,7 @@ utvid.Tracking.n = 1;
 if utvid.Tracking.instr < size(utvid.movs.instrstart,2);
     utvid.Tracking.NoV = utvid.movs.instrstart(utvid.Tracking.instr+1)-utvid.movs.instrstart(utvid.Tracking.instr);
 elseif utvid.Tracking.instr == size(utvid.movs.instrstart,2);
-    utvid.Tracking.NoV = size(utvid.movs.left,2)-utvid.movs.instrstart(utvid.Tracking.instr);
+    utvid.Tracking.NoV = size(utvid.movs.left,2)-utvid.movs.instrstart(utvid.Tracking.instr)+1;
 end
 
 utvid.Tracking.ObjL =[];utvid.Tracking.ObjR =[];utvid.Tracking.ObjM =[];
