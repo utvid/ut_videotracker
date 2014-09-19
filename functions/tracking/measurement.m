@@ -3,6 +3,8 @@ function [utvid] = measurement(utvid)
 %            frames = {FrameL,FrameR,FrameM}
 %            str = or / shape
 %            n = framenumber
+
+% variable when orientation exist is set two 
 if utvid.settings.nrOrMar ~= 0
     jmax = 2;
 else
@@ -13,10 +15,8 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
     cam = {'left','right','center'};
     if isfield(utvid.settings,'Measmethod')~=1
-        utvid.settings.Measmethod = 'reducecolor';
-        
+        utvid.settings.Measmethod = 'templatematching';
     end
-%     disp(utvid.settings.Measmethod);
 
     Xstacked = []; Ystacked = [];
     
@@ -46,9 +46,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
             end
         end
         
-%         figure; imshow(im); hold on ; plot(x,y,'*r');hold off;
-        
-%         utvid.settings.Measmethod = 'findblue'
+        % switch between measurement method
         switch utvid.settings.Measmethod
             case 'findblue'
                 [x,y] = findblue(x,y,im,utvid.Tracking.roi,1);
@@ -69,7 +67,6 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     
     if j == 1
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
-%         mean(abs(utvid.Tracking.Kal.meas(:,1)-utvid.Tracking.Kal.meas(:,utvid.Tracking.n)))
     elseif j == 2
         utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end

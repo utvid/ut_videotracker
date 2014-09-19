@@ -1,7 +1,8 @@
 function utvid = pcaMMSE(utvid)
 
 X = utvid.pca.PCAcoords;
-utvid.pca.Gamma = diag(ones(size(X,1),1));
+% utvid.pca.Gamma = diag(ones(size(X,1),1));
+utvid.pca.Gamma = diag(std(X,1,2));
 utvid.pca.meanX = mean(X,2);
 
 if utvid.pca.Normed == 1

@@ -6,7 +6,7 @@ utvid.pca.S = diag(utvid.pca.SM);
 Cb = utvid.pca.Cb;
 zCor = z-utvid.pca.meanX;
 if utvid.pca.Normed == 1
-    zCor = zCor./diag(utvid.pca.Gamma);
+    zCor = utvid.pca.Gamma\zCor;
 end
 
 if exist('utvid.settings.nrOutlier','var')==0
@@ -78,6 +78,7 @@ end
 
 % om te corrigeren voor kleine foutjes in de benefit
 % zoek de benefit die het meest voorkomt (soort van)
+% dit moet nog wel even goed uitgezocht/onderbouwd worden
 
 %max benefit
 [mB, maxInd] = max(benefit2);
@@ -131,7 +132,7 @@ pcaVec = reconVecN2(:,maxInd);
 c = find(C{maxInd});
 % c3D = find(C{maxInd3D});
 ptsCorr = z;
-disp(['Corrected by MahDist: ' num2str(c')])
+disp(['Corrected markers by MahDist: ' num2str(c')])
 % disp(['Corrected by 3Ddist: ' num2str(c3D')])
 if ~isempty(c)
     
