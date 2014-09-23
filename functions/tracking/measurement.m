@@ -17,7 +17,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     if isfield(utvid.settings,'Measmethod')~=1
         utvid.settings.Measmethod = 'templatematching';
     end
-
+utvid.settings.Measmethod = 'reducecolor';
     Xstacked = []; Ystacked = [];
     
     for i = 1:utvid.settings.nrcams

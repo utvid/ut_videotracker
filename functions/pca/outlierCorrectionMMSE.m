@@ -39,7 +39,7 @@ for i = 1:size(A,1)
     if exist('utvid.pca.thres','var')==0
         utvid.pca.thres = 1;
     end
-     utvid.pca.thres = 2;
+     utvid.pca.thres = 1.5;
     %     M = markCntMasked_ext(1:end/2);
     C{i} = PCAreconEr > utvid.pca.thres;       %determine outliers
     D{i} = PCAreconEr <= utvid.pca.thres;       %determine inliers
@@ -82,46 +82,46 @@ end
 
 %max benefit
 [mB, maxInd] = max(benefit2);
-% 90 procent benefits lijn
-gamma = .9;
-% ii = find(benefit2>mB*gamma);
-%  unieke nummers bepalen
-% [vv ii] = sort(benefit2);
-[vv,~,ii] = unique(benefit2);
-% vindt de indices van de unieke benefitswaarden boven de gamma lijn
-Q = find(vv>=gamma*mB);
-% als benefit2 niet boven 0 uitkomt dan is Q leeg
-if isempty(Q)==1
-    Q = find(vv==mB);
-end
-    
-% aantal waarden van dezelfde benefit boven de gamma lijn bepalen
-for pp = 1:length(Q)
-    numBen(pp) = length(find(benefit2==vv(Q(pp))));
-end
-% meest voorkomende hoge benefit bepalen
-[~,iii] = max(numBen);
-% indices van benefit2 met meeste voorkomende hoge benefit
-[~,iiii] = find(benefit2==vv(Q(iii)));
-% kijken of er verschillende opties (qua correcties) zijn
-for ppp = 1:length(iiii)
-    cc(:,ppp) = C{iiii(ppp)};
-    dd(:,ppp) = D2{iiii(ppp)};
-end
-% bepaal de correctie met minste outliers
-[mv,mi] = min(sum(cc));
-minInd = iiii(mi);
-% bepaal de meeste voorkomende setting qua correcties
-[xx yy zz] = unique(cc','rows');
-counts = histc(zz,[1:length(yy)]);
-[vc,ic] = max(counts);
-% bepaal de corresponderende benefit
-ids = find(zz==ic,1,'first');
-maxInd = iiii(ids);
-
-if maxInd ~= minInd
-    maxInd = minInd;
-end
+% % % % % 90 procent benefits lijn
+% % % % gamma = .9;
+% % % % % ii = find(benefit2>mB*gamma);
+% % % % %  unieke nummers bepalen
+% % % % % [vv ii] = sort(benefit2);
+% % % % [vv,~,ii] = unique(benefit2);
+% % % % % vindt de indices van de unieke benefitswaarden boven de gamma lijn
+% % % % Q = find(vv>=gamma*mB);
+% % % % % als benefit2 niet boven 0 uitkomt dan is Q leeg
+% % % % if isempty(Q)==1
+% % % %     Q = find(vv==mB);
+% % % % end
+% % % %     
+% % % % % aantal waarden van dezelfde benefit boven de gamma lijn bepalen
+% % % % for pp = 1:length(Q)
+% % % %     numBen(pp) = length(find(benefit2==vv(Q(pp))));
+% % % % end
+% % % % % meest voorkomende hoge benefit bepalen
+% % % % [~,iii] = max(numBen);
+% % % % % indices van benefit2 met meeste voorkomende hoge benefit
+% % % % [~,iiii] = find(benefit2==vv(Q(iii)));
+% % % % % kijken of er verschillende opties (qua correcties) zijn
+% % % % for ppp = 1:length(iiii)
+% % % %     cc(:,ppp) = C{iiii(ppp)};
+% % % %     dd(:,ppp) = D2{iiii(ppp)};
+% % % % end
+% % % % % bepaal de correctie met minste outliers
+% % % % [mv,mi] = min(sum(cc));
+% % % % minInd = iiii(mi);
+% % % % % bepaal de meeste voorkomende setting qua correcties
+% % % % [xx yy zz] = unique(cc','rows');
+% % % % counts = histc(zz,[1:length(yy)]);
+% % % % [vc,ic] = max(counts);
+% % % % % bepaal de corresponderende benefit
+% % % % ids = find(zz==ic,1,'first');
+% % % % maxInd = iiii(ids);
+% % % % 
+% % % % if maxInd ~= minInd
+% % % %     maxInd = minInd;
+% % % % end
 
 % [~, maxInd3D] = max(benefit3D);
 % disp(['Number of inliers: ' num2str(length(find(D{maxInd})))]);

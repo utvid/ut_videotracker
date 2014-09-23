@@ -217,7 +217,7 @@ D = bN'*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN;
 disp(['PCA size: ' num2str(size(utvid.pca.PCAcoords,2))])
 disp(['PCA distance: ' num2str(D)]);
 
-if D > 15 %utvid.Tracking.lim
+if D > 10 %utvid.Tracking.lim
     % Correct possible faulty markers
     utvid = PCAExpansionMMSE2(utvid);
 
