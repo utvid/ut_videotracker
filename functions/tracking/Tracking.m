@@ -71,10 +71,6 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
         utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
         
         % reset uncertainty corrected markers
-        
-        
-  
-        
         end
     else
         [utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));

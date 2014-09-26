@@ -139,7 +139,6 @@ else                                % if init.mat doesnot exist execute the foll
     end
 end
 cd(utvid.settings.cdir);                        % change directory back to current directory path
-utvid.settings.initTracking
 %% Geeft een error???
 % guidata(hMainFigure,utvid); 
 
