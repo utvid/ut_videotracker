@@ -205,9 +205,10 @@ zCor = utvid.Tracking.rt_coor(:,utvid.Tracking.n)-utvid.pca.meanX;
 if utvid.pca.Normed == 1
     zCor = utvid.pca.Gamma\zCor;
 end
-bN =  inv(utvid.pca.V(:,1:utvid.settings.PCs)'*utvid.pca.V(:,1:utvid.settings.PCs)+...
-        (utvid.pca.sigv^2*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
-        *utvid.pca.V(:,1:utvid.settings.PCs)'*zCor;
+% bN =  inv(utvid.pca.V(:,1:utvid.settings.PCs)'*utvid.pca.V(:,1:utvid.settings.PCs)+...
+%         (utvid.pca.sigv^2*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
+%         *utvid.pca.V(:,1:utvid.settings.PCs)'*zCor;
+bN = utvid.pca.V(:,1:utvid.settings.PCs)' * zCor;
 D = bN'*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN;
 
 disp(['PCA size: ' num2str(size(utvid.pca.PCAcoords,2))])

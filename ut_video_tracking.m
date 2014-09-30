@@ -200,7 +200,7 @@ end
 function utvid_bayercompress(hMainFigure,utvid);
 utvid = guidata(hMainFigure);
 
-prompt = 'Give standard name (e.g. NEW): '
+prompt = 'Give standard name (e.g. NEW): ';
 result = input(prompt,'s');
 if isempty(result)
     utvid.setttings.stname = 'NEW'
@@ -367,7 +367,7 @@ end
 %% PCA model
 function utvid_selectpca(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-
+utvid.settings.PCs=10;
 prompt = 'Do you want to use a predefined PCA model (y/n)? ';
 result = input(prompt, 's');
 if isempty(result)
@@ -435,7 +435,7 @@ if regexpi(result,'y');
     end
 end
 if utvid.pca.MMSE == 1
-utvid = pcaMMSE(utvid);
+        utvid = pcaMMSE(utvid);
 end
 prompt = 'Do you want to use Mahalanobis Distance (type 1) or 3D euclidean distance (type 2) as error measure? ';
 result = input(prompt, 's');
@@ -462,8 +462,8 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 20%size(utvid.movs.instrstart,2)
-    utvid.settings.initTracking  = 0;
+for i = 1%size(utvid.movs.instrstart,2)
+    utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
 %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

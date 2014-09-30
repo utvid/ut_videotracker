@@ -18,7 +18,7 @@ for i = 1:size(utvid.movs.list,1)
     open(wobj);
     
 %     h2 = waitbar(0,['Processing video ' num2str(i) ' of ' num2str(size(utvid.movs.list,1))]);
-    for f = 1:utvid.movs.obj{i}.NumberOfFrames
+    for f = 2:utvid.movs.obj{i}.NumberOfFrames
 %         waitbar(f/utvid.movs.obj{i}.NumberOfFrames);
         I = read(utvid.movs.obj{i},f);
         I = demosaic(I,'rggb');
@@ -48,7 +48,7 @@ for i = 1:size(cam,2)
     open(wobj);
     
 %     h2 = waitbar(0,['Processing video ' num2str(i) ' of ' num2str(size(utvid.movs.calb,2))]);
-    for f = 1:utvid.movs.calbobj{i}.NumberOfFrames
+    for f = 2:utvid.movs.calbobj{i}.NumberOfFrames
 %         waitbar(f/utvid.movs.calbobj{i}.NumberOfFrames);
         I = read(utvid.movs.calbobj{i},f);
         I = demosaic(I,'rggb');

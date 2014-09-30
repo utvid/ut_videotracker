@@ -28,9 +28,9 @@ for j = 1:utvid.settings.nrcams
     end
     if strcmpi(utvid.enhancement.histeq,'true')==1
         for i = 1:size(im,3)
-            im2(:,:,i) = histeq(im(:,:,i)); 
+            im2(:,:,i) = histeq(im(:,:,i));
         end
-       im = im2; clear im2; 
+        im = im2; clear im2;
     end
     if strcmpi(utvid.enhancement.mono,'false')==1
         
@@ -42,12 +42,12 @@ for j = 1:utvid.settings.nrcams
         
     elseif strcmpi(utvid.enhancement.mono,'true')==1
         try
-            imbw = reshape(reshape(im,size(im,1)*size(im,2),3)*...
-                utvid.enhancement.Trgb2gray,size(im,1),size(im,2));
-            imenergy = imfilter(imbw.^2,utvid.enhancement.averpsf,'replicate');
-            imt = ut_gauss(utvid.enhancement.alpha*imbw-(utvid.enhancement.alpha-1)*...
-                ut_gauss(imbw,utvid.enhancement.sigma_up),utvid.enhancement.sigma_down);
-            Im_filtered = utvid.enhancement.a*imt - utvid.enhancement.b*imenergy;
+            w = utvid.enhancement.Trgb2gray.w;            % the linear mapping
+            W = utvid.enhancement.Trgb2gray.W;            % the quadratic mapping
+            goo = reshape(im,size(im,1)*size(im,2),3);
+            imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
+            imlikel = reshape(imlikel,size(im,1),size(im,2));
+            Im_filtered = ut_gauss(imlikel,2.5);
         catch
             disp('Something went wrong with filtering');
         end

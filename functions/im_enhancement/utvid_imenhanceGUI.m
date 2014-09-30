@@ -397,7 +397,7 @@ if isempty(handles.J)==1;
     handles.J = handles.I;
 end
 [handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
-axes(handles.hax2);imshow(handles.F);title('Enhanced Image');
+axes(handles.hax2);imshow(handles.F,[]);title('Enhanced Image');
 utvid.enhancement.filters = 'true';set(handles.h{3},'background','g')
 guidata(enhanceFigure,handles);
 end
@@ -554,20 +554,27 @@ function toggle(enhanceFigure,handles);
 handles = guidata(enhanceFigure);
 if strcmpi(handles.mono,'true') == 1
     handles.mono = 'false';
+            utvid.enhancement.mono = 'false';
+
     set(handles.h{1,6},'background','default','String','Using colorscale');
 elseif strcmpi(handles.mono,'false') == 1
     handles.mono = 'true';
+        utvid.enhancement.mono = 'true';
+
     set(handles.h{1,6},'background','g','String','Using grayscale');
 else
     disp('using colorscale');
     handles.mono = 'false';
+            utvid.enhancement.mono = 'false';
+
     set(handles.h{1,6},'background','default','String','Using colorscale');
 end
 if isempty(handles.J)==1;
     handles.J = handles.I;
 end
 [handles.F,handles.Trgb2gray] = utvid_applyfilter(handles.J,handles.coords,handles);
-axes(handles.hax2); imshow(handles.F);title('Enhanced Image');
+utvid.enhancement.Trgb2gray=handles.Trgb2gray;
+axes(handles.hax2); imshow(handles.F,[]);title('Enhanced Image');
 guidata(enhanceFigure,handles)
 end
 
