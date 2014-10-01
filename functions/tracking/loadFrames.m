@@ -42,8 +42,21 @@ for j = 1:utvid.settings.nrcams
         
     elseif strcmpi(utvid.enhancement.mono,'true')==1
         try
-            w = utvid.enhancement.Trgb2gray.w;            % the linear mapping
-            W = utvid.enhancement.Trgb2gray.W;            % the quadratic mapping
+            if utvid.settings.nrOrMar ~= 0
+                w = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.w;            % the linear mapping
+                W = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.W;            % the quadratic mapping
+                goo = reshape(im,size(im,1)*size(im,2),3);
+                imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
+                imlikel = reshape(imlikel,size(im,1),size(im,2));
+                Im_filteredor = ut_gauss(imlikel,2.5);
+                if      j == 1; utvid.Tracking.FrameLor = Im_filteredor;
+                elseif  j == 2; utvid.Tracking.FrameRor = Im_filteredor;
+                elseif  j == 3; utvid.Tracking.FrameMor = Im_filteredor;
+                end
+            end
+            
+            w = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.w;            % the linear mapping
+            W = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.W;            % the quadratic mapping
             goo = reshape(im,size(im,1)*size(im,2),3);
             imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
             imlikel = reshape(imlikel,size(im,1),size(im,2));

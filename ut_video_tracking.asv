@@ -358,15 +358,15 @@ utvid = guidata(hMainFigure);
 
 %imenhanceGUI moet nog verbeterd worden met meer opties
 % % utvid = utvid_imenhanceGUI(utvid);
-utvid.enhancement = rmfield(utvid.enhancement,'Trgb2gray');
+
 fname = fieldnames(utvid.settings.cam);
 for i = 1:size(utvid.movs.instrstart,2)
     
     for j = 1:utvid.settings.nrcams
         vidnr = utvid.movs.(fname{j})(1,utvid.movs.instrstart(i)); % which video to load
-        obj = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(vidnr).name]);
-        im = im2double(read(obj,1));
-        
+        obj = Videoreader([utvid.settings.dirdata '\Video\' utvid.movs.list(vidnr).name])
+        im = im2double(read(utvid.movs.obj{vidnr},1));
+       
         % get coords of shape markers
         coords.x = utvid.coords.shape.(fname{j}).x(:,i);
         coords.y = utvid.coords.shape.(fname{j}).y(:,i);
@@ -380,139 +380,139 @@ for i = 1:size(utvid.movs.instrstart,2)
         end
     end
 end
-
-utvid.settings.state = 5; % update state
-save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-guidata(hMainFigure,utvid);
-set(utvid.handle.h5,'backgroundcolor','g');
-end
-%% PCA model
-function utvid_selectpca(hMainFigure,utvid)
-utvid = guidata(hMainFigure);
-utvid.settings.PCs=10;
-prompt = 'Do you want to use a predefined PCA model (y/n)? ';
-result = input(prompt, 's');
-if isempty(result)
-    result = 'y';
-end
-
-while isempty(regexpi(result,'y'))
-    if regexpi(result,'n')==1
         
-        utvid.settings.pca = 'expansion';
-        %         for i = 1:size(utvid.coords.shape.left.x,2)
-        %             [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
-        %                 utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
-        %                 utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
-        %                 utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
-        %             utvid.pca.info(1,i) = i;
-        %             utvid.pca.info(2,i) = 1;
-        %         end
-        break
-    else
-        prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
-        result = input(prompt, 's');
+        utvid.settings.state = 5; % update state
+        save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+        guidata(hMainFigure,utvid);
+        set(utvid.handle.h5,'backgroundcolor','g');
     end
-end
-
-if regexpi(result,'y');
-    %% hier moet de PCA selectie GUI aangeroepen worden
-    %  met mogelijkheid tot het laden van een opgeslagen pcamodel
-    utvid = getPCApoints(utvid);
-    utvid.settings.pca = 'predefined';
-end
-prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
-result = input(prompt, 's');
-if isempty(result)
-    result = 'y';
-end
-while isempty(regexpi(result,'y'))
-    if regexpi(result,'n')==1
-        utvid.pca.MMSE = 0;
-        disp('LSE not working yet')
-        break
-    else
-        prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
-        result = input(prompt, 's');
+    %% PCA model
+    function utvid_selectpca(hMainFigure,utvid)
+    utvid = guidata(hMainFigure);
+    utvid.settings.PCs=10;
+    prompt = 'Do you want to use a predefined PCA model (y/n)? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = 'y';
     end
-end
-if regexpi(result,'y');
-    utvid.pca.MMSE = 1;
-    prompt = 'Do you want to normalize data (y/n)? ';
+    
+    while isempty(regexpi(result,'y'))
+        if regexpi(result,'n')==1
+            
+            utvid.settings.pca = 'expansion';
+            %         for i = 1:size(utvid.coords.shape.left.x,2)
+            %             [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
+            %                 utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
+            %                 utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
+            %                 utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
+            %             utvid.pca.info(1,i) = i;
+            %             utvid.pca.info(2,i) = 1;
+            %         end
+            break
+        else
+            prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
+            result = input(prompt, 's');
+        end
+    end
+    
+    if regexpi(result,'y');
+        %% hier moet de PCA selectie GUI aangeroepen worden
+        %  met mogelijkheid tot het laden van een opgeslagen pcamodel
+        utvid = getPCApoints(utvid);
+        utvid.settings.pca = 'predefined';
+    end
+    prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
     result = input(prompt, 's');
     if isempty(result)
         result = 'y';
     end
     while isempty(regexpi(result,'y'))
         if regexpi(result,'n')==1
-            utvid.pca.Normed = 0;
+            utvid.pca.MMSE = 0;
+            disp('LSE not working yet')
             break
         else
-            prompt = 'Do you want to normalize data (y/n)? ';
+            prompt = 'Do you want to use MMSE as PCA coefficient estimator (y/n)? ';
             result = input(prompt, 's');
         end
     end
     if regexpi(result,'y');
-        utvid.pca.Normed = 1;
-    end
-end
-if utvid.pca.MMSE == 1
-    utvid = pcaMMSE(utvid);
-end
-prompt = 'Do you want to use Mahalanobis Distance (type 1) or 3D euclidean distance (type 2) as error measure? ';
-result = input(prompt, 's');
-if isempty(result)
-    result = '1';
-    utvid.pca.errMethod = 'MahDist';
-end
-while isempty(regexpi(result,'1'))
-    if regexpi(result,'2')==1
-        utvid.pca.errMethod = '3Ddist';
-        break
-    else
-        prompt = 'Type 1 for Mahalanobis distance, Type 2 for 3D euclidean distance : ';
+        utvid.pca.MMSE = 1;
+        prompt = 'Do you want to normalize data (y/n)? ';
         result = input(prompt, 's');
+        if isempty(result)
+            result = 'y';
+        end
+        while isempty(regexpi(result,'y'))
+            if regexpi(result,'n')==1
+                utvid.pca.Normed = 0;
+                break
+            else
+                prompt = 'Do you want to normalize data (y/n)? ';
+                result = input(prompt, 's');
+            end
+        end
+        if regexpi(result,'y');
+            utvid.pca.Normed = 1;
+        end
     end
-end
-
-utvid.settings.state = 6; % update state
-save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
-guidata(hMainFigure,utvid);
-set(utvid.handle.h6,'backgroundcolor','g');
-end
-%% Marker tracking
-function markertracker(hMainFigure,utvid)
-
-utvid = guidata(hMainFigure);
-for i = 1%size(utvid.movs.instrstart,2)
-    utvid.settings.initTracking  = 1;
-    utvid.Tracking.instr = i;
-    %     utvid.settings.nrOrMar = 0;
-    utvid = markerTracking(utvid);
-    save([utvid.settings.dir_data '\trackingOK' num2str(i) '.mat'],'utvid');
-end
-utvid.settings.state = 7; % update state
-guidata(hMainFigure);
-set(utvid.handle.h7,'backgroundcolor','g');
-
-end
-
-%%
-function utvid_history(hMainFigure,utvid)
-utvid = guidata(hMainFigure);
-
-if iscell(utvid.settings.historyfolder)
-    num = get(hMainFigure,'value');
-    utvid.settings.dir_data = utvid.settings.historyfolder{num};
-    disp([  'Measurement folder: ' utvid.settings.dir_data])
-end
-
-%proceed with initialization
-utvid = utvid_init(hMainFigure,utvid);
-% make buttons of completed steps green
-for i = 1:utvid.settings.state
-    set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
-end
-
-guidata(hMainFigure,utvid)
-end
+    if utvid.pca.MMSE == 1
+        utvid = pcaMMSE(utvid);
+    end
+    prompt = 'Do you want to use Mahalanobis Distance (type 1) or 3D euclidean distance (type 2) as error measure? ';
+    result = input(prompt, 's');
+    if isempty(result)
+        result = '1';
+        utvid.pca.errMethod = 'MahDist';
+    end
+    while isempty(regexpi(result,'1'))
+        if regexpi(result,'2')==1
+            utvid.pca.errMethod = '3Ddist';
+            break
+        else
+            prompt = 'Type 1 for Mahalanobis distance, Type 2 for 3D euclidean distance : ';
+            result = input(prompt, 's');
+        end
+    end
+    
+    utvid.settings.state = 6; % update state
+    save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+    guidata(hMainFigure,utvid);
+    set(utvid.handle.h6,'backgroundcolor','g');
+    end
+    %% Marker tracking
+    function markertracker(hMainFigure,utvid)
+    
+    utvid = guidata(hMainFigure);
+    for i = 1%size(utvid.movs.instrstart,2)
+        utvid.settings.initTracking  = 1;
+        utvid.Tracking.instr = i;
+        %     utvid.settings.nrOrMar = 0;
+        utvid = markerTracking(utvid);
+        save([utvid.settings.dir_data '\trackingOK' num2str(i) '.mat'],'utvid');
+    end
+    utvid.settings.state = 7; % update state
+    guidata(hMainFigure);
+    set(utvid.handle.h7,'backgroundcolor','g');
+    
+    end
+    
+    %%
+    function utvid_history(hMainFigure,utvid)
+    utvid = guidata(hMainFigure);
+    
+    if iscell(utvid.settings.historyfolder)
+        num = get(hMainFigure,'value');
+        utvid.settings.dir_data = utvid.settings.historyfolder{num};
+        disp([  'Measurement folder: ' utvid.settings.dir_data])
+    end
+    
+    %proceed with initialization
+    utvid = utvid_init(hMainFigure,utvid);
+    % make buttons of completed steps green
+    for i = 1:utvid.settings.state
+        set(eval(['utvid.handle.h' num2str(i)]),'backgroundcolor','g');
+    end
+    
+    guidata(hMainFigure,utvid)
+    end

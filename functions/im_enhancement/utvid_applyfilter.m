@@ -9,7 +9,7 @@ if strcmpi(handles.mono,'false')==1
     
 elseif strcmpi(handles.mono,'true')==1
     try
-        Trgb2gray = utvid_calcTrgb(im,coords,handles.vertical,handles.horizontal);
+        Trgb2gray = utvid_calcTrgb(im,coords);
         w = Trgb2gray.w;            % the linear mapping
         W = Trgb2gray.W;            % the quadratic mapping
         goo = reshape(im,size(im,1)*size(im,2),3);

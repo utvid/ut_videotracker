@@ -1,6 +1,6 @@
 function [utvid] = PCAExpansionMMSE2(utvid)
 
-imnL = utvid.Tracking.FrameL; imnR = utvid.Tracking.FrameR; imnM = utvid.Tracking.FrameM;
+imnL = utvid.Tracking.FrameLorig; imnR = utvid.Tracking.FrameRorig; imnM = utvid.Tracking.FrameMorig;
 n = utvid.Tracking.n;
 c1 = [];
 c2 = [];
