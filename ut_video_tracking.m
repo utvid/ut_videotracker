@@ -256,10 +256,9 @@ Ideas to add:
 %% Calibration process
 function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-cam ={'left','right','center'};
+cam =fieldnames(utvid.settings.cam);
 for i = 1:utvid.settings.nrcams;
     if strcmp(utvid.settings.version,'R2012')
-        %         [utvid.settings.dir_data '\Calibration\' utvid.movs.calb.(cam{i})(1).name]
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\'  utvid.settings.stname utvid.movs.calb.(cam{i})(1).name]),2);
         if size(I,3) == 1
             I = demosaic(I,'rggb');
@@ -272,7 +271,6 @@ for i = 1:utvid.settings.nrcams;
     else
         disp('Version not yet implemented')
     end
-    [utvid.settings.dir_data '\Calibration\' utvid.settings.stname utvid.movs.calb.(cam{i})(1).name]
     % calibration using script of Hageman and van der Heijden
     [K, R, T, P,Ximage,avgEr,stdEr] = utvid_camcalibration(I,50);
     utvid.calbMat.(cam{i}){1,1} = K;
@@ -303,30 +301,30 @@ result = input(prompt, 's');
 
 if strcmp(result,'n')
     utvid.settings.nrOrMar = 0;
-    prompt = 'How many markers to follow?';
+    prompt = 'How many markers to follow? ';
     utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 else
-    prompt = 'How many orientation markers to follow?';
+    prompt = 'How many orientation markers to follow? ';
     utvid.settings.nrOrMar = str2double(input(prompt, 's'));
     if utvid.settings.nrOrMar < 3
-        prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)?';
+        prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)? ';
         utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         result = input(prompt, 's');
         if strcmp(result,'n')
             utvid.settings.nrOrMar = 0;
         else
-            prompt = 'How many orientation markers to follow? Minimal of 3.';
+            prompt = 'How many orientation markers to follow? Minimum of 3. ';
             utvid.settings.nrOrMar = str2double(input(prompt, 's'));
         end
     end
     
-    prompt = 'How many markers to follow?';
+    prompt = 'How many markers to follow? ';
     utvid.settings.nrMarkers = str2double(input(prompt, 's'));
 end
 
-cam ={'left','right','center'};
+cam = fieldnames(utvid.settings.cam);
 for j = 1:size(utvid.movs.instrstart,2)
-    j
+    disp(['Instruction number: ' num2str(j)]);
     for i = 1:utvid.settings.nrcams;
         if strcmp(utvid.settings.version,'R2012')
             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(cam{i})(1,utvid.movs.instrstart(j))).name]),2);
@@ -356,27 +354,29 @@ end
 function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 
-%imenhanceGUI moet nog verbeterd worden met meer opties
-% % utvid = utvid_imenhanceGUI(utvid);
 utvid.enhancement = rmfield(utvid.enhancement,'Trgb2gray');
 fname = fieldnames(utvid.settings.cam);
+r_marker = 12; % radius of marker in pixels
+
 for i = 1:size(utvid.movs.instrstart,2)
-    
     for j = 1:utvid.settings.nrcams
         vidnr = utvid.movs.(fname{j})(1,utvid.movs.instrstart(i)); % which video to load
-        obj = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(vidnr).name]);
-        im = im2double(read(obj,1));
+        obj = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(vidnr).name]); % create videoreader object
+        im = im2double(read(obj,1)); % load image
         
-        % get coords of shape markers
+        % Enhance image by using 2 class problem quadratic mapping (shape
+        % markers)
         coords.x = utvid.coords.shape.(fname{j}).x(:,i);
         coords.y = utvid.coords.shape.(fname{j}).y(:,i);
-        [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords);
+        [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,r_marker);
         
-        % get coords of orientation markers
+        % Enhance image by using 2 class problem quadratic mapping
+        % (orientation
+        % markers)
         if utvid.settings.nrOrMar ~= 0
             coords_or.x = utvid.coords.or.(fname{j}).x(:,i);
             coords_or.y = utvid.coords.or.(fname{j}).y(:,i);
-            [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or);
+            [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,r_marker);
         end
     end
 end
@@ -390,6 +390,7 @@ end
 function utvid_selectpca(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
 utvid.settings.PCs=10;
+utvid.pca.sigv = 0.01;
 prompt = 'Do you want to use a predefined PCA model (y/n)? ';
 result = input(prompt, 's');
 if isempty(result)
@@ -398,16 +399,7 @@ end
 
 while isempty(regexpi(result,'y'))
     if regexpi(result,'n')==1
-        
-        utvid.settings.pca = 'expansion';
-        %         for i = 1:size(utvid.coords.shape.left.x,2)
-        %             [utvid.pca.PCAcoords(:,i),~] = twoDto3D_3cam([utvid.coords.shape.left.x(:,i);...
-        %                 utvid.coords.shape.right.x(:,i);utvid.coords.shape.center.x(:,i);...
-        %                 utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
-        %                 utvid.coords.shape.center.y(:,i)],1,utvid.Pstruct.Pext);
-        %             utvid.pca.info(1,i) = i;
-        %             utvid.pca.info(2,i) = 1;
-        %         end
+       utvid.settings.pca = 'expansion'; 
         break
     else
         prompt = 'Do you want to use a predefined PCA model (y/n)? Please type y for yes or n for no: ';
@@ -438,24 +430,9 @@ while isempty(regexpi(result,'y'))
 end
 if regexpi(result,'y');
     utvid.pca.MMSE = 1;
-    prompt = 'Do you want to normalize data (y/n)? ';
-    result = input(prompt, 's');
-    if isempty(result)
-        result = 'y';
-    end
-    while isempty(regexpi(result,'y'))
-        if regexpi(result,'n')==1
-            utvid.pca.Normed = 0;
-            break
-        else
-            prompt = 'Do you want to normalize data (y/n)? ';
-            result = input(prompt, 's');
-        end
-    end
-    if regexpi(result,'y');
-        utvid.pca.Normed = 1;
-    end
 end
+    utvid.pca.Normed = 1; % Always normalise data
+
 if utvid.pca.MMSE == 1
     utvid = pcaMMSE(utvid);
 end
@@ -484,8 +461,8 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 1%size(utvid.movs.instrstart,2)
-    utvid.settings.initTracking  = 1;
+for i = 19%size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
+    utvid.settings.initTracking  = 0;
     utvid.Tracking.instr = i;
     %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

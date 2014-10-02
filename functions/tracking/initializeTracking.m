@@ -48,7 +48,7 @@ else
 end
 utvid.Tracking.FrameNum = sum(utvid.Tracking.NoF);
 utvid.Tracking.FrameRate = utvid.Tracking.ObjL{1}.FrameRate;
-utvid.pca.sigv = 0.1;
+
 
 %initial head orientation
 if utvid.Tracking.instr == 1
