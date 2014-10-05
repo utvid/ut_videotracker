@@ -1,5 +1,6 @@
 function [Im_filtered,Trgb2gray] = utvid_imenhanceLLR(im,coords,r_marker)
-% im(:,:,1) = im(:,:,1).^2;
+im(:,:,1) = im(:,:,1).^2; % squared Red channel for enhancing lips
+
 Trgb2gray = utvid_calcTrgb(im,coords,r_marker);
 w = Trgb2gray.w;            % the linear mapping
 W = Trgb2gray.W;            % the quadratic mapping

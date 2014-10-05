@@ -1,6 +1,5 @@
 function Trgb2gray = utvid_calcTrgb(im,coords,r_marker)
 % find rgb transform based on 2 class separation problem
-
 %% create rings around selected points to get rgb's of the neighbourhood of markers
 immask = zeros(size(im,1),size(im,2));
 ind = sub2ind(size(immask),round(coords.y),round(coords.x));

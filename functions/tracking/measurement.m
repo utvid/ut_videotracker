@@ -1,30 +1,34 @@
 function [utvid] = measurement(utvid)
-% inputs:    utvid,
-%            frames = {FrameL,FrameR,FrameM}
-%            str = or / shape
-%            n = framenumber
+% inputs:    utvid
+% outputs:   utvid
 
-% variable when orientation exist is set two 
+%% variable when orientation exist is set two
 if utvid.settings.nrOrMar ~= 0
-    jmax = 2;
+    jmax = 2; % j = 2 in case of orientation markers
 else
     jmax = 1;
 end
-    frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
-    frames_or = {utvid.Tracking.FrameLor,utvid.Tracking.FrameRor,utvid.Tracking.FrameMor};
-for j = 1:jmax % j = 1 is shape, j = 2 is or markers
 
-    cam = {'left','right','center'};
-    if isfield(utvid.settings,'Measmethod')~=1
-        utvid.settings.Measmethod = 'templatematching';
-    end
-utvid.settings.Measmethod = 'minsearch';
+%% get the enhanced images
+frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
+if utvid.settings.nrOrMar~=0; % in case of orientation markers
+    frames_or = {utvid.Tracking.FrameLor,utvid.Tracking.FrameRor,utvid.Tracking.FrameMor};
+end
+
+%% get the camera titles
+cam =  fieldnames(utvid.settings.cam);
+
+%% loop through orientation and shape markers
+for j = 1:jmax % j = 1 is shape, j = 2 is or markers
+    
     Xstacked = []; Ystacked = [];
     
+    % loop through number of cameras
     for i = 1:utvid.settings.nrcams
-                
+        
         if j == 1
             im  = frames{i};
+            % using Xpred coordinates for region of interest
             if i == 1
                 x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
                 y   = utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n) ;
@@ -68,12 +72,13 @@ utvid.settings.Measmethod = 'minsearch';
         Ystacked = [Ystacked; y];
     end
     
+    % update the kalman measurement with the found pixel coordinates
     if j == 1
         utvid.Tracking.Kal.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     elseif j == 2
         utvid.Tracking.Kal_or.meas(:,utvid.Tracking.n) = [Xstacked; Ystacked];
     end
-
+    
 end
 
 end

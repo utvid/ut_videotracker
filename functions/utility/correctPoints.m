@@ -1,4 +1,6 @@
 function [coords,c] = correctPoints(Im,nrMar,coords,str)
+
+space = 75;
 f = figure; 
 c = [];
 % axes(h1)
@@ -7,8 +9,8 @@ hold on
 imshow(Im,[]); title(str);
 mins = min(coords);
 maxs = max(coords);
-xlim([mins(1)-25 maxs(1)+25]);
-ylim([mins(2)-25 maxs(2)+25]);
+xlim([mins(1)-space maxs(1)+space]);
+ylim([mins(2)-space maxs(2)+space]);
 set(f,'Position',get(0,'screensize')); 
 for i = 1:nrMar
     h{i} = line([coords(i,1)-5 coords(i,1)-5 coords(i,1)+5 coords(i,1)+5 coords(i,1)-5],...

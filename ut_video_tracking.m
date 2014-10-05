@@ -251,6 +251,7 @@ Ideas to add:
 -   Choose compression method: motion jpg avi, motion jpg 2000 mpeg 4 etc
 -   Choose new standard filenames for videos + location,
     these standard filenames must also be added to utvid_init
+-   Connect corresponding videoclips to one recording
 %}
 
 %% Calibration process
@@ -353,36 +354,34 @@ end
 %% Image enhancement
 function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-
-utvid.enhancement = rmfield(utvid.enhancement,'Trgb2gray');
-fname = fieldnames(utvid.settings.cam);
+cam = fieldnames(utvid.settings.cam);
 r_marker = 12; % radius of marker in pixels
 
 for i = 1:size(utvid.movs.instrstart,2)
     for j = 1:utvid.settings.nrcams
-        vidnr = utvid.movs.(fname{j})(1,utvid.movs.instrstart(i)); % which video to load
+        vidnr = utvid.movs.(cam{j})(1,utvid.movs.instrstart(i)); % which video to load
         obj = VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(vidnr).name]); % create videoreader object
         im = im2double(read(obj,1)); % load image
         
         % Enhance image by using 2 class problem quadratic mapping (shape
         % markers)
-        coords.x = utvid.coords.shape.(fname{j}).x(:,i);
-        coords.y = utvid.coords.shape.(fname{j}).y(:,i);
+        coords.x = utvid.coords.shape.(cam{j}).x(:,i);
+        coords.y = utvid.coords.shape.(cam{j}).y(:,i);
         [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,r_marker);
         
         % Enhance image by using 2 class problem quadratic mapping
         % (orientation
         % markers)
         if utvid.settings.nrOrMar ~= 0
-            coords_or.x = utvid.coords.or.(fname{j}).x(:,i);
-            coords_or.y = utvid.coords.or.(fname{j}).y(:,i);
+            coords_or.x = utvid.coords.or.(cam{j}).x(:,i);
+            coords_or.y = utvid.coords.or.(cam{j}).y(:,i);
             [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,r_marker);
         end
     end
 end
 
 utvid.settings.state = 5; % update state
-save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
+% save([utvid.settings.dir_data '\init.mat'],'utvid','-append');
 guidata(hMainFigure,utvid);
 set(utvid.handle.h5,'backgroundcolor','g');
 end
@@ -461,8 +460,8 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 19%size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
-    utvid.settings.initTracking  = 0;
+for i = 17%size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
+    utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
     %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

@@ -1,53 +1,63 @@
 function utvid = Tracking(utvid,handles)
+% display current frame number
 disp(['Frame: ' num2str(utvid.Tracking.n)])
-
-%% Load frames 
+disp(['Roi: ' num2str(utvid.Tracking.roi)])
+%% Load frames
 % Load images and perform image enhancement
+% image enhancement can be improved
 utvid = loadFrames(utvid,handles);
 
 %% Perform Measurement
 % detect markers in current frames both shape as optional orientation
 % markers
+% template matching needs to be created
 utvid = measurement(utvid);
 
-%% Update Kalman for orientation markers  
-% Should there be an outlierdetection for the orientation markers as well?
-%Head orientation
-%3D estimation of orientational markers
+%% Update Kalman for orientation markers
+% Currently the orientation markers do not undergo outlier detection!!
 if utvid.settings.nrOrMar ~= 0
+    % prepare the kalman filter structure of a kalman update
     utvid.Tracking.Kal_or      = prepareKalman3D(utvid.Tracking.Kal_or, utvid.Pstruct_or, utvid.Tracking.n);
+    % perform kalman update
     utvid.Tracking.Kal_or      = updateKal(utvid.Tracking.Kal_or, utvid.Tracking.n);
+    % transform kalman 3D coordinates to 2D
     utvid.Tracking.Xest_or     = getSpatialRep(utvid.Tracking.Xest_or, utvid.Tracking.n, utvid.Tracking.Kal_or.Xest(1:end/2,utvid.Tracking.n), ...
         utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct_or);
     utvid.Tracking.Xpred_or    = getSpatialRep(utvid.Tracking.Xpred_or, utvid.Tracking.n+1, utvid.Tracking.Kal_or.Xpred(1:end/2,utvid.Tracking.n+1),...
         utvid.Tracking.Kal_or.Cpred(1:end/2,1:end/2,utvid.Tracking.n+1), utvid.Pstruct_or);
+    % save orientation coordinates in Xinit_or
     utvid.coords.Xinit_or(:,utvid.Tracking.n) =  [utvid.Tracking.Xest_or.X(:,1,utvid.Tracking.n);utvid.Tracking.Xest_or.X(:,2,utvid.Tracking.n);utvid.Tracking.Xest_or.X(:,3,utvid.Tracking.n)];
 end
 
 %% rotate shape markers to base_or
-% uncertainty voor onderstaande berekening??
+% Uncertainty is set to zero!!
+% Kalman 2D measured coordinates are transformed to 3D
 Meas3D = twoDto3D_3cam(utvid.Tracking.Kal.meas(:,utvid.Tracking.n),0,utvid.Pstruct.Pext);
 
 if utvid.settings.nrOrMar ~= 0
-    % PCA rotation
+    % PCA rotation using rigid transform
     utvid.Tracking.T(:,:,utvid.Tracking.instr,utvid.Tracking.n) = rigid_transform_3D(utvid.Tracking.Xest_or.X(:,:,utvid.Tracking.n),utvid.Tracking.base_or);
+    % Rotation
     R = utvid.Tracking.T(1:3,1:3,utvid.Tracking.instr,utvid.Tracking.n);
+    % Extended rotation matrix
     Rrext = getRext(R, utvid.settings.nrMarkers);
+    % Rotated measured 3D coordinates
     rot_coor = Rrext*Meas3D;
-    % add translation
+    % Add translation
     utvid.Tracking.rt_coor(:,utvid.Tracking.n) = [rot_coor(1:utvid.settings.nrMarkers)+utvid.Tracking.T(1,4,utvid.Tracking.instr,utvid.Tracking.n); ...
         rot_coor(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers)+  utvid.Tracking.T(2,4,utvid.Tracking.instr,utvid.Tracking.n);...
         rot_coor(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers)+utvid.Tracking.T(3,4,utvid.Tracking.instr,utvid.Tracking.n)];
 end
 
-
-
 %% perform outlier detection
+% check if the number of PCA coordinates in the models is greater than two
+% times the number of principle components
 if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
     if utvid.pca.outlier == 0, disp('Outlier detection performed'), utvid.pca.outlier = 1; end
     if utvid.settings.nrOrMar ~= 0
         
-        % MMSE outlierdetection
+        % MMSE outlierdetection on rotated and translated 3D Kalman
+        % measurement coordinates, in c the detected outliers
         [utvid,utvid.Tracking.rt_coor(:,utvid.Tracking.n),c] = outlierCorrectionMMSE(utvid,utvid.Tracking.rt_coor(:,utvid.Tracking.n));
         
         % back to original coordinate system in Kal.Xest - translation and - rotation
@@ -55,49 +65,56 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
             utvid.Tracking.rt_coor(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers,utvid.Tracking.n)-  utvid.Tracking.T(2,4,utvid.Tracking.instr,utvid.Tracking.n);...
             utvid.Tracking.rt_coor(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers,utvid.Tracking.n)-utvid.Tracking.T(3,4,utvid.Tracking.instr,utvid.Tracking.n)];
         coor_back = inv(Rrext)*rot_back;
-    
+        
         % check for erroneous markers, if c is empty, no outliers detected
-        if isempty(c) == 0  
-        
-        % 3D coordinates to 2D
-        [c1,c2,c3,~,~,~]=threeDto2D_3cam(coor_back,utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n),utvid.Pstruct);
-        
-        % correct measurement
-        utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n) = c1(1,:)';
-        utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(1,:)';
-        utvid.Tracking.Kal.meas(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(1,:)';
-        utvid.Tracking.Kal.meas(3*utvid.settings.nrMarkers+1:4*utvid.settings.nrMarkers,utvid.Tracking.n) = c1(2,:)';
-        utvid.Tracking.Kal.meas(4*utvid.settings.nrMarkers+1:5*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(2,:)';
-        utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
-        
-        % reset uncertainty corrected markers
+        if isempty(c) == 0
+            
+            % Transform 3D coordinates to 2D
+            [c1,c2,c3,~,~,~]=threeDto2D_3cam(coor_back,utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n),utvid.Pstruct);
+            
+            % correct Kalman measurement marker positions
+            utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n) = c1(1,:)';
+            utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(1,:)';
+            utvid.Tracking.Kal.meas(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(1,:)';
+            utvid.Tracking.Kal.meas(3*utvid.settings.nrMarkers+1:4*utvid.settings.nrMarkers,utvid.Tracking.n) = c1(2,:)';
+            utvid.Tracking.Kal.meas(4*utvid.settings.nrMarkers+1:5*utvid.settings.nrMarkers,utvid.Tracking.n) = c2(2,:)';
+            utvid.Tracking.Kal.meas(5*utvid.settings.nrMarkers+1:6*utvid.settings.nrMarkers,utvid.Tracking.n) = c3(2,:)';
+            
+            % reset uncertainty corrected markers; should be done here!
+            % set prediction uncertainty to 1e6;
+            utvid.Tracking.Kal.Cpred(c+30,c+30,utvid.Tracking.n) = 1e6;
         end
     else
+        % when not using orientation markers; probably does not function at
+        % the moment
         [utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
         utvid.Tracking.rt_coor = utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,:);
     end
 end
-      % update Kalman structure
-        utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,utvid.Tracking.n);
-        utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,utvid.Tracking.n);
+% prepare the kalman filter for an update and perform the Kalman update
+utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,utvid.Tracking.n);
+utvid.Tracking.Kal = updateKal(utvid.Tracking.Kal,utvid.Tracking.n);
 
 %% Space representations Estimations
 % Transform Kal.Xest to Tracking.Xest structure
+% 3D --> 2D
 utvid.Tracking.Xest  = getAllRep( utvid.Tracking.Xest, utvid.Tracking.n, utvid.Tracking.Kal.Xest(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
 % Transform Kal.Xpred current frame to Tracking.Xpred structure
+% 3D --> 2D
 utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n), ...
     utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n), utvid.Pstruct);
 
 % Transform Kal.Xpred current frame + 1 to Tracking.Xpred structure
+% 3D --> 2D
 utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n+1, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n+1), ...
     utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n+1), utvid.Pstruct);
 
-%% plotting
+%% plotting the new frames in the GUI
+space = 50; % extra space x, and y for plotting
 if utvid.Tracking.plotting == 1
-    
-    %     try delete(handles.hax{1,1},handles.hax{1,2},handles.hax{1,3}); catch ;end
+    % plotting shape markers
     cla(handles.hax{1,1});
     axes(handles.hax{1,1}), hold on
     h11 = imshow(utvid.Tracking.FrameL,[]);
@@ -105,21 +122,11 @@ if utvid.Tracking.plotting == 1
     h13 = plot(utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n),'ob');
     h14 = plot(utvid.Tracking.Kal.meas(1:utvid.settings.nrMarkers,utvid.Tracking.n), ...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4,utvid.Tracking.n),'r.');
-    %     plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'go')
-    %      plot(test.Xest.x1(:,1,utvid.Tracking.n),test.Xest.x1(:,2,utvid.Tracking.n),'m+','linewidth',2);
-    %      plot(test.Xpred.x1(:,1,utvid.Tracking.n),test.Xpred.x1(:,2,utvid.Tracking.n),'oc');
-    %      plot(test.Kal.meas(1:utvid.settings.nrMarkers), ...
-    %        test.Kal.meas(utvid.settings.nrMarkers*3+1:utvid.settings.nrMarkers*4),'g.');
-    %
     mins = min(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
     maxs = max(utvid.Tracking.Xest.x1(:,:,utvid.Tracking.n));
-    xlim([mins(1)-25 maxs(1)+25]);
-    ylim([mins(2)-25 maxs(2)+25]);
+    xlim([mins(1)-space maxs(1)+space]);
+    ylim([mins(2)-space maxs(2)+space]);
     drawnow
-    
-    %     utvid.Tracking.Xest.x1(6,:,utvid.Tracking.n)
-    %     utvid.Tracking.Xpred.x1(6,:,utvid.Tracking.n)
-    %     [utvid.Tracking.Kal.meas(6,utvid.Tracking.n),utvid.Tracking.Kal.meas(36,utvid.Tracking.n)]
     
     cla(handles.hax{1,2});
     axes(handles.hax{1,2}), hold on
@@ -128,11 +135,10 @@ if utvid.Tracking.plotting == 1
     h23 = plot(utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n),'ob');
     h24 = plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers+1:utvid.settings.nrMarkers*2,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*4+1:utvid.settings.nrMarkers*5,utvid.Tracking.n),'r.');
-    %     plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'go')
     mins = min(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
     maxs = max(utvid.Tracking.Xest.x2(:,:,utvid.Tracking.n));
-    xlim([mins(1)-25 maxs(1)+25]);
-    ylim([mins(2)-25 maxs(2)+25]);
+    xlim([mins(1)-space maxs(1)+space]);
+    ylim([mins(2)-space maxs(2)+space]);
     drawnow
     
     cla(handles.hax{1,3});
@@ -142,15 +148,14 @@ if utvid.Tracking.plotting == 1
     h33 = plot(utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n),'ob');
     h34 = plot(utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*2+1:utvid.settings.nrMarkers*3,utvid.Tracking.n),...
         utvid.Tracking.Kal.meas(utvid.settings.nrMarkers*5+1:utvid.settings.nrMarkers*6,utvid.Tracking.n),'r.');
-    %     plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'go')
     mins = min(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
     maxs = max(utvid.Tracking.Xest.x3(:,:,utvid.Tracking.n));
-    xlim([mins(1)-25 maxs(1)+25]);
-    ylim([mins(2)-25 maxs(2)+25]);
+    xlim([mins(1)-space maxs(1)+space]);
+    ylim([mins(2)-space maxs(2)+space]);
     drawnow
     
+    %% in case of orientation markers; plotting the orientation markers
     if utvid.settings.nrOrMar ~=0
-        %         try delete(handles.hax{2,1},handles.hax{2,2},handles.hax{2,3}); catch ;end
         cla(handles.hax{2,1});
         axes(handles.hax{2,1}), hold on
         h41 = imshow(utvid.Tracking.FrameL,[]);
@@ -158,11 +163,10 @@ if utvid.Tracking.plotting == 1
         h43 = plot(utvid.Tracking.Xpred_or.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x1(:,2,utvid.Tracking.n),'ob');
         h44 = plot(utvid.Tracking.Kal_or.meas(1:utvid.settings.nrOrMar,utvid.Tracking.n), ...
             utvid.Tracking.Kal_or.meas(utvid.settings.nrOrMar*3+1:utvid.settings.nrOrMar*4,utvid.Tracking.n),'r.');
-        %         plot(utvid.Tracking.Xest_or.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x1(:,2,utvid.Tracking.n),'go')
         mins = min(utvid.Tracking.Xest_or.x1(:,:,utvid.Tracking.n));
         maxs = max(utvid.Tracking.Xest_or.x1(:,:,utvid.Tracking.n));
-        xlim([mins(1)-25 maxs(1)+25]);
-        ylim([mins(2)-25 maxs(2)+25]);
+        xlim([mins(1)-space maxs(1)+space]);
+        ylim([mins(2)-space maxs(2)+space]);
         drawnow
         
         cla(handles.hax{2,2});
@@ -172,11 +176,10 @@ if utvid.Tracking.plotting == 1
         h53 = plot(utvid.Tracking.Xpred_or.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x2(:,2,utvid.Tracking.n),'ob');
         h54 = plot(utvid.Tracking.Kal_or.meas(utvid.settings.nrOrMar+1:utvid.settings.nrOrMar*2,utvid.Tracking.n),...
             utvid.Tracking.Kal_or.meas(utvid.settings.nrOrMar*4+1:utvid.settings.nrOrMar*5,utvid.Tracking.n),'r.');
-        %         plot(utvid.Tracking.Xest_or.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x2(:,2,utvid.Tracking.n),'go')
         mins = min(utvid.Tracking.Xest_or.x2(:,:,utvid.Tracking.n));
         maxs = max(utvid.Tracking.Xest_or.x2(:,:,utvid.Tracking.n));
-        xlim([mins(1)-25 maxs(1)+25]);
-        ylim([mins(2)-25 maxs(2)+25]);
+        xlim([mins(1)-space maxs(1)+space]);
+        ylim([mins(2)-space maxs(2)+space]);
         drawnow
         
         cla(handles.hax{2,3});
@@ -186,45 +189,59 @@ if utvid.Tracking.plotting == 1
         h63 = plot(utvid.Tracking.Xpred_or.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x3(:,2,utvid.Tracking.n),'ob');
         h64 = plot(utvid.Tracking.Kal_or.meas(utvid.settings.nrOrMar*2+1:utvid.settings.nrOrMar*3,utvid.Tracking.n),...
             utvid.Tracking.Kal_or.meas(utvid.settings.nrOrMar*5+1:utvid.settings.nrOrMar*6,utvid.Tracking.n),'r.');
-        %         plot(utvid.Tracking.Xest_or.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x3(:,2,utvid.Tracking.n),'go')
         mins = min(utvid.Tracking.Xest_or.x3(:,:,utvid.Tracking.n));
         maxs = max(utvid.Tracking.Xest_or.x3(:,:,utvid.Tracking.n));
-        xlim([mins(1)-25 maxs(1)+25]);
-        ylim([mins(2)-25 maxs(2)+25]);
+        xlim([mins(1)-space maxs(1)+space]);
+        ylim([mins(2)-space maxs(2)+space]);
         drawnow
     end
     
 end
 
 %% PCA Expansion
-% lim should be set in GUI
-% D = min(pdist2(utvid.Tracking.rt_coor(:,utvid.Tracking.n)',utvid.pca.PCAcoords','euclidean'));
-
-% calculate mahalonobis distance
-zCor = utvid.Tracking.rt_coor(:,utvid.Tracking.n)-utvid.pca.meanX;
+% Use estimated shape markers for pca expansion
+z = utvid.Tracking.Xest.X(:,:,utvid.Tracking.n); % get estimated coordinates
+z = reshape(z,[size(z,1)*size(z,2),1]); % reshape to one vector
+% get Rotation
+R = utvid.Tracking.T(1:3,1:3,utvid.Tracking.instr,utvid.Tracking.n);
+% get extended Rotation
+Rrext = getRext(R, utvid.settings.nrMarkers);
+% Rotated measured 3D coordinates
+zR = Rrext*z;
+% Add translation
+zCor = [zR(1:utvid.settings.nrMarkers)+utvid.Tracking.T(1,4,utvid.Tracking.instr,utvid.Tracking.n); ...
+        zR(utvid.settings.nrMarkers+1:2*utvid.settings.nrMarkers)+  utvid.Tracking.T(2,4,utvid.Tracking.instr,utvid.Tracking.n);...
+        zR(2*utvid.settings.nrMarkers+1:3*utvid.settings.nrMarkers)+utvid.Tracking.T(3,4,utvid.Tracking.instr,utvid.Tracking.n)];
+% normalize zCor
+zCor = zCor-utvid.pca.meanX;
 if utvid.pca.Normed == 1
     zCor = utvid.pca.Gamma\zCor;
 end
-% bN =  inv(utvid.pca.V(:,1:utvid.settings.PCs)'*utvid.pca.V(:,1:utvid.settings.PCs)+...
-%         (utvid.pca.sigv^2*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
-%         *utvid.pca.V(:,1:utvid.settings.PCs)'*zCor;
+% calculate mahalonobis distance
 bN = utvid.pca.V(:,1:utvid.settings.PCs)' * zCor;
 D = bN'*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN;
 
+% Display the number of frames in PCA model, and the of the current frame
+% to the PCA model
 disp(['PCA size: ' num2str(size(utvid.pca.PCAcoords,2))])
 disp(['PCA distance: ' num2str(D)]);
 
-if D >  chi2inv(0.9,utvid.settings.PCs);
-    % Correct possible faulty markers
+% Limit of accepting new frames in the PCA model. Using the chi squared
+% distribution. The number of principle components is used as the degrees
+% of freedom. The probability is set to 0.9.
+if D >  chi2inv(0.95,utvid.settings.PCs);
+    % open pca expansion, show the measured coordinates and in case of
+    % misplaced markers, correct them to assure the correct shape to be
+    % added in the PCA model
     utvid = PCAExpansionMMSE2(utvid);
-
+    
     % update PCA model
     utvid = pcaMMSE(utvid);
-   
-    %Space representations Prediction
-    utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n+1, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n+1), ...
-    utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n+1), utvid.Pstruct);
-
+    
+%     %Space representations Prediction for next frame update. 
+%     utvid.Tracking.Xpred = getAllRep( utvid.Tracking.Xpred, utvid.Tracking.n+1, utvid.Tracking.Kal.Xpred(1:end/2,utvid.Tracking.n+1), ...
+%         utvid.Tracking.Kal.Cpred(1:end/2,1:end/2,utvid.Tracking.n+1), utvid.Pstruct);
+%     
 end
 
 

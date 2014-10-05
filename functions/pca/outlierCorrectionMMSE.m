@@ -4,7 +4,7 @@ N = utvid.settings.nrMarkers;
 utvid.pca.S = diag(utvid.pca.SM);  % eigenvalues
 
 Cb = utvid.pca.Cb; % covariance
-zCor = z-utvid.pca.meanX;  
+zCor = z-utvid.pca.meanX;
 if utvid.pca.Normed == 1
     zCor = utvid.pca.Gamma\zCor; % normalised coordinates
 end
@@ -50,17 +50,17 @@ for i = 1:size(A,1)
         (utvid.pca.sigv^2*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))))...
         *utvid.pca.V(pn,1:utvid.settings.PCs)'*zCor(pn);
     
- 
+    
     % new reconstructed vector and transformation back to normal coordinate system
     reconVec = utvid.pca.V(:,1:utvid.settings.PCs)*bN{i};
-    reconVecN2(:,i) = utvid.pca.Gamma * reconVec + utvid.pca.meanX; 
+    reconVecN2(:,i) = utvid.pca.Gamma * reconVec + utvid.pca.meanX;
     reconVecN3{i} = [reconVecN2(1:end/3,i),reconVecN2(end/3+1:end/3*2,i),reconVecN2(end/3*2+1:end,i)];
     
     % reconstruction error of reconstructed vector based on inliers
     % (euclidean distance)
     PCAreconEr3 = sqrt(sum([reconVecN3{i}-origN(1:utvid.settings.nrMarkers,:)].^2,2));
     C2{i} = PCAreconEr3 > utvid.pca.thres;       %determine outliers
-    D2{i} = PCAreconEr3 <= utvid.pca.thres;       
+    D2{i} = PCAreconEr3 <= utvid.pca.thres;
     
     inliers(i) = sum(D2{i}); % number of inliers in new reconstruction
     if exist('utvid.pca.errMethod','var') == 0; utvid.pca.errMethod = 'MahDist'; end
@@ -68,7 +68,7 @@ for i = 1:size(A,1)
         
         % calculate mahalanobis distance
         MahDist(i) = bN{i}'*inv(Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN{i};
-       
+        
         alfa = 1; beta = 0.25; % measure of importance number of inliers/mah dist
         % calculate benefit
         benefit2(i) = alfa*length(find(D2{i})) - beta*MahDist(i);
@@ -83,16 +83,33 @@ for i = 1:size(A,1)
     
 end
 
+% [mB, maxInd] = max(benefit2); % find the max benefit index
+% pcaVec = reconVecN2(:,maxInd); % get the coordinates at max benefit
+%
+% c = find(C2{maxInd}); % find the outliers in this hypothesis
 
+% [~,minInd] = min(costMah);
+% c = find(C2{minInd});
 
-
-[mB, maxInd] = max(benefit2); % find the max benefit index
-pcaVec = reconVecN2(:,maxInd); % get the coordinates at max benefit
-
-c = find(C2{maxInd}); % find the outliers in this hypothesis
-
-[~,minInd] = min(costMah);
-c = find(C2{minInd});
+[bb ix] = sort(costMah);
+c = find(C2{ix(1)});
+pcaVec = reconVecN2(:,1);
+%% only sequence 8,9,10
+% maybe the same holds for other consecutive markers....
+seq = [8,9,10]; % if outliers are 8 9 10, this is probably not correct
+% algorithm to find smallest cost without correcting 8,9,10 simultaneously.
+if isempty(find(c==seq(1)))==0 && isempty(find(c==seq(2)))==0 && isempty(find(c==seq(3)))==0;
+    for ii = 2:length(ix); % loop through costfunction outcomes from low to high
+        c = find(C2{ix(ii)});
+        % check if c contains sequence 8,9,10
+        if isempty(find(c==seq(1)))==0 && isempty(find(c==seq(2)))==0 && isempty(find(c==seq(3)))==0;
+        else
+            % if c does not contain 8,9,and 10; create the pcaVec at ix,ii
+            pcaVec = reconVecN2(:,ix(ii));
+            break
+        end
+    end  
+end
 
 ptsCorr = z;
 disp(['Corrected markers by MahDist: ' num2str(c')])
@@ -102,12 +119,12 @@ if ~isempty(c)
     
     if length(c)>.5*utvid.settings.nrMarkers
         disp('Manual correction of outliers')
-%         utvid = PCAExpansionMMSE2(utvid);
+        %         utvid = PCAExpansionMMSE2(utvid);
     else
-    
-    for cc = 1:length(c)%c = find(C{maxInd})%(C{maxInd}<=N)
-        ptsCorr(c(cc):N:N*2+c(cc)) = (pcaVec(c(cc):N:N*2+c(cc)));
-    end
+        
+        for cc = 1:length(c)%c = find(C{maxInd})%(C{maxInd}<=N)
+            ptsCorr(c(cc):N:N*2+c(cc)) = (pcaVec(c(cc):N:N*2+c(cc)));
+        end
     end
 end
 end
