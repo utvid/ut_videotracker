@@ -38,11 +38,9 @@ function utvid = createKalmanFilter3D(utvid)
 
 Pext        = utvid.Pstruct.Pext;
 % nrMarkers   = handles.nMar;
-N           = 2*3*utvid.settings.nrMarkers;
+N           = 2*length(utvid.Tracking.usecams)*utvid.settings.nrMarkers;
 M           = 6*utvid.settings.nrMarkers;
 nrOfFrames  = sum(utvid.Tracking.NoF);
-
-% utvid.Tracking.sigMeas = 3;    %measurement error expressed in pixels
 
 %create state variables
 utvid.Tracking.Kal.meas     = zeros(N, nrOfFrames);
@@ -55,16 +53,17 @@ utvid.Tracking.Kal.Cpred    = zeros(M, M, nrOfFrames);
 utvid.Tracking.Kal.Cest_b   = zeros(M, M, nrOfFrames);
 utvid.Tracking.Kal.Cn       = zeros(N, N, nrOfFrames);
 
+
+i = utvid.Tracking.instr; % current instruction number
 %initializes first measurement vector
 measVecX = []; measVecY = [];
-% for i=1:3
-%     measVecX = [measVecX; handles.xm((i-1)*7+1:(i-1)*7+7)'];
-%     measVecY = [measVecY; handles.ym((i-1)*7+1:(i-1)*7+7)'];
-% end
-i = utvid.Tracking.instr; % eerste filmpje 
-utvid.Tracking.Kal.meas(:,1) = [utvid.coords.shape.left.x(:,i);utvid.coords.shape.right.x(:,i);...
-    utvid.coords.shape.center.x(:,i);utvid.coords.shape.left.y(:,i);utvid.coords.shape.right.y(:,i);...
-    utvid.coords.shape.center.y(:,i)];
+
+for ii = 1:length(utvid.Tracking.usecams)
+    
+    measVecX = [measVecX; utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(ii)}).x(:,i)];
+    measVecY = [measVecY; utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(ii)}).y(:,i)];
+end
+utvid.Tracking.Kal.meas(:,1) = [measVecX;measVecY];
 
 %define measurement matrix, which is determined every new iteration
 utvid.Tracking.Kal.H = zeros(N, M, nrOfFrames);
@@ -92,7 +91,7 @@ utvid.Tracking.Kal.Cest(:,:,1) = 1E10*eye(M);
 utvid.Tracking.Kal.Cpred(:,:,1) = 1E10*eye(M);
 utvid.Tracking.Kal.Cpred(:,:,2) = 1E10*eye(M);
 
-if utvid.settings.nrcams == 3
+if utvid.settings.nrcams == 3 && length(utvid.Tracking.usecams) == 3
     [utvid.Tracking.Kal.Xest(1:end/2,1), utvid.Tracking.Kal.Cest(1:end/2,1:end/2,1)] = twoDto3D_3cam(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
     [utvid.Tracking.Kal.Xpred(1:end/2,2), ~] = twoDto3D_3cam(utvid.Tracking.Kal.meas(:,1), utvid.Tracking.sigMeas^2, Pext); 
 else

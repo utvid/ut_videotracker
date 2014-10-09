@@ -77,18 +77,16 @@ function X = getAllRep(X, iter, vec, unc, Pstruct)
 % 
 % elseif strcmp(rep, '3D')
     
-    %defines 2D state
-%     if settings.nrCam==3
-
+    if size(Pstruct.P,2) == 3
          [x1,x2,x3,X.Cx_1(:,:,:,iter),X.Cx_2(:,:,:,iter),X.Cx_3(:,:,:,iter)] = threeDto2D_3cam(vec, unc, Pstruct);
         X.x1(:,:,iter) = x1';
         X.x2(:,:,iter) = x2'; 
         X.x3(:,:,iter) = x3'; 
 
-%     else
-%         [X.x1(:,:,iter), X.x2(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter)] = ...
-%             threeDto2D(vec, unc, Pstruct);
-%     end
+    else
+        [X.x1(:,:,iter), X.x2(:,:,iter), X.C_x1(:,:,:,iter), X.C_x2(:,:,:,iter)] = ...
+            threeDto2D(vec, unc, Pstruct);
+    end
 %     
     %defines 3D state
     N = length(vec)/3;

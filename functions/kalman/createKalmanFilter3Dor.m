@@ -38,7 +38,7 @@ function utvid = createKalmanFilter3D(utvid)
 
 Pext        = utvid.Pstruct_or.Pext;
 % nrMarkers   = handles.nMar;
-N           = 2*3*utvid.settings.nrOrMar;
+N           = 2*length(utvid.Tracking.usecams)*utvid.settings.nrOrMar;
 M           = 6*utvid.settings.nrOrMar;
 nrOfFrames  = sum(utvid.Tracking.NoF);
 
@@ -55,17 +55,14 @@ utvid.Tracking.Kal_or.Cpred    = zeros(M, M,nrOfFrames);
 utvid.Tracking.Kal_or.Cest_b   = zeros(M, M,nrOfFrames);
 utvid.Tracking.Kal_or.Cn       = zeros(N, N,nrOfFrames);
 
+i = utvid.Tracking.instr; % eerste filmpje nog aanpassen
 %initializes first measurement vector
 measVecX = []; measVecY = [];
-% for i=1:3
-%     measVecX = [measVecX; handles.xm((i-1)*7+1:(i-1)*7+7)'];
-%     measVecY = [measVecY; handles.ym((i-1)*7+1:(i-1)*7+7)'];
-% end
-
-i = utvid.Tracking.instr; % eerste filmpje nog aanpassen
-utvid.Tracking.Kal_or.meas(:,1) = [utvid.coords.or.left.x(:,i);utvid.coords.or.right.x(:,i);...
-    utvid.coords.or.center.x(:,i);utvid.coords.or.left.y(:,i);utvid.coords.or.right.y(:,i);...
-    utvid.coords.or.center.y(:,i)];
+for ii = 1:length(utvid.Tracking.usecams)
+    measVecX = [measVecX; utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(ii)}).x(:,i)];
+    measVecY = [measVecY; utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(ii)}).y(:,i)];
+end
+utvid.Tracking.Kal_or.meas(:,1) = [measVecX;measVecY];
 
 %define measurement matrix, which is determined every new iteration
 utvid.Tracking.Kal_or.H = zeros(N, M,nrOfFrames);
@@ -95,7 +92,7 @@ utvid.Tracking.Kal_or.Cest(:,:,1) = 1E10*eye(M);
 utvid.Tracking.Kal_or.Cpred(:,:,1) = 1E10*eye(M);
 utvid.Tracking.Kal_or.Cpred(:,:,2) = 1E10*eye(M);
 
-if utvid.settings.nrcams == 3
+if utvid.settings.nrcams == 3 && length(utvid.Tracking.usecams) == 3
     [utvid.Tracking.Kal_or.Xest(1:end/2,1), utvid.Tracking.Kal_or.Cest(1:end/2,1:end/2,1)] = twoDto3D_3cam(utvid.Tracking.Kal_or.meas(:,1), utvid.Tracking.sigMeas^2, Pext);
     [utvid.Tracking.Kal_or.Xpred(1:end/2,2), ~] = twoDto3D_3cam(utvid.Tracking.Kal_or.meas(:,1), utvid.Tracking.sigMeas^2, Pext); 
 else

@@ -10,13 +10,24 @@ else
 end
 
 %% get the enhanced images
-frames = {utvid.Tracking.FrameL,utvid.Tracking.FrameR,utvid.Tracking.FrameM};
-if utvid.settings.nrOrMar~=0; % in case of orientation markers
-    frames_or = {utvid.Tracking.FrameLor,utvid.Tracking.FrameRor,utvid.Tracking.FrameMor};
+if isfield(utvid.Tracking,'frames')==0
+fnames = fieldnames(utvid.Tracking);
+ii = 1;
+for i = 1:length(fnames)
+    fl = strcmp(fnames{i},'FrameL');
+    if fl == 1; utvid.Tracking.frames{ii} = 'FrameL';
+       utvid.Tracking.frames_or{ii} = 'FrameLor';
+       ii=ii+1; end
+    fr = strcmp(fnames{i},'FrameR');
+    if fr == 1; utvid.Tracking.frames{ii} = 'FrameR';
+       utvid.Tracking.frames_or{ii} = 'FrameRor';
+       ii=ii+1; end
+    fm = strcmp(fnames{i},'FrameM');
+    if fm == 1; utvid.Tracking.frames{ii} = 'FrameM'; 
+    utvid.Tracking.frames_or{ii} = 'FrameMor';
+    ii=ii+1; end
 end
-
-%% get the camera titles
-cam =  fieldnames(utvid.settings.cam);
+end
 
 %% loop through orientation and shape markers
 for j = 1:jmax % j = 1 is shape, j = 2 is or markers
@@ -24,10 +35,11 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
     Xstacked = []; Ystacked = [];
     
     % loop through number of cameras
-    for i = 1:utvid.settings.nrcams
-        
+    for i = 1:utvid.Tracking.nrcams
+        x = [];
+        y = [];
         if j == 1
-            im  = frames{i};
+            im  = utvid.Tracking.(utvid.Tracking.frames{i});
             % using Xpred coordinates for region of interest
             if i == 1
                 x   = utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n) ;
@@ -40,7 +52,7 @@ for j = 1:jmax % j = 1 is shape, j = 2 is or markers
                 y   = utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n) ;
             end
         elseif j == 2
-            im = frames_or{i};
+            im = utvid.Tracking.(utvid.Tracking.frames_or{i});
             if i == 1
                 x   = utvid.Tracking.Xpred_or.x1(:,1,utvid.Tracking.n) ;
                 y   = utvid.Tracking.Xpred_or.x1(:,2,utvid.Tracking.n) ;
