@@ -100,6 +100,7 @@ end
 %% select measurement method
 % idea to make pop up with bullet points
 utvid.settings.Measmethod = 'minsearch';
-
+%% use all three cameras
+utvid.Tracking.cams = [1 1 1];
 
 end
