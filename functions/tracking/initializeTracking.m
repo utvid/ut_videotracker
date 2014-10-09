@@ -51,7 +51,7 @@ utvid.Tracking.FrameRate = utvid.Tracking.ObjL{1}.FrameRate;
 
 
 %initial head orientation
-if utvid.Tracking.instr == 1
+if isfield(utvid.Tracking,'Xinit_or')==0;
 if utvid.settings.nrOrMar ~= 0 
     [utvid.coords.Xinit_or, ~] = twoDto3D_3cam([utvid.coords.or.left.x(:,utvid.Tracking.instr);utvid.coords.or.right.x(:,utvid.Tracking.instr);...
         utvid.coords.or.center.x(:,utvid.Tracking.instr); utvid.coords.or.left.y(:,utvid.Tracking.instr);utvid.coords.or.right.y(:,utvid.Tracking.instr);...
@@ -89,5 +89,17 @@ end
 utvid.Tracking.Meas1.coor(:,:,1) = [utvid.coords.shape.left.x(:,utvid.Tracking.instr);utvid.coords.shape.left.y(:,utvid.Tracking.instr)];
 utvid.Tracking.Meas2.coor(:,:,1) = [utvid.coords.shape.right.x(:,utvid.Tracking.instr);utvid.coords.shape.right.y(:,utvid.Tracking.instr)];
 utvid.Tracking.Meas3.coor(:,:,1) = [utvid.coords.shape.center.x(:,utvid.Tracking.instr);utvid.coords.shape.center.y(:,utvid.Tracking.instr)];
+
+%% add pca coords frame 1;
+if isfield(utvid.pca,'PCAcoords')==0;
+    utvid.pca.info(1,1) = utvid.Tracking.instr;
+    utvid.pca.info(2,1) = 1;
+    utvid.pca.PCAcoords = utvid.Tracking.Xest.X(:);
+    utvid = pcaMMSE(utvid);
+end
+%% select measurement method
+% idea to make pop up with bullet points
+utvid.settings.Measmethod = 'minsearch';
+
 
 end

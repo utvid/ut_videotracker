@@ -58,6 +58,10 @@ if utvid.settings.nrOrMar ~= 0
                 % 2D to 3D transform into Kalman structure estimate
                 utvid.Tracking.Kal_or.Xest(1:18,utvid.Tracking.n) = twoDto3D_3cam(vec2d,0,utvid.Pstruct_or.Pext);
                 
+                utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar,utvid.Tracking.n) = 0;
+                utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar+utvid.settings.nrOrMar,utvid.Tracking.n) = 0;
+                utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar+utvid.settings.nrOrMar*2,utvid.Tracking.n) = 0;
+                
                 % set prediction uncertainty to 1e6;
                 utvid.Tracking.Kal_or.Cpred(c+18,c+18,utvid.Tracking.n+1) = 1e6;
     
@@ -182,7 +186,7 @@ if utvid.pca.Normed == 1
 end
 bN = utvid.pca.V(:,1:utvid.settings.PCs)' * zCor;
 Dn = bN'*inv(utvid.pca.Cb(1:utvid.settings.PCs,1:utvid.settings.PCs))*bN;
-
+display(['PCA distance2: '  num2str(Dn)]); 
 pcainfo = utvid.pca.info;
 pcacoords = utvid.pca.PCAcoords;
 if Dn >  chi2inv(0.75,utvid.settings.PCs) || utvid.pca.outlier == 0

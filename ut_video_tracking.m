@@ -257,7 +257,7 @@ Ideas to add:
 %% Calibration process
 function utvid_calibration(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-cam =fieldnames(utvid.settings.cam);
+cam ={'left','right','center'};
 for i = 1:utvid.settings.nrcams;
     if strcmp(utvid.settings.version,'R2012')
         I = read(VideoReader([utvid.settings.dir_data '\Calibration\'  utvid.settings.stname utvid.movs.calb.(cam{i})(1).name]),2);
@@ -460,7 +460,7 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 17%size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
+for i = 19% size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
     utvid.settings.initTracking  = 1;
     utvid.Tracking.instr = i;
     %     utvid.settings.nrOrMar = 0;

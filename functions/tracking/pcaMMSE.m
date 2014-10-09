@@ -1,6 +1,10 @@
 function utvid = pcaMMSE(utvid)
 
+try
 X = utvid.pca.PCAcoords;
+catch
+    X =[];
+end
 %% if only one vector in dbase, then make a dummy PCA
 if size(X,2)<(utvid.settings.PCs+2)      
     utvid.pca.Gamma = diag(ones(size(X,1),1));

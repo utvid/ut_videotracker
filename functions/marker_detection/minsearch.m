@@ -1,5 +1,7 @@
 function [xnew,ynew] = minsearch(x,y,im,roi)
-
+if length(x) == 6
+    roi = round(roi*.6);
+end
 %% check boundaries
 % roi is number of pixels to left, right, up and down of center pixel
 imsize = size(im);

@@ -52,6 +52,7 @@ end
 %% perform outlier detection
 % check if the number of PCA coordinates in the models is greater than two
 % times the number of principle components
+if isfield(utvid.pca,'PCAcoords')==1
 if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
     if utvid.pca.outlier == 0, disp('Outlier detection performed'), utvid.pca.outlier = 1; end
     if utvid.settings.nrOrMar ~= 0
@@ -82,7 +83,9 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
             
             % reset uncertainty corrected markers; should be done here!
             % set prediction uncertainty to 1e6;
-            utvid.Tracking.Kal.Cpred(c+30,c+30,utvid.Tracking.n) = 1e6;
+            for iii = 1:length(c)
+                utvid.Tracking.Kal.Cpred(c(iii)+30,c(iii)+30,utvid.Tracking.n) = 1e10;
+            end
         end
     else
         % when not using orientation markers; probably does not function at
@@ -90,6 +93,7 @@ if size(utvid.pca.PCAcoords,2) > 2*utvid.settings.PCs
         [utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n)] = outlierCorrectionMMSE(utvid,utvid.Tracking.Kal.Xest(:,utvid.Tracking.n));
         utvid.Tracking.rt_coor = utvid.Tracking.Kal.Xest(1:utvid.settings.nrcams*utvid.settings.nrMarkers,:);
     end
+end
 end
 % prepare the kalman filter for an update and perform the Kalman update
 utvid.Tracking.Kal = prepareKalman3D(utvid.Tracking.Kal, utvid.Pstruct,utvid.Tracking.n);
@@ -229,7 +233,7 @@ disp(['PCA distance: ' num2str(D)]);
 % Limit of accepting new frames in the PCA model. Using the chi squared
 % distribution. The number of principle components is used as the degrees
 % of freedom. The probability is set to 0.9.
-if D >  chi2inv(0.95,utvid.settings.PCs);
+if D >  utvid.Tracking.lim;
     % open pca expansion, show the measured coordinates and in case of
     % misplaced markers, correct them to assure the correct shape to be
     % added in the PCA model
