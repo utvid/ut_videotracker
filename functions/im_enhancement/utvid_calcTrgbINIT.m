@@ -1,4 +1,4 @@
-function [Trgb2gray] = utvid_calcTrgb(im,coords,r_marker,r_outer,r_inner)
+function [Trgb2gray,imring,imdil] = utvid_calcTrgbINIT(im,coords,r_marker,r_outer,r_inner)
 % find rgb transform based on 2 class separation problem
 %% create rings around selected points to get rgb's of the neighbourhood of markers
 immask = zeros(size(im,1),size(im,2));
@@ -14,6 +14,8 @@ data2 = goo(imring==1,:);
 
 %% create disk around selected points to get rgb's of markers
 imdil0 = imdilate(immask,strel('disk',round(r_marker)));      % radius marker
+imdil1 = imdilate(immask,strel('disk',round(r_marker)-2));
+imdil = imdil0 - imdil1;
 data1 = goo(imdil0==1,:);
 
 %% get the statistics

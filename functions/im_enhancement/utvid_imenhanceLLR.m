@@ -12,7 +12,7 @@ end
 if scrsize(1)/scrsize(2)>1.5, scrsize(1)=1.5*scrsize(2); end
 
 scrsize = monpos(1,3:4);
-winsize = [.5 * scrsize(1) 0.75* scrsize(2) ];%[800 600];
+winsize = [.95 * scrsize(1) 0.95* scrsize(2) ];%[800 600];
 scrbase = monpos(1,1:2)+0.5*scrsize - 0.5*winsize;
 
 enhanceFig = figure('Color',[0.94 0.94 0.94],...
@@ -24,13 +24,16 @@ enhanceFig = figure('Color',[0.94 0.94 0.94],...
     'Position',[scrbase winsize],...
     'Resize','off');
 
-handles.hax = axes('Parent',enhanceFig,'position',[.125 .2 .75 .75]);
-axes(handles.hax), imshow(im,[]);
+handles.hax1 = axes('Parent',enhanceFig,'position',[.075 .2 .4 .6]);
+handles.hax2 = axes('Parent',enhanceFig,'position',[.55 .2 .4 .6]);
+
+axes(handles.hax1), imshow(im,[]);
+axes(handles.hax2), imshow(im,[]);
 
 im(:,:,1) = im(:,:,1).^2; % squared Red channel for enhancing lips
-r_marker = 10;
+r_marker = 5;
 r_outer = 15;
-r_inner = 5;
+r_inner = 10;
 
 
 %% OK button
@@ -45,7 +48,7 @@ handles.h{1} = uicontrol(...
     'enable','on',...
     'callback',{@docalculations});
 %% slider inner
-slmax = 25;
+slmax = 30;
 slmin = 0;
 slize = [bsize(1), bsize(2)/3];
 handles.sl{1} = uicontrol(...
@@ -115,16 +118,22 @@ uiwait(enhanceFig)
         set(handles.sl{x},'value',val);
         if x == 1
             r_inner = val;
-            set(handles.sl{2},'Min',val-1);
+            set(handles.sl{2},'Min',val+1);
+            set(handles.sl{3},'Max',val-1)
             set(handles.text{1},'string',['Inner radius: ' num2str(r_inner)]);
             if get(handles.sl{3},'value') >= r_inner
                 set(handles.sl{3},'value',r_inner-1);
                 set(handles.text{3},'string',['Radius marker: ' num2str(r_inner-1)]);
                 r_marker = r_inner-1;
             end
+            if get(handles.sl{2},'value') <= r_inner
+                set(handles.sl{2},'value',r_inner+1);
+                set(handles.text{2},'string',['Radius marker: ' num2str(r_inner+1)]);
+                r_marker = r_inner+1;
+            end
         elseif x == 2
             r_outer = val;
-            set(handles.sl{1},'Max',val+1);
+            set(handles.sl{1},'Max',val-1);
             set(handles.text{2},'string',['Outer radius: ' num2str(r_outer)]);
             if get(handles.sl{1},'value') >= r_outer
                 set(handles.sl{1},'value',r_outer-1);
@@ -132,27 +141,30 @@ uiwait(enhanceFig)
                 r_inner = r_outer-1;
             end
             if get(handles.sl{3},'value') >= r_outer;
-                set(handles.sl{3},'value',r_outer-1);
-                set(handles.text{3},'string',['Radius marker: ' num2str(r_outer-1)]);
-                r_marker = r_outer-1;
+                set(handles.sl{3},'value',r_outer-2);
+                set(handles.text{3},'string',['Radius marker: ' num2str(r_outer-2)]);
+                r_marker = r_outer-2;
             end
         elseif x == 3
             r_marker = val;
-            set(handles.sl{2},'Min',val-1);
-            set(handles.sl{1},'Max',val+1);
+            set(handles.sl{2},'Min',val+1);
+            set(handles.sl{1},'Min',val+1);
             set(handles.text{3},'string',['Radius marker: ' num2str(r_marker)]);
-            if get(handles.sl{1},'value') >= r_marker;
-                set(handles.sl{1},'value',r_marker-1);
-                set(handles.text{1},'string',['Inner radius: ' num2str(r_marker-1)]);
-                r_inner = r_marker-1;
+            if get(handles.sl{1},'value') <= r_marker;
+                set(handles.sl{1},'value',r_marker+1);
+                set(handles.text{1},'string',['Inner radius: ' num2str(r_marker+1)]);
+                r_inner = r_marker+1;
             end
              if get(handles.sl{2},'value') <= r_marker;
-                set(handles.sl{2},'value',r_marker+1);
-                set(handles.text{2},'string',['Outer radius: ' num2str(r_marker+1)]);
-                r_outer = r_marker+1;
+                set(handles.sl{2},'value',r_marker+2);
+                set(handles.text{2},'string',['Outer radius: ' num2str(r_marker+2)]);
+                r_outer = r_marker+2;
             end
         end    
-        Trgb2gray = utvid_calcTrgb(im,coords,r_marker,r_outer,r_inner);
+        
+        
+        [Trgb2gray,imring,imdil] = utvid_calcTrgbINIT(im,coords,r_marker,r_outer,r_inner);
+        
         w = Trgb2gray.w;            % the linear mapping
         W = Trgb2gray.W;            % the quadratic mapping
         
@@ -160,9 +172,15 @@ uiwait(enhanceFig)
         imlikel= sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
         imlikel = reshape(imlikel,size(im,1),size(im,2));
         Im_filtered = ut_gauss(imlikel,2.5);        % low pass filtering to suppress multiple responses
-
-        axes(handles.hax), imshow(Im_filtered,[]);
-
+        cla(handles.hax1)
+        axes(handles.hax1);imshow(Im_filtered,[]);
+        cla(handles.hax2)
+        axes(handles.hax2), imshow(im,[]); % display original filtered image
+        green = cat(3, zeros(size(Im_filtered)), ones(size(Im_filtered)), zeros(size(Im_filtered)));% Make a truecolor all-green image.
+        hold on;
+        h = imshow(green); % display all green on top of original
+        hold off
+        set(h, 'AlphaData', imring+imdil)
         guidata(enhanceFig,handles);
     end
 end
