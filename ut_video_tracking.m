@@ -394,7 +394,14 @@ for i = 1%:size(utvid.movs.instrstart,2)
         % markers)
         coords.x = utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).x(:,i);
         coords.y = utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
-        [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords);
+        
+        if i == 1;
+            [~,utvid.enhancement.Trgb2gray{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords);
+
+        else
+          [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
+        end
+
         
         % Enhance image by using 2 class problem quadratic mapping
         % (orientation
@@ -402,9 +409,15 @@ for i = 1%:size(utvid.movs.instrstart,2)
         if utvid.settings.nrOrMar ~= 0
             coords_or.x = utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).x(:,i);
             coords_or.y = utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
-            [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or);
+                
+        if i == 1;
+            [~,utvid.enhancement.Trgb2gray_or{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords_or);
+
+        else
+          [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
         end
-        
+
+        end
     end
 end
 

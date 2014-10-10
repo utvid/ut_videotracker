@@ -1,4 +1,4 @@
-function [Im_filtered,Trgb2gray] = utvid_imenhanceLLRinit(im,coords)
+function [Im_filtered,Trgb2gray,r_marker,r_outer,r_inner] = utvid_imenhanceLLRinit(im,coords)
 
 monpos = get(0,'monitorposition');
 if size(monpos,1) == 1                                  % there is only a primary monitor
