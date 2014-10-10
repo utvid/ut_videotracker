@@ -117,10 +117,9 @@ uiwait(enhanceFig)
             r_inner = val;
             set(handles.sl{2},'Min',val-1);
             set(handles.text{1},'string',['Inner radius: ' num2str(r_inner)]);
-            if get(handles.sl{3},'value') >= r_inner
-                set(handles.sl{3},'value',r_inner-1);
-                set(handles.text{3},'string',['Radius marker: ' num2str(r_inner-1)]);
-                r_marker = r_inner-1;
+            if get(handles.sl{3},'value') > r_inner
+                set(handles.sl{3},'value',r_inner);
+                set(handles.text{3},'string',['Radius marker: ' num2str(r_inner)]);
             end
         elseif x == 2
             r_outer = val;
@@ -129,12 +128,10 @@ uiwait(enhanceFig)
             if get(handles.sl{1},'value') >= r_outer
                 set(handles.sl{1},'value',r_outer-1);
                 set(handles.text{1},'string',['Inner radius: ' num2str(r_outer-1)]);
-                r_inner = r_outer-1;
             end
             if get(handles.sl{3},'value') >= r_outer;
                 set(handles.sl{3},'value',r_outer-1);
                 set(handles.text{3},'string',['Radius marker: ' num2str(r_outer-1)]);
-                r_marker = r_outer-1;
             end
         elseif x == 3
             r_marker = val;
@@ -144,12 +141,10 @@ uiwait(enhanceFig)
             if get(handles.sl{1},'value') >= r_marker;
                 set(handles.sl{1},'value',r_marker-1);
                 set(handles.text{1},'string',['Inner radius: ' num2str(r_marker-1)]);
-                r_inner = r_marker-1;
             end
              if get(handles.sl{2},'value') <= r_marker;
                 set(handles.sl{2},'value',r_marker+1);
                 set(handles.text{2},'string',['Outer radius: ' num2str(r_marker+1)]);
-                r_outer = r_marker+1;
             end
         end    
         Trgb2gray = utvid_calcTrgb(im,coords,r_marker,r_outer,r_inner);

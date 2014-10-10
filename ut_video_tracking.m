@@ -383,7 +383,6 @@ end
 %% Image enhancement
 function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-r_marker = 12; % radius of marker in pixels
 
 for i = 1%:size(utvid.movs.instrstart,2)
     for j = 1:length(utvid.Tracking.usecams)
@@ -395,7 +394,7 @@ for i = 1%:size(utvid.movs.instrstart,2)
         % markers)
         coords.x = utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).x(:,i);
         coords.y = utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
-        [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,r_marker);
+        [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords);
         
         % Enhance image by using 2 class problem quadratic mapping
         % (orientation
@@ -403,7 +402,7 @@ for i = 1%:size(utvid.movs.instrstart,2)
         if utvid.settings.nrOrMar ~= 0
             coords_or.x = utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).x(:,i);
             coords_or.y = utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
-            [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,r_marker);
+            [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or);
         end
         
     end
@@ -490,7 +489,7 @@ function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
 for i = 1% size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
-    utvid.settings.initTracking  = 1;
+    utvid.settings.initTracking  = 0;
     utvid.Tracking.instr = i;
     %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

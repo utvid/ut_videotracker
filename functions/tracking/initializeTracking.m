@@ -1,5 +1,7 @@
 function utvid = initializeTracking(utvid,handles)
 utvid.Tracking.nrcams = length(utvid.Tracking.usecams);
+utvid.pca.thres = ones(size(utvid.settings.nrMarkers,1))*2;
+utvid.Tracking.lim = chi2inv(0.95,utvid.settings.PCs);
 %%
 utvid.Tracking.n = 1; 
 if utvid.Tracking.instr < size(utvid.movs.instrstart,2);
