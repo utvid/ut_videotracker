@@ -56,16 +56,16 @@ if utvid.settings.nrOrMar ~= 0
                 % 2D to 3D transform into Kalman structure estimate
                 
                 if utvid.Tracking.nrcams ==3
-                utvid.Tracking.Kal_or.Xest(1:18,utvid.Tracking.n) = twoDto3D_3cam(vec2d,0,utvid.Pstruct_or.Pext);
+                utvid.Tracking.Kal_or.Xest(1:utvid.settings.nrOrMar*utvid.settings.nrcams,utvid.Tracking.n) = twoDto3D_3cam(vec2d,0,utvid.Pstruct_or.Pext);
                 else
-                    utvid.Tracking.Kal_or.Xest(1:18,utvid.Tracking.n) = twoDto3D(vec2d,0,utvid.Pstruct_or.Pext);
+                    utvid.Tracking.Kal_or.Xest(1:utvid.settings.nrOrMar*utvid.settings.nrcams,utvid.Tracking.n) = twoDto3D(vec2d,0,utvid.Pstruct_or.Pext);
                 end
                 utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar,utvid.Tracking.n) = 0;
                 utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar+utvid.settings.nrOrMar,utvid.Tracking.n) = 0;
                 utvid.Tracking.Kal_or.Xest(c+utvid.settings.nrcams*utvid.settings.nrOrMar+utvid.settings.nrOrMar*2,utvid.Tracking.n) = 0;
                 
                 % set prediction uncertainty to 1e6;
-                utvid.Tracking.Kal_or.Cpred(c+18,c+18,utvid.Tracking.n+1) = 1e6;
+                utvid.Tracking.Kal_or.Cpred(c+utvid.settings.nrOrMar*utvid.settings.nrcams,c+utvid.settings.nrOrMar*utvid.settings.nrcams,utvid.Tracking.n+1) = 1e6;
                 
                 % update Kal or structure
                 utvid.Tracking.Kal_or.Xpred(:,utvid.Tracking.n+1)    = utvid.Tracking.Kal_or.Xest(:,utvid.Tracking.n);

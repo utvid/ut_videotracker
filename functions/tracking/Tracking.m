@@ -74,7 +74,7 @@ if isfield(utvid.pca,'PCAcoords')==1
             if isempty(c) == 0
                 
                 % Transform 3D coordinates to 2D
-                if utvid.Tracking.usecams == 3
+                if utvid.Tracking.nrcams == 3
                 [c1,c2,c3,~,~,~]=threeDto2D_3cam(coor_back,utvid.Tracking.Kal.Cest(1:end/2,1:end/2,utvid.Tracking.n),utvid.Pstruct);
                     c1 = c1';
                     c2 = c2';

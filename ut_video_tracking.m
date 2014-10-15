@@ -300,77 +300,77 @@ end
 % search for ideal marker pixel after clicking
 function utvid_markerselector(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
-
-prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
-result = input(prompt, 's');
-
-if strcmp(result,'n')
-    utvid.settings.nrOrMar = 0;
-    prompt = 'How many markers to follow? ';
-    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
-else
-    prompt = 'How many orientation markers to follow? ';
-    utvid.settings.nrOrMar = str2double(input(prompt, 's'));
-    if utvid.settings.nrOrMar < 3
-        prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)? ';
-        utvid.settings.nrOrMar = str2double(input(prompt, 's'));
-        result = input(prompt, 's');
-        if strcmp(result,'n')
-            utvid.settings.nrOrMar = 0;
-        else
-            prompt = 'How many orientation markers to follow? Minimum of 3. ';
-            utvid.settings.nrOrMar = str2double(input(prompt, 's'));
-        end
-    end
-    
-    prompt = 'How many markers to follow? ';
-    utvid.settings.nrMarkers = str2double(input(prompt, 's'));
-end
-
-%% check cameras for selecting cameras to use
-for j = 1
-    for i = 1:utvid.settings.nrcams;
-        if strcmp(utvid.settings.version,'R2012')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{i})(1,utvid.movs.instrstart(j))).name]),2);
-        elseif strcmp(utvid.settings.version,'R2013')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{i})(1,utvid.movs.instrstart(j))).name]),1);
-        else
-            disp('Version not yet implemented')
-        end
-        % check which camera didnot record anything useful
-        if j==1;
-            frames{i} = Im;
-            if i == utvid.settings.nrcams
-                figure;
-                subplot(1,3,1);imshow(frames{1},[]);
-                subplot(1,3,2);imshow(frames{2},[]);
-                subplot(1,3,3);imshow(frames{3},[]);
-                utvid.Tracking.usecams = input('Which cameras to use (e.g. [1,3],[1,2], or  [1,2,3]? ');
-                utvid.Tracking.nrcams = length(utvid.Tracking.usecams);
-            end
-        end
-    end
-end
-
-for j = 1%:size(utvid.movs.instrstart,2)
-    disp(['Instruction number: ' num2str(j)]);
-    for i = 1:length(utvid.Tracking.usecams);
-        if strcmp(utvid.settings.version,'R2012')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{utvid.Tracking.usecams(i)})(1,utvid.movs.instrstart(j))).name]),2);
-        elseif strcmp(utvid.settings.version,'R2013')
-            Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{utvid.Tracking.usecams(i)})(1,utvid.movs.instrstart(j))).name]),1);
-        else
-            disp('Version not yet implemented')
-        end
-        
-        if utvid.settings.nrOrMar == 0
-            [utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
-        else
-            [utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrOrMar,'Select Orientation markers');
-            [utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
-        end
-    end
-end
+% 
+% prompt = 'Use orientation markers (y/n)? Please type y for yes or n for no: ';
+% result = input(prompt, 's');
+% 
+% if strcmp(result,'n')
+%     utvid.settings.nrOrMar = 0;
+%     prompt = 'How many markers to follow? ';
+%     utvid.settings.nrMarkers = str2double(input(prompt, 's'));
+% else
+%     prompt = 'How many orientation markers to follow? ';
+%     utvid.settings.nrOrMar = str2double(input(prompt, 's'));
+%     if utvid.settings.nrOrMar < 3
+%         prompt = 'At least 3 orientation markers needed. Do you still want to use orientation markers (y/n)? ';
+%         utvid.settings.nrOrMar = str2double(input(prompt, 's'));
+%         result = input(prompt, 's');
+%         if strcmp(result,'n')
+%             utvid.settings.nrOrMar = 0;
+%         else
+%             prompt = 'How many orientation markers to follow? Minimum of 3. ';
+%             utvid.settings.nrOrMar = str2double(input(prompt, 's'));
+%         end
+%     end
+%     
+%     prompt = 'How many markers to follow? ';
+%     utvid.settings.nrMarkers = str2double(input(prompt, 's'));
+% end
+% 
+% %% check cameras for selecting cameras to use
+% for j = 1
+%     for i = 1:utvid.settings.nrcams;
+%         if strcmp(utvid.settings.version,'R2012')
+%             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{i})(1,utvid.movs.instrstart(j))).name]),2);
+%         elseif strcmp(utvid.settings.version,'R2013')
+%             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{i})(1,utvid.movs.instrstart(j))).name]),1);
+%         else
+%             disp('Version not yet implemented')
+%         end
+%         % check which camera didnot record anything useful
+%         if j==1;
+%             frames{i} = Im;
+%             if i == utvid.settings.nrcams
+%                 figure;
+%                 subplot(1,3,1);imshow(frames{1},[]);
+%                 subplot(1,3,2);imshow(frames{2},[]);
+%                 subplot(1,3,3);imshow(frames{3},[]);
+%                 utvid.Tracking.usecams = input('Which cameras to use (e.g. [1,3],[1,2], or  [1,2,3]? ');
+%                 utvid.Tracking.nrcams = length(utvid.Tracking.usecams);
+%             end
+%         end
+%     end
+% end
+% 
+% for j = 1:size(utvid.movs.instrstart,2)
+%     disp(['Instruction number: ' num2str(j)]);
+%     for i = 1:length(utvid.Tracking.usecams);
+%         if strcmp(utvid.settings.version,'R2012')
+%             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{utvid.Tracking.usecams(i)})(1,utvid.movs.instrstart(j))).name]),2);
+%         elseif strcmp(utvid.settings.version,'R2013')
+%             Im = read(VideoReader([utvid.settings.dir_data '\Video\' utvid.settings.stname utvid.movs.list(utvid.movs.(utvid.settings.camseq{utvid.Tracking.usecams(i)})(1,utvid.movs.instrstart(j))).name]),1);
+%         else
+%             disp('Version not yet implemented')
+%         end
+%         
+%         if utvid.settings.nrOrMar == 0
+%             [utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
+%         else
+%             [utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrOrMar,'Select Orientation markers');
+%             [utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).x(:,j),utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(i)}).y(:,j)] = getPoints(Im,utvid.settings.nrMarkers,'Select shape markers');
+%         end
+%     end
+% end
 
 [utvid.Pstruct, utvid.Pstruct_or] = getPstruct(utvid.calb, utvid); % create Pstruct and Pstruct_or
 
@@ -383,6 +383,8 @@ end
 %% Image enhancement
 function utvid_imenhance(hMainFigure,utvid)
 utvid = guidata(hMainFigure);
+utvid.enhancement.Trgb2gray = cell(size(utvid.movs.instrstart,2),length(utvid.Tracking.usecams));
+utvid.enhancement.Trgb2gray_or = cell(size(utvid.movs.instrstart,2),length(utvid.Tracking.usecams));
 
 for i = 1%:size(utvid.movs.instrstart,2)
     for j = 1:length(utvid.Tracking.usecams)
@@ -396,10 +398,10 @@ for i = 1%:size(utvid.movs.instrstart,2)
         coords.y = utvid.coords.shape.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
         
         if i == 1;
-            [~,utvid.enhancement.Trgb2gray{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords);
+            [utvid.enhancement.Trgb2gray{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords);
 
         else
-          [~, utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
+          [utvid.enhancement.Trgb2gray{i,j}] = utvid_imenhanceLLR(im,coords,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
         end
 
         
@@ -411,10 +413,10 @@ for i = 1%:size(utvid.movs.instrstart,2)
             coords_or.y = utvid.coords.or.(utvid.settings.camseq{utvid.Tracking.usecams(j)}).y(:,i);
                 
         if i == 1;
-            [~,utvid.enhancement.Trgb2gray_or{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords_or);
+            [utvid.enhancement.Trgb2gray_or{i,j},utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner] = utvid_imenhanceLLRinit(im,coords_or);
 
         else
-          [~, utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
+          [utvid.enhancement.Trgb2gray_or{i,j}] = utvid_imenhanceLLR(im,coords_or,utvid.enhancement.r_marker,utvid.enhancement.r_outer,utvid.enhancement.r_inner);
         end
 
         end
@@ -501,8 +503,8 @@ end
 function markertracker(hMainFigure,utvid)
 
 utvid = guidata(hMainFigure);
-for i = 1% size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
-    utvid.settings.initTracking  = 0;
+for i = 20% size(utvid.movs.instrstart,2):-1:1  % backwards through videos because of pca model training (most variance is in the last instructions).
+    utvid.settings.initTracking =1;
     utvid.Tracking.instr = i;
     %     utvid.settings.nrOrMar = 0;
     utvid = markerTracking(utvid);

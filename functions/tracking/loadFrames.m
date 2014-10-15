@@ -38,9 +38,9 @@ for j = 1:utvid.Tracking.nrcams
                 imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
                 imlikel = reshape(imlikel,size(im,1),size(im,2));
                 Im_filteredor = ut_gauss(imlikel,2.5);
-                if      jj == 1; utvid.Tracking.FrameLor = Im_filteredor;
-                elseif  jj == 2; utvid.Tracking.FrameRor = Im_filteredor;
-                elseif  jj == 3; utvid.Tracking.FrameMor = Im_filteredor;
+                if      jj == 1; utvid.Tracking.FrameLor = im;%Im_filteredor;
+                elseif  jj == 2; utvid.Tracking.FrameRor = im;%Im_filteredor;
+                elseif  jj == 3; utvid.Tracking.FrameMor = im;%Im_filteredor;
                 end
             end
             
@@ -53,9 +53,9 @@ for j = 1:utvid.Tracking.nrcams
         catch
             disp('Something went wrong with filtering');
         end
-        if      jj == 1; utvid.Tracking.FrameL = Im_filtered;
-        elseif  jj == 2; utvid.Tracking.FrameR = Im_filtered;
-        elseif  jj == 3; utvid.Tracking.FrameM = Im_filtered;
+        if      jj == 1; utvid.Tracking.FrameL = im;%Im_filtered;
+        elseif  jj == 2; utvid.Tracking.FrameR = im;%Im_filtered;
+        elseif  jj == 3; utvid.Tracking.FrameM = im;%Im_filtered;
         end
     end
 end
