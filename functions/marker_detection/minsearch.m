@@ -1,6 +1,7 @@
 function [xnew,ynew] = minsearch(x,y,im,roi)
+roi = roi/2;
 if length(x) == 6
-    roi = round(roi*.6);
+    roi = round(roi*.5);
 end
 %% check boundaries
 % roi is number of pixels to left, right, up and down of center pixel
@@ -21,6 +22,8 @@ for i = 1:size(x,1)
     [rmin,cmin] = ind2sub(size(imfoo),imin);
     xnew(i) = x(i)-(roi+1)+cmin;
     ynew(i) = y(i)-(roi+1)+rmin;
+% %     figure; imshow(log(imfoo),[]);
+% %     hold on;plot(cmin,rmin,'*r');
 end
 xnew = xnew'; ynew = ynew';
 end

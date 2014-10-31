@@ -20,42 +20,50 @@ else
     disp('Version not yet implemented')
 end
 
+
+
 %
 for j = 1:utvid.Tracking.nrcams
-        jj= utvid.Tracking.usecams(j);
-        
-        if      jj == 1; im = utvid.Tracking.FrameLorig;
-        elseif  jj == 2; im = utvid.Tracking.FrameRorig;
-        elseif  jj == 3; im = utvid.Tracking.FrameMorig;
-        end
-        try
-            % image enhancement using quadratic mapping
-            if utvid.settings.nrOrMar ~= 0
-                w = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.w;            % the linear mapping
-                W = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.W;            % the quadratic mapping
-                
-                goo = reshape(im,size(im,1)*size(im,2),3);
-                imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
-                imlikel = reshape(imlikel,size(im,1),size(im,2));
-                Im_filteredor = ut_gauss(imlikel,2.5);
-                if      jj == 1; utvid.Tracking.FrameLor = im;%Im_filteredor;
-                elseif  jj == 2; utvid.Tracking.FrameRor = im;%Im_filteredor;
-                elseif  jj == 3; utvid.Tracking.FrameMor = im;%Im_filteredor;
-                end
-            end
-            
-            w = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.w;            % the linear mapping
-            W = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.W;            % the quadratic mapping
-            goo = reshape(im,size(im,1)*size(im,2),3);
-            imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
-            imlikel = reshape(imlikel,size(im,1),size(im,2));
-            Im_filtered = ut_gauss(imlikel,2.5);
-        catch
-            disp('Something went wrong with filtering');
-        end
-        if      jj == 1; utvid.Tracking.FrameL = im;%Im_filtered;
-        elseif  jj == 2; utvid.Tracking.FrameR = im;%Im_filtered;
-        elseif  jj == 3; utvid.Tracking.FrameM = im;%Im_filtered;
-        end
+    jj= utvid.Tracking.usecams(j);
+    
+    if      jj == 1; im = utvid.Tracking.FrameLorig;
+    elseif  jj == 2; im = utvid.Tracking.FrameRorig;
+    elseif  jj == 3; im = utvid.Tracking.FrameMorig;
     end
+    try
+        % image enhancement using quadratic mapping
+        if utvid.settings.nrOrMar ~= 0
+           Im_filteredor = ut_gauss(rgb2gray(ut_single_retinex(im,30,0.01)),2.5);
+%             
+%             w = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.w;            % the linear mapping
+%             W = utvid.enhancement.Trgb2gray_or{utvid.Tracking.instr,j}.W;            % the quadratic mapping
+%             
+%             goo = reshape(im,size(im,1)*size(im,2),3);
+%             imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
+%             imlikel = reshape(imlikel,size(im,1),size(im,2));
+%             Im_filteredor = ut_gauss(imlikel,2.5);
+            if      jj == 1; utvid.Tracking.FrameLor = Im_filteredor;
+            elseif  jj == 2; utvid.Tracking.FrameRor = Im_filteredor;
+            elseif  jj == 3; utvid.Tracking.FrameMor = Im_filteredor;
+            end
+        end
+            Im_filtered = ut_gauss(rgb2gray(ut_single_retinex(im,30,0.01)),2.5);
+
+% %         w = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.w;            % the linear mapping
+% %         W = utvid.enhancement.Trgb2gray{utvid.Tracking.instr,j}.W;            % the quadratic mapping
+% %         goo = reshape(im,size(im,1)*size(im,2),3);
+% %         imlikel=sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
+% %         imlikel = reshape(imlikel,size(im,1),size(im,2));
+% %         Im_filtered = ut_gauss(imlikel,2.5);
+    catch
+        disp('Something went wrong with filtering');
+    end
+    if      jj == 1; utvid.Tracking.FrameL = Im_filtered;
+%         utvid.Tracking.FrameLor = im;
+    elseif  jj == 2; utvid.Tracking.FrameR = Im_filtered;
+%         utvid.Tracking.FrameRor = im;
+    elseif  jj == 3; utvid.Tracking.FrameM = Im_filtered;
+%         utvid.Tracking.FrameMor = im;
+    end
+end
 end

@@ -155,7 +155,7 @@ if isempty(c)==0
     display(['PCA distance2: '  num2str(Dn)]);
     pcainfo = utvid.pca.info;
     pcacoords = utvid.pca.PCAcoords;
-    if Dn >  chi2inv(0.75,utvid.settings.PCs) || utvid.pca.outlier == 0
+    if Dn >  chi2inv(0.5,utvid.settings.PCs) || utvid.pca.outlier == 0
         pcainfo = [pcainfo,[utvid.Tracking.instr;utvid.Tracking.n]];
         pcacoords = [pcacoords,compVec];
         utvid.pca.info = pcainfo;

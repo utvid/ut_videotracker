@@ -139,6 +139,8 @@ if utvid.Tracking.plotting == 1
     ncam = utvid.Tracking.nrcams;
     
     h11 = imshow(utvid.Tracking.(utvid.Tracking.frames{1}),[]);
+% %         h11 = imshow(utvid.Tracking.([utvid.Tracking.frames{1} 'orig']),[]);
+
     h12 = plot(utvid.Tracking.Xest.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x1(:,2,utvid.Tracking.n),'y+','linewidth',2);
     h13 = plot(utvid.Tracking.Xpred.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x1(:,2,utvid.Tracking.n),'ob');
     h14 = plot(utvid.Tracking.Kal.meas(1:nmar,utvid.Tracking.n), ...
@@ -156,6 +158,8 @@ if utvid.Tracking.plotting == 1
     cla(handles.hax{1,2});
     axes(handles.hax{1,2}), hold on
     h21 = imshow(utvid.Tracking.(utvid.Tracking.frames{2}),[]);
+% %         h21 = imshow(utvid.Tracking.([utvid.Tracking.frames{2}, 'orig']),[]);
+
     h22 = plot(utvid.Tracking.Xest.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x2(:,2,utvid.Tracking.n),'y+');
     h23 = plot(utvid.Tracking.Xpred.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x2(:,2,utvid.Tracking.n),'ob');
     h24 = plot(utvid.Tracking.Kal.meas(1+nmar:nmar*2,utvid.Tracking.n), ...
@@ -170,6 +174,8 @@ if utvid.Tracking.plotting == 1
         cla(handles.hax{1,3});
         axes(handles.hax{1,3}), hold on
         h31 = imshow(utvid.Tracking.(utvid.Tracking.frames{3}),[]);
+% %                 h31 = imshow(utvid.Tracking.([utvid.Tracking.frames{3} 'orig']),[]);
+
         h32 = plot(utvid.Tracking.Xest.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest.x3(:,2,utvid.Tracking.n),'y+');
         h33 = plot(utvid.Tracking.Xpred.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred.x3(:,2,utvid.Tracking.n),'ob');
         h34 = plot(utvid.Tracking.Kal.meas(1+nmar*2:nmar*3,utvid.Tracking.n), ...
@@ -187,7 +193,9 @@ if utvid.Tracking.plotting == 1
         
         cla(handles.hax{2,1});
         axes(handles.hax{2,1}), hold on
-        h41 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{1}),[]);
+%         h41 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{1}),[]);
+                 h41 = imshow(utvid.Tracking.([utvid.Tracking.frames{1}, 'orig']),[]);
+
         h42 = plot(utvid.Tracking.Xest_or.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x1(:,2,utvid.Tracking.n),'y+');
         h43 = plot(utvid.Tracking.Xpred_or.x1(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x1(:,2,utvid.Tracking.n),'ob');
         h44 = plot(utvid.Tracking.Kal_or.meas(1:nmar,utvid.Tracking.n), ...
@@ -201,7 +209,9 @@ if utvid.Tracking.plotting == 1
         
         cla(handles.hax{2,2});
         axes(handles.hax{2,2}), hold on
-        h51 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{2}),[]);
+%         h51 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{2}),[]);
+        h51 = imshow(utvid.Tracking.([utvid.Tracking.frames{2}, 'orig']),[]);
+        
         h52 = plot(utvid.Tracking.Xest_or.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x2(:,2,utvid.Tracking.n),'y+');
         h53 = plot(utvid.Tracking.Xpred_or.x2(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x2(:,2,utvid.Tracking.n),'ob');
         h54 =  plot(utvid.Tracking.Kal_or.meas(1+nmar:nmar*2,utvid.Tracking.n), ...
@@ -215,7 +225,9 @@ if utvid.Tracking.plotting == 1
         if length(utvid.Tracking.frames_or) == 3
             cla(handles.hax{2,3});
             axes(handles.hax{2,3}), hold on
-            h61 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{3}),[]);
+%             h61 = imshow(utvid.Tracking.(utvid.Tracking.frames_or{3}),[]);
+            h61 = imshow(utvid.Tracking.([utvid.Tracking.frames{3}, 'orig']),[]);
+            
             h62 = plot(utvid.Tracking.Xest_or.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xest_or.x3(:,2,utvid.Tracking.n),'y+');
             h63 = plot(utvid.Tracking.Xpred_or.x3(:,1,utvid.Tracking.n),utvid.Tracking.Xpred_or.x3(:,2,utvid.Tracking.n),'ob');
             h64 =   plot(utvid.Tracking.Kal_or.meas(1+nmar*2:nmar*3,utvid.Tracking.n), ...

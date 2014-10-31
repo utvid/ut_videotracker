@@ -103,7 +103,6 @@ uiwait(enhanceFig)
         Trgb2gray = utvid_calcTrgb(im,coords,r_marker,r_outer,r_inner);
         w = Trgb2gray.w;            % the linear mapping
         W = Trgb2gray.W;            % the quadratic mapping
-        
         goo = reshape(im,size(im,1)*size(im,2),3);
         imlikel= sum(goo.*(W*goo')',2)+goo*w;        % the pixel log-likelihood ratio
         imlikel = reshape(imlikel,size(im,1),size(im,2));
@@ -162,7 +161,6 @@ uiwait(enhanceFig)
             end
         end    
         
-        
         [Trgb2gray,imring,imdil] = utvid_calcTrgbINIT(im,coords,r_marker,r_outer,r_inner);
         
         w = Trgb2gray.w;            % the linear mapping
@@ -174,7 +172,7 @@ uiwait(enhanceFig)
         Im_filtered = ut_gauss(imlikel,2.5);        % low pass filtering to suppress multiple responses
         
         cla(handles.hax1)
-        axes(handles.hax1);imshow(Im_filtered,[]);
+        axes(handles.hax1);imshow(log(Im_filtered-min(Im_filtered(:))+50),[]);
         cla(handles.hax2)
         axes(handles.hax2), imshow(im,[]); % display original filtered image
         green = cat(3, zeros(size(Im_filtered)), ones(size(Im_filtered)), zeros(size(Im_filtered)));% Make a truecolor all-green image.
